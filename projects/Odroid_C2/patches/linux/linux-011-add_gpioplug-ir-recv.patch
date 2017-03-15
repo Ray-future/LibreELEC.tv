@@ -1,0 +1,623 @@
+From 489fe10819ab39afbe6fd57d497b611152924b86 Mon Sep 17 00:00:00 2001
+From: Joy Cho <joy.cho@hardkernel.com>
+Date: Thu, 12 May 2016 10:43:39 +0900
+Subject: [PATCH 1/4] media/rc: Add new IR receiver to specify gpio number for
+ IR sensor
+
+This driver helps to register the device of GPIO based IR receiver, "gpio-ir-recv"
+with the gpio number and pulse trigger when driver is loading. For example,
+
+	# modprobe gpio-ir-recv
+	# modprobe gpioplug-ir-recv gpio_nr=249 active_low=1
+
+Change-Id: I5c16a5b108fcd34d90885d37345c84aa0ac5cf9c
+---
+ drivers/media/rc/Kconfig            | 10 +++++
+ drivers/media/rc/Makefile           |  1 +
+ drivers/media/rc/gpio-ir-recv.c     |  2 -
+ drivers/media/rc/gpioplug-ir-recv.c | 90 +++++++++++++++++++++++++++++++++++++
+ include/media/gpio-ir-recv.h        |  3 ++
+ 5 files changed, 104 insertions(+), 2 deletions(-)
+ create mode 100644 drivers/media/rc/gpioplug-ir-recv.c
+
+diff --git a/drivers/media/rc/Kconfig b/drivers/media/rc/Kconfig
+index 4a995018b013..6dc1a0f83628 100644
+--- a/drivers/media/rc/Kconfig
++++ b/drivers/media/rc/Kconfig
+@@ -342,4 +342,14 @@ config RC_ST
+ 
+ 	 If you're not sure, select N here.
+ 
++config IR_GPIOPLUG_CIR
++	tristate "GPIOPLUG IR remote control"
++	depends on RC_CORE
++	select IR_GPIO_CIR
++	---help---
++	   Say Y if you want to use GPIOPLUG based IR Receiver.
++
++	   To compile this driver as a module, choose M here: the module will
++	   be called gpio-ir-recv.
++
+ endif #RC_DEVICES
+diff --git a/drivers/media/rc/Makefile b/drivers/media/rc/Makefile
+index b6aaa95ef864..9e5fe92bc07b 100644
+--- a/drivers/media/rc/Makefile
++++ b/drivers/media/rc/Makefile
+@@ -29,6 +29,7 @@ obj-$(CONFIG_IR_STREAMZAP) += streamzap.o
+ obj-$(CONFIG_IR_WINBOND_CIR) += winbond-cir.o
+ obj-$(CONFIG_RC_LOOPBACK) += rc-loopback.o
+ obj-$(CONFIG_IR_GPIO_CIR) += gpio-ir-recv.o
++obj-$(CONFIG_IR_GPIOPLUG_CIR) += gpioplug-ir-recv.o
+ obj-$(CONFIG_IR_IGUANA) += iguanair.o
+ obj-$(CONFIG_IR_TTUSBIR) += ttusbir.o
+ obj-$(CONFIG_RC_ST) += st_rc.o
+diff --git a/drivers/media/rc/gpio-ir-recv.c b/drivers/media/rc/gpio-ir-recv.c
+index 80c611c2e8c2..3e4c632d3b85 100644
+--- a/drivers/media/rc/gpio-ir-recv.c
++++ b/drivers/media/rc/gpio-ir-recv.c
+@@ -23,8 +23,6 @@
+ #include <media/rc-core.h>
+ #include <media/gpio-ir-recv.h>
+ 
+-#define GPIO_IR_DRIVER_NAME	"gpio-rc-recv"
+-#define GPIO_IR_DEVICE_NAME	"gpio_ir_recv"
+ 
+ struct gpio_rc_dev {
+ 	struct rc_dev *rcdev;
+diff --git a/drivers/media/rc/gpioplug-ir-recv.c b/drivers/media/rc/gpioplug-ir-recv.c
+new file mode 100644
+index 000000000000..7020c1e4c90e
+--- /dev/null
++++ b/drivers/media/rc/gpioplug-ir-recv.c
+@@ -0,0 +1,90 @@
++/*
++ * Pluggable GPIO IR receiver
++ *
++ * Copyright (c) 2015 Dongjin Kim (tobetter@gmail.com)
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ */
++
++#include <linux/kernel.h>
++#include <linux/init.h>
++#include <linux/module.h>
++#include <linux/gpio.h>
++#include <linux/slab.h>
++#include <linux/platform_device.h>
++#include <media/gpio-ir-recv.h>
++
++static unsigned gpio_nr = -1;
++module_param(gpio_nr, uint, 0);
++MODULE_PARM_DESC(gpio_nr, "GPIO number to receive IR pulse");
++
++static bool active_low = 1;
++module_param(active_low, bool, 0);
++MODULE_PARM_DESC(active_low,
++		"IR pulse trigger level, (1=low active, 0=high active");
++
++static struct platform_device *pdev;
++static struct gpio_ir_recv_platform_data *pdata;
++
++static int __init gpio_init(void)
++{
++	int rc = -ENOMEM;
++
++	if (gpio_nr == -1) {
++		pr_err("gpioplug-ir-recv: missing module parameter: 'gpio_nr'\n");
++		return -EINVAL;
++	}
++
++	pdev = platform_device_alloc(GPIO_IR_DRIVER_NAME, -1);
++	if (!pdev)
++		return rc;
++
++	pdata = kzalloc(sizeof(*pdata), GFP_KERNEL);
++	if (!pdata)
++		goto err_free_platform_data;
++
++	pdev->dev.platform_data = pdata;
++
++	pdata->gpio_nr = gpio_nr;
++	pdata->active_low = active_low;
++	pdata->allowed_protos = 0;
++	pdata->map_name = NULL;
++
++	rc = platform_device_add(pdev);
++	if (rc < 0)
++		goto err_free_device;
++
++	dev_info(&pdev->dev,
++		"IR driver is initialized (gpio_nr=%d, pulse level=%s)\n",
++		pdata->gpio_nr, pdata->active_low ? "low" : "high");
++
++	return 0;
++
++err_free_platform_data:
++	kfree(pdata);
++
++err_free_device:
++	platform_device_put(pdev);
++
++	return rc;
++}
++
++static void __exit gpio_exit(void)
++{
++	dev_info(&pdev->dev, "gpioplug-ir-recv: IR driver is removed\n");
++	platform_device_unregister(pdev);
++}
++
++MODULE_DESCRIPTION("GPIO IR Receiver driver");
++MODULE_LICENSE("GPL v2");
++
++module_init(gpio_init);
++module_exit(gpio_exit);
+diff --git a/include/media/gpio-ir-recv.h b/include/media/gpio-ir-recv.h
+index 0142736a59db..6342d5ebf323 100644
+--- a/include/media/gpio-ir-recv.h
++++ b/include/media/gpio-ir-recv.h
+@@ -13,6 +13,9 @@
+ #ifndef __GPIO_IR_RECV_H__
+ #define __GPIO_IR_RECV_H__
+ 
++#define GPIO_IR_DRIVER_NAME	"gpio-rc-recv"
++#define GPIO_IR_DEVICE_NAME	"gpio_ir_recv"
++
+ struct gpio_ir_recv_platform_data {
+ 	int		gpio_nr;
+ 	bool		active_low;
+-- 
+2.11.0
+
+
+From c902e9e1f0010107327483d9098a8baaeb931ae0 Mon Sep 17 00:00:00 2001
+From: "charles.park" <charles.park@hardkernel.com>
+Date: Sun, 10 Apr 2016 12:12:38 +0900
+Subject: [PATCH 2/4] ODROID-C2 : gpio sysfs irq implement.
+
+Change-Id: I1391eccf4453fb358610b52fcd0beb4cfc3ea62f
+---
+ drivers/amlogic/pinctrl/pinctrl_amlogic.c | 126 ++++++++++++++++++++++++++++--
+ drivers/gpio/gpiolib.c                    |  54 ++++++++++++-
+ include/linux/amlogic/pinctrl_amlogic.h   |   6 ++
+ 3 files changed, 179 insertions(+), 7 deletions(-)
+ mode change 100644 => 100755 drivers/amlogic/pinctrl/pinctrl_amlogic.c
+ mode change 100644 => 100755 drivers/gpio/gpiolib.c
+ mode change 100644 => 100755 include/linux/amlogic/pinctrl_amlogic.h
+
+diff --git a/drivers/amlogic/pinctrl/pinctrl_amlogic.c b/drivers/amlogic/pinctrl/pinctrl_amlogic.c
+old mode 100644
+new mode 100755
+index e34231dbafd4..8335afd15a3a
+--- a/drivers/amlogic/pinctrl/pinctrl_amlogic.c
++++ b/drivers/amlogic/pinctrl/pinctrl_amlogic.c
+@@ -895,6 +895,13 @@ static int meson_gpio_set_pullup_down(struct gpio_chip *chip,
+ 	meson_config_pullup(pin, domain, bank, config);
+ 	return 0;
+ }
++
++#if defined(CONFIG_ARCH_MESON64_ODROIDC2)
++	#define	AMLGPIO_IRQ_MAX	8
++
++	unsigned int meson_irq_desc[AMLGPIO_IRQ_MAX] = { 0, };
++#endif
++
+ static int meson_gpio_to_irq(struct gpio_chip *chip,
+ 			     unsigned int gpio, unsigned gpio_flag)
+ {
+@@ -908,12 +915,23 @@ static int meson_gpio_to_irq(struct gpio_chip *chip,
+ 				0x1,	/*GPIO_IRQ_RISING*/
+ 				0x10001, /*GPIO_IRQ_FALLING*/
+ 				};
+-	 /*set trigger type*/
++	/*set trigger type*/
+ 	struct meson_domain *domain = to_meson_domain(chip);
+-	 pin = domain->data->pin_base + gpio;
+-	 regmap_update_bits(int_reg, (GPIO_EDGE * 4),
+-						0x10001<<irq_bank,
+-						type[irq_type]<<irq_bank);
++
++#if defined(CONFIG_ARCH_MESON64_ODROIDC2)
++	if (meson_irq_desc[irq_bank])	{
++		pr_err("ERROR(%s) : already allocation irq bank!!\n",
++							 __func__);
++		pr_err("ERROR(%s) : gpio = %d, bank = %d\n", __func__,
++							    gpio,
++							    irq_bank);
++		return	-1;
++	}
++#endif
++	pin = domain->data->pin_base + gpio;
++	regmap_update_bits(int_reg, (GPIO_EDGE * 4),
++					0x10001<<irq_bank,
++					type[irq_type]<<irq_bank);
+ 	/*select pin*/
+ 	start_bit = (irq_bank&3)*8;
+ 	regmap_update_bits(int_reg,
+@@ -925,6 +943,11 @@ static int meson_gpio_to_irq(struct gpio_chip *chip,
+ 
+ 	regmap_update_bits(int_reg,  (GPIO_FILTER_NUM*4),
+ 			0x7<<start_bit, filter<<start_bit);
++
++#if defined(CONFIG_ARCH_MESON64_ODROIDC2)
++	meson_irq_desc[irq_bank] = gpio;
++#endif
++
+ 	return 0;
+ }
+ static int meson_gpio_mask_irq(struct gpio_chip *chip,
+@@ -959,6 +982,96 @@ static int meson_gpio_mask_irq(struct gpio_chip *chip,
+ 	return 0;
+ }
+ 
++#if defined(CONFIG_ARCH_MESON64_ODROIDC2)
++
++#include <linux/interrupt.h>
++
++static int find_free_irq_bank(void)
++{
++	unsigned int i;
++
++	for (i = 0; i < AMLGPIO_IRQ_MAX; i++)	{
++		if (!meson_irq_desc[i])
++			break;
++	}
++
++	if (i == AMLGPIO_IRQ_MAX)
++		pr_err("ERROR(%s) : Can't find free irq bank!!\n", __func__);
++
++	return	(i != AMLGPIO_IRQ_MAX) ? i : -1;
++}
++
++/* enable sysclass gpio edge */
++static int meson_to_irq(struct gpio_chip *chip,
++			unsigned int offset)
++{
++	return	offset;
++}
++
++int meson_setup_irq(struct gpio_chip *chip, unsigned int gpio,
++			unsigned int irq_flags, int *irq_banks)
++{
++	int irq_rising = -1, irq_falling = -1;
++	unsigned int gpio_flag;
++
++	/* rising irq setup */
++	if (irq_flags & IRQF_TRIGGER_RISING)	{
++		irq_rising = find_free_irq_bank();
++		if (irq_rising < 0)
++			goto out;
++
++		gpio_flag = AML_GPIO_IRQ(irq_rising,
++					 FILTER_NUM0,
++					 GPIO_IRQ_RISING);
++
++		if (meson_gpio_to_irq(chip, gpio, gpio_flag) < 0)
++			goto out;
++	}
++
++	/* falling irq setup */
++	if (irq_flags & IRQF_TRIGGER_FALLING)	{
++		irq_falling = find_free_irq_bank();
++		if ((irq_falling) < 0)
++			goto out;
++
++		gpio_flag = AML_GPIO_IRQ(irq_falling,
++					 FILTER_NUM0,
++					 GPIO_IRQ_FALLING);
++
++		if (meson_gpio_to_irq(chip, gpio, gpio_flag) < 0)
++			goto out;
++	}
++
++	irq_banks[0] = irq_rising;	irq_banks[1] = irq_falling;
++	return	0;
++out:
++	if (irq_rising  != -1)
++		meson_irq_desc[irq_rising]  = 0;
++	if (irq_falling != -1)
++		meson_irq_desc[irq_falling] = 0;
++	return	-1;
++}
++EXPORT_SYMBOL(meson_setup_irq);
++
++void meson_free_irq(unsigned int gpio, int *irq_banks)
++{
++	int i, find;
++
++	irq_banks[0] = -1, irq_banks[1] = -1;
++
++	for (i = 0, find = 0; i < AMLGPIO_IRQ_MAX; i++)	{
++		if (gpio == meson_irq_desc[i])	{
++			irq_banks[find++] = i;
++			meson_irq_desc[i] = 0;
++		}
++		if (find == 2)
++			break;
++	}
++}
++EXPORT_SYMBOL(meson_free_irq);
++
++#endif
++
+ struct pinctrl_dev *pctl;
+ static int meson_gpiolib_register(struct amlogic_pmx  *pc)
+ {
+@@ -979,6 +1092,9 @@ static int meson_gpiolib_register(struct amlogic_pmx  *pc)
+ 		domain->chip.set_pullup_down = meson_gpio_set_pullup_down;
+ 		domain->chip.set_gpio_to_irq = meson_gpio_to_irq;
+ 		domain->chip.mask_gpio_irq = meson_gpio_mask_irq;
++#if defined(CONFIG_ARCH_MESON64_ODROIDC2)
++		domain->chip.to_irq = meson_to_irq;
++#endif
+ 		domain->chip.base = -1;
+ 		domain->chip.ngpio = domain->data->num_pins;
+ 		domain->chip.can_sleep = false;
+diff --git a/drivers/gpio/gpiolib.c b/drivers/gpio/gpiolib.c
+old mode 100644
+new mode 100755
+index 6ae19cc49d04..30096331574e
+--- a/drivers/gpio/gpiolib.c
++++ b/drivers/gpio/gpiolib.c
+@@ -419,13 +419,21 @@ static irqreturn_t gpio_sysfs_irq(int irq, void *priv)
+ 	return IRQ_HANDLED;
+ }
+ 
++#if defined(CONFIG_ARCH_MESON64_ODROIDC2)
++	#include <linux/amlogic/pinctrl_amlogic.h>
++	/* AMLogic GPIO irq bank start offset */
++	#define	AMLGPIO_IRQ_BASE	96
++#endif
++
+ static int gpio_setup_irq(struct gpio_desc *desc, struct device *dev,
+ 		unsigned long gpio_flags)
+ {
+ 	struct kernfs_node	*value_sd;
+ 	unsigned long		irq_flags;
+ 	int			ret, irq, id;
+-
++#if defined(CONFIG_ARCH_MESON64_ODROIDC2)
++	int			irq_banks[2] = {0, };
++#endif
+ 	if ((desc->flags & GPIO_TRIGGER_MASK) == gpio_flags)
+ 		return 0;
+ 
+@@ -435,8 +443,21 @@ static int gpio_setup_irq(struct gpio_desc *desc, struct device *dev,
+ 
+ 	id = desc->flags >> ID_SHIFT;
+ 	value_sd = idr_find(&dirent_idr, id);
+-	if (value_sd)
++	if (value_sd)	{
++#if defined(CONFIG_ARCH_MESON64_ODROIDC2)
++		meson_free_irq(irq, &irq_banks[0]);
++
++		/* rising irq bank */
++		if (irq_banks[0] != -1)
++			free_irq(irq_banks[0] + AMLGPIO_IRQ_BASE, value_sd);
++
++		/* falling irq bank */
++		if (irq_banks[1] != -1)
++			free_irq(irq_banks[1] + AMLGPIO_IRQ_BASE, value_sd);
++#else
+ 		free_irq(irq, value_sd);
++#endif
++	}
+ 
+ 	desc->flags &= ~GPIO_TRIGGER_MASK;
+ 
+@@ -475,8 +496,37 @@ static int gpio_setup_irq(struct gpio_desc *desc, struct device *dev,
+ 		}
+ 	}
+ 
++#if defined(CONFIG_ARCH_MESON64_ODROIDC2)
++	ret = meson_setup_irq(desc->chip, irq, irq_flags, &irq_banks[0]);
++
++	if (ret < 0)
++		goto free_id;
++
++	/* rising irq bank */
++	if (irq_banks[0] != -1)	{
++		ret = request_any_context_irq(irq_banks[0] + AMLGPIO_IRQ_BASE,
++					gpio_sysfs_irq, IRQF_DISABLED,
++					"gpiolib", value_sd);
++		if (ret < 0)
++			goto free_id;
++	}
++	/* falling irq bank */
++	if (irq_banks[1] != -1)	{
++		ret = request_any_context_irq(irq_banks[1] + AMLGPIO_IRQ_BASE,
++					gpio_sysfs_irq, IRQF_DISABLED,
++					"gpiolib", value_sd);
++
++		if (ret < 0)	{
++			if (irq_banks[0] != -1)
++				free_irq(irq_banks[0] + AMLGPIO_IRQ_BASE,
++					 value_sd);
++			goto free_id;
++		}
++	}
++#else
+ 	ret = request_any_context_irq(irq, gpio_sysfs_irq, irq_flags,
+ 				"gpiolib", value_sd);
++#endif
+ 	if (ret < 0)
+ 		goto free_id;
+ 
+diff --git a/include/linux/amlogic/pinctrl_amlogic.h b/include/linux/amlogic/pinctrl_amlogic.h
+old mode 100644
+new mode 100755
+index 64118a1cae5d..561ca1b472c7
+--- a/include/linux/amlogic/pinctrl_amlogic.h
++++ b/include/linux/amlogic/pinctrl_amlogic.h
+@@ -192,4 +192,10 @@ static inline struct meson_domain *to_meson_domain(struct gpio_chip *chip)
+ }
+ 
+ extern struct amlogic_pmx *gl_pmx;
++
++#if defined(CONFIG_ARCH_MESON64_ODROIDC2)
++	int meson_setup_irq(struct gpio_chip *chip, unsigned int gpio,
++				unsigned int irq_flags, int *irq_banks);
++	void meson_free_irq(unsigned int gpio, int *irq_banks);
++#endif
+ #endif
+-- 
+2.11.0
+
+
+From 53937559ec6982b4b30701f9bdfbf2d356ce52c3 Mon Sep 17 00:00:00 2001
+From: Joy Cho <joy.cho@hardkernel.com>
+Date: Thu, 12 May 2016 10:49:41 +0900
+Subject: [PATCH 3/4] ODROID-C2: Apply meson_fix_irqbank to find an available
+ gpioirq bank
+
+Change-Id: I76a47610feda467007aa880a4dee428d8fd94383
+---
+ drivers/amlogic/pinctrl/pinctrl_amlogic.c | 21 +++++++++++++++++++++
+ include/linux/amlogic/pinctrl_amlogic.h   |  1 +
+ 2 files changed, 22 insertions(+)
+
+diff --git a/drivers/amlogic/pinctrl/pinctrl_amlogic.c b/drivers/amlogic/pinctrl/pinctrl_amlogic.c
+index 8335afd15a3a..acea12dee894 100755
+--- a/drivers/amlogic/pinctrl/pinctrl_amlogic.c
++++ b/drivers/amlogic/pinctrl/pinctrl_amlogic.c
+@@ -1008,6 +1008,27 @@ static int meson_to_irq(struct gpio_chip *chip,
+ 	return	offset;
+ }
+ 
++/* find available irq bank */
++int meson_fix_irqbank(int bank)
++{
++	if (bank < AMLGPIO_IRQ_MAX)	{
++		if (!meson_irq_desc[bank])
++			return	bank;
++		else	{
++			pr_err("ERROR(%s):already allocation irq bank(%d)!!\n",
++							__func__, bank);
++		}
++
++		/* if irq bank is not empty then find free irq bank */
++		bank = find_free_irq_bank();
++		pr_err("%s : new allocation irq bank(%d)!!\n",
++						__func__, bank);
++		return	bank;
++	}
++	return	-1;
++}
++EXPORT_SYMBOL(meson_fix_irqbank);
++
+ int meson_setup_irq(struct gpio_chip *chip, unsigned int gpio,
+ 			unsigned int irq_flags, int *irq_banks)
+ {
+diff --git a/include/linux/amlogic/pinctrl_amlogic.h b/include/linux/amlogic/pinctrl_amlogic.h
+index 561ca1b472c7..7f340d1af123 100755
+--- a/include/linux/amlogic/pinctrl_amlogic.h
++++ b/include/linux/amlogic/pinctrl_amlogic.h
+@@ -196,6 +196,7 @@ extern struct amlogic_pmx *gl_pmx;
+ #if defined(CONFIG_ARCH_MESON64_ODROIDC2)
+ 	int meson_setup_irq(struct gpio_chip *chip, unsigned int gpio,
+ 				unsigned int irq_flags, int *irq_banks);
++	int meson_fix_irqbank(int bank);
+ 	void meson_free_irq(unsigned int gpio, int *irq_banks);
+ #endif
+ #endif
+-- 
+2.11.0
+
+
+From a6477249afb392ca81620d2fa1f70ed535d72001 Mon Sep 17 00:00:00 2001
+From: Joy Cho <joy.cho@hardkernel.com>
+Date: Thu, 12 May 2016 10:58:17 +0900
+Subject: [PATCH 4/4] ODROID-C2: Adjust request irq routine based on meson gpio
+ irq
+
+Change-Id: Ia6583a2cd7d881c8459e17d3edd76ae2dad927e4
+---
+ drivers/media/rc/gpio-ir-recv.c | 40 ++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 40 insertions(+)
+
+diff --git a/drivers/media/rc/gpio-ir-recv.c b/drivers/media/rc/gpio-ir-recv.c
+index 3e4c632d3b85..321195445235 100644
+--- a/drivers/media/rc/gpio-ir-recv.c
++++ b/drivers/media/rc/gpio-ir-recv.c
+@@ -23,11 +23,22 @@
+ #include <media/rc-core.h>
+ #include <media/gpio-ir-recv.h>
+ 
++#if defined(CONFIG_ARCH_MESON64_ODROIDC2)
++#include <linux/amlogic/aml_gpio_consumer.h>
++#include <linux/amlogic/pinctrl_amlogic.h>
++
++#define MESON_GPIOIRQ_BASE	96
++#define GPIOIRQ_BANK_0		0
++#endif
+ 
+ struct gpio_rc_dev {
+ 	struct rc_dev *rcdev;
+ 	int gpio_nr;
+ 	bool active_low;
++#if defined(CONFIG_ARCH_MESON64_ODROIDC2)
++	int irq0_bank;
++	int irq1_bank;
++#endif
+ };
+ 
+ #ifdef CONFIG_OF
+@@ -167,10 +178,34 @@ static int gpio_ir_recv_probe(struct platform_device *pdev)
+ 
+ 	platform_set_drvdata(pdev, gpio_dev);
+ 
++#if !defined(CONFIG_ARCH_MESON64_ODROIDC2)
+ 	rc = request_any_context_irq(gpio_to_irq(pdata->gpio_nr),
+ 				gpio_ir_recv_irq,
+ 			IRQF_TRIGGER_FALLING | IRQF_TRIGGER_RISING,
+ 					"gpio-ir-recv-irq", gpio_dev);
++#else
++	gpio_dev->irq0_bank = meson_fix_irqbank(GPIOIRQ_BANK_0);
++
++	gpio_for_irq(pdata->gpio_nr,
++			AML_GPIO_IRQ(gpio_dev->irq0_bank,
++			FILTER_NUM0, GPIO_IRQ_FALLING));
++
++	rc = request_irq(gpio_dev->irq0_bank+MESON_GPIOIRQ_BASE,
++			gpio_ir_recv_irq, IRQF_DISABLED,
++			"gpio-ir-recv-irq0", gpio_dev);
++
++	gpio_dev->irq1_bank = meson_fix_irqbank(gpio_dev->irq0_bank+1);
++
++	gpio_for_irq(pdata->gpio_nr,
++			AML_GPIO_IRQ(gpio_dev->irq1_bank,
++			FILTER_NUM0, GPIO_IRQ_RISING));
++
++	rc = request_irq(gpio_dev->irq1_bank+MESON_GPIOIRQ_BASE,
++			gpio_ir_recv_irq, IRQF_DISABLED,
++			"gpio-ir-recv-irq1", gpio_dev);
++
++#endif /* defined(CONFIG_ARCH_MESON64_ODROIDC2) */
++
+ 	if (rc < 0)
+ 		goto err_request_irq;
+ 
+@@ -193,7 +228,12 @@ static int gpio_ir_recv_remove(struct platform_device *pdev)
+ {
+ 	struct gpio_rc_dev *gpio_dev = platform_get_drvdata(pdev);
+ 
++#if !defined(CONFIG_ARCH_MESON64_ODROIDC2)
+ 	free_irq(gpio_to_irq(gpio_dev->gpio_nr), gpio_dev);
++#else
++	free_irq(gpio_dev->irq0_bank+MESON_GPIOIRQ_BASE, gpio_dev);
++	free_irq(gpio_dev->irq1_bank+MESON_GPIOIRQ_BASE, gpio_dev);
++#endif
+ 	rc_unregister_device(gpio_dev->rcdev);
+ 	gpio_free(gpio_dev->gpio_nr);
+ 	kfree(gpio_dev);
+-- 
+2.11.0
+

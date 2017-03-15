@@ -18,7 +18,7 @@
 
 PKG_NAME="sundtek-mediatv"
 PKG_VERSION="7.0"
-PKG_REV="102"
+PKG_REV="103"
 PKG_ARCH="any"
 PKG_LICENSE="nonfree"
 PKG_SITE="http://support.sundtek.com/"
@@ -37,14 +37,14 @@ make_target() {
   mkdir -p $ROOT/$PKG_BUILD
   cd $ROOT/$PKG_BUILD
 
-  case $TARGET_KERNEL_ARCH in
+  case $TARGET_ARCH in
     x86_64)
       INSTALLER_URL="http://sundtek.de/media/netinst/64bit/installer.tar.gz"
       ;;
     arm)
       INSTALLER_URL="http://sundtek.de/media/netinst/armsysvhf/installer.tar.gz"
       ;;
-    arm64)
+    aarch64)
       INSTALLER_URL="http://sundtek.de/media/netinst/arm64/installer.tar.gz"
       ;;
   esac

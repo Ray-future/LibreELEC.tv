@@ -24,7 +24,7 @@
   GLIBC_LOCALES="yes"
 
 # Mediacenter to use (kodi / no)
-  MEDIACENTER="kodi"
+  MEDIACENTER="${MEDIACENTER:-kodi}"
 
 # Skins to install (Estuary)
 # Space separated list is supported,

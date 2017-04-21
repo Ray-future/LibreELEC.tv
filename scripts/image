@@ -344,6 +344,7 @@ if [ "$1" = "release" -o "$1" = "mkimage" -o "$1" = "amlpkg" -o "$1" = "noobs" ]
       TARGET_IMG="$TARGET_IMG" \
       IMAGE_NAME="$IMAGE_NAME" \
       BOOTLOADER="$BOOTLOADER" \
+      MEDIACENTER="$MEDIACENTER" \
       KERNEL_NAME="$KERNEL_NAME" \
       RELEASE_DIR=$RELEASE_DIR \
       UUID_SYSTEM="$(uuidgen)" \

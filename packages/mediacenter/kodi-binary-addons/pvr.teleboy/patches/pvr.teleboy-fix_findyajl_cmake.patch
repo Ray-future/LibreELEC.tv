@@ -1,0 +1,12 @@
+diff -Naur pvr.teleboy-5d099bd.orig/FindYajl.cmake pvr.teleboy-5d099bd/FindYajl.cmake
+--- pvr.teleboy-5d099bd.orig/FindYajl.cmake	2017-05-12 09:15:48.210597918 +0200
++++ pvr.teleboy-5d099bd/FindYajl.cmake	2017-05-12 09:16:21.898119748 +0200
+@@ -23,7 +23,7 @@
+ 
+ find_path(YAJL_INCLUDE_DIR NAMES yajl/yajl_common.h
+                            PATHS ${PC_YAJL_INCLUDEDIR})
+-find_library(YAJL_LIBRARY NAMES yajl_s
++find_library(YAJL_LIBRARY NAMES yajl
+                           PATHS ${PC_YAJL_LIBDIR})
+ 
+ if(PC_YAJL_VERSION)

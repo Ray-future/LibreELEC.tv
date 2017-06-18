@@ -19,7 +19,7 @@
 # with 1.0.0 repeat delay is broken. test on upgrade
 
 PKG_NAME="v4l-utils"
-PKG_VERSION="1.12.3"
+PKG_VERSION="1.12.5"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="http://linuxtv.org/"
@@ -32,16 +32,13 @@ PKG_LONGDESC="Linux V4L2 and DVB API utilities and v4l libraries (libv4l)."
 PKG_IS_ADDON="no"
 PKG_AUTORECONF="no"
 
-PKG_CONFIGURE_OPTS_TARGET="--without-jpeg"
+PKG_CONFIGURE_OPTS_TARGET="--without-jpeg --disable-qv4l2"
+PKG_MAKEINSTALL_OPTS_TARGET="PREFIX=/usr -C utils"
 
-make_target() {
-    make -C utils/keytable CFLAGS="$TARGET_CFLAGS"
-    make -C utils/ir-ctl CFLAGS="$TARGET_CFLAGS"
-}
-
-makeinstall_target() {
-   make install DESTDIR=$INSTALL PREFIX=/usr -C utils/keytable
-   make install DESTDIR=$INSTALL PREFIX=/usr -C utils/ir-ctl
+pre_configure_target() {
+  # v4l-utils fails to build in subdirs
+  cd $PKG_BUILD
+  rm -rf .$TARGET_NAME
 }
 
 post_makeinstall_target() {

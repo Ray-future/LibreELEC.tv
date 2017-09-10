@@ -5,6 +5,7 @@ This project is for Rockchip SoC devices
 ## Devices
 
 * [ASUS Tinker Board](devices/TinkerBoard)
+* [RK3328](devices/RK3328)
 
 ## Code
 

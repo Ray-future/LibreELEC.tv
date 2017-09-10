@@ -55,6 +55,10 @@ else
   PKG_CMAKE_OPTS_TARGET="$PKG_CMAKE_OPTS_TARGET -DHAVE_AOCEC_API=0 -DHAVE_AMLOGIC_API=0"
 fi
 
+if [ "$PROJECT" = "Rockchip" ]; then
+  PKG_CMAKE_OPTS_TARGET="$PKG_CMAKE_OPTS_TARGET -DHAVE_LINUX_API=1"
+fi
+
 pre_configure_target() {
   if [ "$KODIPLAYER_DRIVER" = "bcm2835-firmware" ]; then
     export CXXFLAGS="$CXXFLAGS \

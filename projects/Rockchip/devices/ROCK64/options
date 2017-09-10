@@ -9,6 +9,13 @@
         TARGET_CPU="cortex-a53"
         TARGET_CPU_FLAGS="+crc+crypto"
         ;;
+      arm)
+        TARGET_CPU="cortex-a53"
+        TARGET_FLOAT="hard"
+        TARGET_FPU="crypto-neon-fp-armv8"
+        TARGET_KERNEL_ARCH="arm64"
+        TARGET_PATCH_ARCH="aarch64"
+        ;;
     esac
 
   # Configuration for u-boot

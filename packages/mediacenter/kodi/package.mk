@@ -198,6 +198,8 @@ if [ ! "$KODIPLAYER_DRIVER" = default ]; then
     CXXFLAGS="$CXXFLAGS -DHAS_IMXVPU -DLINUX -DEGL_API_FB"
   elif [ "$KODIPLAYER_DRIVER" = libamcodec ]; then
     KODI_PLAYER="-DENABLE_AML=ON"
+  elif [ "$KODIPLAYER_DRIVER" = rkmpp ]; then
+    KODI_PLAYER="-DENABLE_GBM=ON -DENABLE_RK=ON"
   fi
 fi
 

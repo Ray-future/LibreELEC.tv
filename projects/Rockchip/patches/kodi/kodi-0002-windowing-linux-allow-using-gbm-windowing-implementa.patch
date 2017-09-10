@@ -1,0 +1,68 @@
+From 538db9d777207f8027942d24fafe7ef77f889f4e Mon Sep 17 00:00:00 2001
+From: Lukas Rusak <lorusak@gmail.com>
+Date: Tue, 11 Apr 2017 18:37:17 -0700
+Subject: [PATCH 02/10] [windowing][linux] allow using gbm windowing
+ implementation
+
+---
+ xbmc/windowing/WinSystem.h        |  1 +
+ xbmc/windowing/WindowingFactory.h |  3 +++
+ xbmc/windowing/egl/CMakeLists.txt | 20 +++++++++++---------
+ 3 files changed, 15 insertions(+), 9 deletions(-)
+
+diff --git a/xbmc/windowing/WinSystem.h b/xbmc/windowing/WinSystem.h
+index 08c28a3620..a01f63e936 100644
+--- a/xbmc/windowing/WinSystem.h
++++ b/xbmc/windowing/WinSystem.h
+@@ -31,6 +31,7 @@ typedef enum _WindowSystemType
+   WINDOW_SYSTEM_OSX,
+   WINDOW_SYSTEM_IOS,
+   WINDOW_SYSTEM_X11,
++  WINDOW_SYSTEM_GBM,
+   WINDOW_SYSTEM_SDL,
+   WINDOW_SYSTEM_EGL,
+   WINDOW_SYSTEM_ANDROID
+diff --git a/xbmc/windowing/WindowingFactory.h b/xbmc/windowing/WindowingFactory.h
+index 4cd6c76d87..a38990ae5e 100644
+--- a/xbmc/windowing/WindowingFactory.h
++++ b/xbmc/windowing/WindowingFactory.h
+@@ -29,6 +29,9 @@
+ #elif defined(TARGET_WINDOWS) && defined(HAS_DX)
+ #include "windows/WinSystemWin32DX.h"
+ 
++#elif defined(TARGET_LINUX) && defined(HAVE_GBM) && defined(HAS_GLES)
++#include "gbm/WinSystemGbmGLESContext.h"
++
+ #elif defined(TARGET_LINUX)   && defined(HAVE_X11)   && defined(HAS_GLES)
+ #include "X11/WinSystemX11GLESContext.h"
+ 
+diff --git a/xbmc/windowing/egl/CMakeLists.txt b/xbmc/windowing/egl/CMakeLists.txt
+index 51e13abb86..b1eaeccc89 100644
+--- a/xbmc/windowing/egl/CMakeLists.txt
++++ b/xbmc/windowing/egl/CMakeLists.txt
+@@ -1,14 +1,16 @@
+-if(OPENGLES_FOUND OR AML_FOUND OR IMX_FOUND OR MMAL_FOUND)
+-  set(SOURCES EGLWrapper.cpp)
++if (NOT GBM_FOUND)
++  if(OPENGLES_FOUND OR AML_FOUND OR IMX_FOUND OR MMAL_FOUND)
++    set(SOURCES EGLWrapper.cpp)
+ 
+-  set(HEADERS EGLNativeType.h
+-              EGLQuirks.h
+-              EGLWrapper.h)
+-endif()
++    set(HEADERS EGLNativeType.h
++                EGLQuirks.h
++                EGLWrapper.h)
++  endif()
+ 
+-if(OPENGLES_FOUND)
+-  list(APPEND SOURCES WinSystemEGL.cpp)
+-  list(APPEND HEADERS WinSystemEGL.h)
++  if(OPENGLES_FOUND)
++    list(APPEND SOURCES WinSystemEGL.cpp)
++    list(APPEND HEADERS WinSystemEGL.h)
++  endif()
+ endif()
+ 
+ if(CORE_SYSTEM_NAME STREQUAL android)

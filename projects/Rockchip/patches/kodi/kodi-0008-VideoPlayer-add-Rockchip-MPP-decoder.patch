@@ -1,0 +1,460 @@
+From 9964489ed310fdca19e39b5c286d112d087effab Mon Sep 17 00:00:00 2001
+From: Jonas Karlman <jonas@kwiboo.se>
+Date: Fri, 26 May 2017 20:53:19 +0200
+Subject: [PATCH 08/10] VideoPlayer: add Rockchip MPP decoder
+
+---
+ project/cmake/CMakeLists.txt                       |   2 +
+ project/cmake/modules/FindRK.cmake                 |  28 ++++
+ .../VideoPlayer/DVDCodecs/Video/CMakeLists.txt     |   5 +
+ .../VideoPlayer/DVDCodecs/Video/DVDVideoCodec.h    |   5 +
+ .../DVDCodecs/Video/DVDVideoCodecFFmpeg.cpp        |  38 ++++-
+ xbmc/cores/VideoPlayer/DVDCodecs/Video/RKMPP.cpp   | 155 +++++++++++++++++++++
+ xbmc/cores/VideoPlayer/DVDCodecs/Video/RKMPP.h     |  79 +++++++++++
+ .../VideoPlayer/VideoRenderers/RenderFormats.h     |   1 +
+ .../VideoPlayer/VideoRenderers/RenderManager.cpp   |   1 +
+ 9 files changed, 312 insertions(+), 2 deletions(-)
+ create mode 100644 project/cmake/modules/FindRK.cmake
+ create mode 100644 xbmc/cores/VideoPlayer/DVDCodecs/Video/RKMPP.cpp
+ create mode 100644 xbmc/cores/VideoPlayer/DVDCodecs/Video/RKMPP.h
+
+diff --git a/project/cmake/CMakeLists.txt b/project/cmake/CMakeLists.txt
+index 74870c117d..069d720d0b 100644
+--- a/project/cmake/CMakeLists.txt
++++ b/project/cmake/CMakeLists.txt
+@@ -57,6 +57,7 @@ if(UNIX)
+     option(ENABLE_X11         "Enable X11 support?" ON)
+     option(ENABLE_AML         "Enable AML?" OFF)
+     option(ENABLE_IMX         "Enable IMX?" OFF)
++    option(ENABLE_RK          "Enable RK?" OFF)
+   endif()
+ endif()
+ # System options
+@@ -218,6 +219,7 @@ endif()
+ if(CORE_SYSTEM_NAME STREQUAL android OR CORE_SYSTEM_NAME STREQUAL linux)
+   core_optional_dep(AML)
+   core_optional_dep(IMX)
++  core_optional_dep(RK)
+ elseif(CORE_SYSTEM_NAME STREQUAL rbpi)
+   core_require_dep(MMAL)
+ endif()
+diff --git a/project/cmake/modules/FindRK.cmake b/project/cmake/modules/FindRK.cmake
+new file mode 100644
+index 0000000000..ffec62548b
+--- /dev/null
++++ b/project/cmake/modules/FindRK.cmake
+@@ -0,0 +1,28 @@
++#.rst:
++# FindRK
++# -------
++# Finds the Rockchip MPP
++#
++# This will will define the following variables::
++#
++# RK_FOUND - system has RK
++# RK_LIBRARIES - the RK libraries
++# RK_DEFINITIONS - the RK definitions
++
++if(PKG_CONFIG_FOUND)
++  pkg_check_modules(RK rockchip_mpp QUIET)
++endif()
++
++find_library(RKMPP_LIBRARY NAMES rockchip_mpp
++                           PATHS ${PC_RK_LIBDIR})
++
++include(FindPackageHandleStandardArgs)
++find_package_handle_standard_args(RK
++                                  REQUIRED_VARS RKMPP_LIBRARY)
++
++if(RK_FOUND)
++  set(RK_LIBRARIES ${RKMPP_LIBRARY})
++  set(RK_DEFINITIONS -DHAS_RKMPP=1)
++endif()
++
++mark_as_advanced(RKMPP_LIBRARY)
+diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/CMakeLists.txt b/xbmc/cores/VideoPlayer/DVDCodecs/Video/CMakeLists.txt
+index 7ee3bb6cca..9fc5748c64 100644
+--- a/xbmc/cores/VideoPlayer/DVDCodecs/Video/CMakeLists.txt
++++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/CMakeLists.txt
+@@ -58,6 +58,11 @@ if(IMX_FOUND)
+   list(APPEND HEADERS DVDVideoCodecIMX.h)
+ endif()
+ 
++if(RK_FOUND)
++  list(APPEND SOURCES RKMPP.cpp)
++  list(APPEND HEADERS RKMPP.h)
++endif()
++
+ if(CORE_SYSTEM_NAME STREQUAL android)
+   list(APPEND SOURCES DVDVideoCodecAndroidMediaCodec.cpp)
+   list(APPEND HEADERS DVDVideoCodecAndroidMediaCodec.h)
+diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodec.h b/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodec.h
+index a2da9de437..ca0ff909b7 100644
+--- a/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodec.h
++++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodec.h
+@@ -51,6 +51,7 @@ class CDVDMediaCodecInfo;
+ class CDVDVideoCodecIMXBuffer;
+ class CMMALBuffer;
+ class CDVDAmlogicInfo;
++class CDVDDrmPrimeInfo;
+ 
+ 
+ // should be entirely filled by all codecs
+@@ -100,6 +101,10 @@ struct DVDVideoPicture
+       CDVDAmlogicInfo *amlcodec;
+     };
+ 
++    struct {
++      CDVDDrmPrimeInfo *drmprime;
++    };
++
+   };
+ 
+   unsigned int iFlags;
+diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecFFmpeg.cpp b/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecFFmpeg.cpp
+index 8b5a4bd050..443d059a64 100644
+--- a/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecFFmpeg.cpp
++++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecFFmpeg.cpp
+@@ -61,6 +61,9 @@
+ #ifdef HAS_MMAL
+ #include "MMALFFmpeg.h"
+ #endif
++#ifdef HAS_RKMPP
++#include "RKMPP.h"
++#endif
+ #include "utils/StringUtils.h"
+ 
+ extern "C" {
+@@ -254,6 +257,21 @@ enum AVPixelFormat CDVDVideoCodecFFmpeg::GetFormat(struct AVCodecContext * avctx
+         dec->Release();
+     }
+ #endif
++
++#ifdef HAS_RKMPP
++    if (*cur == AV_PIX_FMT_RKMPP)
++    {
++      RKMPP::CDecoder* dec = new RKMPP::CDecoder(ctx->m_processInfo);
++      if (dec->Open(avctx, ctx->m_pCodecContext, *cur, ctx->m_uSurfacesCount))
++      {
++        ctx->m_processInfo.SetVideoPixelFormat(pixFmtName ? pixFmtName : "");
++        ctx->SetHardware(dec);
++        return *cur;
++      }
++      else
++        dec->Release();
++    }
++#endif
+     cur++;
+   }
+ 
+@@ -305,7 +323,7 @@ bool CDVDVideoCodecFFmpeg::Open(CDVDStreamInfo &hints, CDVDCodecOptions &options
+   m_hints = hints;
+   m_options = options;
+ 
+-  AVCodec* pCodec;
++  AVCodec* pCodec = NULL;
+ 
+   m_iOrientation = hints.orientation;
+ 
+@@ -321,7 +339,20 @@ bool CDVDVideoCodecFFmpeg::Open(CDVDStreamInfo &hints, CDVDCodecOptions &options
+   }
+   m_formats.push_back(AV_PIX_FMT_NONE); /* always add none to get a terminated list in ffmpeg world */
+ 
+-  pCodec = avcodec_find_decoder(hints.codec);
++#ifdef HAS_RKMPP
++  if (!hints.software)
++  {
++    if (hints.codec == AV_CODEC_ID_H264)
++      pCodec = avcodec_find_decoder_by_name("h264_rkmpp");
++    else if (hints.codec == AV_CODEC_ID_HEVC)
++      pCodec = avcodec_find_decoder_by_name("hevc_rkmpp");
++    else if (hints.codec == AV_CODEC_ID_VP8)
++      pCodec = avcodec_find_decoder_by_name("vp8_rkmpp");
++  }
++#endif
++
++  if (pCodec == NULL)
++    pCodec = avcodec_find_decoder(hints.codec);
+ 
+   if(pCodec == NULL)
+   {
+@@ -365,6 +396,9 @@ bool CDVDVideoCodecFFmpeg::Open(CDVDStreamInfo &hints, CDVDCodecOptions &options
+ #ifdef HAS_MMAL
+     tryhw = true;
+ #endif
++#ifdef HAS_RKMPP
++    tryhw = true;
++#endif
+     if (tryhw && m_decoderState == STATE_NONE)
+     {
+       m_decoderState = STATE_HW_SINGLE;
+diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/RKMPP.cpp b/xbmc/cores/VideoPlayer/DVDCodecs/Video/RKMPP.cpp
+new file mode 100644
+index 0000000000..0f1812fa1e
+--- /dev/null
++++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/RKMPP.cpp
+@@ -0,0 +1,155 @@
++/*
++ *      Copyright (C) 2017 Team Kodi
++ *      http://kodi.tv
++ *
++ *  This Program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation; either version 2, or (at your option)
++ *  any later version.
++ *
++ *  This Program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this Program; see the file COPYING.  If not, see
++ *  <http://www.gnu.org/licenses/>.
++ *
++ */
++
++#include "RKMPP.h"
++
++#ifdef HAS_RKMPP
++
++#include "cores/VideoPlayer/Process/ProcessInfo.h"
++#include "cores/VideoPlayer/DVDClock.h"
++#include "DVDVideoCodec.h"
++#include "DVDCodecs/DVDCodecUtils.h"
++#include "settings/AdvancedSettings.h"
++#include "utils/log.h"
++#include "windowing/WindowingFactory.h"
++
++#undef CLASSNAME
++#define CLASSNAME "RKMPP::CDVDDrmPrimeInfo"
++
++CDVDDrmPrimeInfo::CDVDDrmPrimeInfo(AVFrame* frame)
++  : m_refs(0)
++  , m_frame(nullptr)
++{
++  // ref frame until MppFrame has been rendered
++  m_frame = av_frame_alloc();
++  if (m_frame)
++    av_frame_ref(m_frame, frame);
++
++  //if (g_advancedSettings.CanLogComponent(LOGVIDEO))
++  //  CLog::Log(LOGDEBUG, "%s::%s - create %p refs:%ld frame:%p drmprime:%p", CLASSNAME, __FUNCTION__, this, m_refs, m_frame, GetDrmPrime());
++}
++
++CDVDDrmPrimeInfo::~CDVDDrmPrimeInfo()
++{
++  //if (g_advancedSettings.CanLogComponent(LOGVIDEO))
++  //  CLog::Log(LOGDEBUG, "%s::%s - destroy %p refs:%ld frame:%p drmprime:%p", CLASSNAME, __FUNCTION__, this, m_refs, m_frame, GetDrmPrime());
++
++  // unref frame to deinit MppFrame
++  av_frame_free(&m_frame);
++}
++
++CDVDDrmPrimeInfo* CDVDDrmPrimeInfo::Retain()
++{
++  AtomicIncrement(&m_refs);
++
++  //if (g_advancedSettings.CanLogComponent(LOGVIDEO))
++  //  CLog::Log(LOGDEBUG, "%s::%s - retain %p refs:%ld frame:%p drmprime:%p", CLASSNAME, __FUNCTION__, this, m_refs, m_frame, GetDrmPrime());
++
++  return this;
++}
++
++long CDVDDrmPrimeInfo::Release()
++{
++  //if (g_advancedSettings.CanLogComponent(LOGVIDEO))
++  //  CLog::Log(LOGDEBUG, "%s::%s - release %p refs:%ld frame:%p drmprime:%p", CLASSNAME, __FUNCTION__, this, m_refs, m_frame, GetDrmPrime());
++
++  long count = AtomicDecrement(&m_refs);
++  if (count == 0)
++    delete this;
++  return count;
++}
++
++using namespace RKMPP;
++
++#undef CLASSNAME
++#define CLASSNAME "RKMPP::CDecoder"
++
++CDecoder::CDecoder(CProcessInfo& processInfo)
++  : m_processInfo(processInfo)
++{
++  //if (g_advancedSettings.CanLogComponent(LOGVIDEO))
++  //  CLog::Log(LOGDEBUG, "%s::%s - create %p", CLASSNAME, __FUNCTION__, this);
++}
++
++CDecoder::~CDecoder()
++{
++  //if (g_advancedSettings.CanLogComponent(LOGVIDEO))
++  //  CLog::Log(LOGDEBUG, "%s::%s - destroy %p", CLASSNAME, __FUNCTION__, this);
++}
++
++bool CDecoder::Open(AVCodecContext* avctx, AVCodecContext* mainctx, enum AVPixelFormat fmt, unsigned int surfaces)
++{
++  //if (g_advancedSettings.CanLogComponent(LOGVIDEO))
++  //  CLog::Log(LOGDEBUG, "%s::%s - avctx:%p mainctx:%p fmt:%d surfaces:%u", CLASSNAME, __FUNCTION__, avctx, mainctx, fmt, surfaces);
++
++  m_processInfo.SetVideoDeintMethod("none");
++
++  std::list<EINTERLACEMETHOD> deintMethods;
++  deintMethods.push_back(EINTERLACEMETHOD::VS_INTERLACEMETHOD_NONE);
++  m_processInfo.UpdateDeinterlacingMethods(deintMethods);
++
++  return true;
++}
++
++int CDecoder::Decode(AVCodecContext* avctx, AVFrame* frame)
++{
++  int status = Check(avctx);
++  if (status)
++    return status;
++
++  if (frame)
++    return VC_BUFFER | VC_PICTURE;
++  else
++    return VC_BUFFER;
++}
++
++bool CDecoder::GetPicture(AVCodecContext* avctx, AVFrame* frame, DVDVideoPicture* picture)
++{
++  CDVDVideoCodecFFmpeg* ctx = static_cast<CDVDVideoCodecFFmpeg *>(avctx->opaque);
++  bool ret = ctx->GetPictureCommon(picture);
++  if (!ret || !frame)
++    return false;
++
++  picture->format = RENDER_FMT_RKMPP;
++  picture->drmprime = (new CDVDDrmPrimeInfo(frame))->Retain();
++  picture->pts = (double)frame->pts * DVD_TIME_BASE / AV_TIME_BASE;
++
++  //if (g_advancedSettings.CanLogComponent(LOGVIDEO))
++  //  CLog::Log(LOGDEBUG, "%s::%s - width:%d height:%d pts:%" PRId64 " drmprime:%p", CLASSNAME, __FUNCTION__, frame->width, frame->height, frame->pts, picture->drmprime);
++
++  return true;
++}
++
++void CDecoder::ClearPicture(DVDVideoPicture* picture)
++{
++  SAFE_RELEASE(picture->drmprime);
++}
++
++int CDecoder::Check(AVCodecContext* avctx)
++{
++  return 0;
++}
++
++unsigned CDecoder::GetAllowedReferences()
++{
++  return 4;
++}
++
++#endif
+diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/RKMPP.h b/xbmc/cores/VideoPlayer/DVDCodecs/Video/RKMPP.h
+new file mode 100644
+index 0000000000..cbc21607b2
+--- /dev/null
++++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/RKMPP.h
+@@ -0,0 +1,79 @@
++/*
++ *      Copyright (C) 2017 Team Kodi
++ *      http://kodi.tv
++ *
++ *  This Program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation; either version 2, or (at your option)
++ *  any later version.
++ *
++ *  This Program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this Program; see the file COPYING.  If not, see
++ *  <http://www.gnu.org/licenses/>.
++ *
++ */
++
++#pragma once
++
++#ifdef HAS_RKMPP
++
++#include "DVDVideoCodecFFmpeg.h"
++
++extern "C" {
++#include "libavcodec/drmprime.h"
++#include "libavutil/frame.h"
++}
++
++class CProcessInfo;
++
++class CDVDDrmPrimeInfo
++{
++public:
++  CDVDDrmPrimeInfo(AVFrame* frame);
++
++  // reference counting
++  CDVDDrmPrimeInfo* Retain();
++  long Release();
++
++  av_drmprime* GetDrmPrime() const { return (av_drmprime*)m_frame->data[3]; }
++  uint32_t GetWidth() const { return m_frame->width; }
++  uint32_t GetHeight() const { return m_frame->height; }
++  int64_t GetPTS() const { return m_frame->pts; }
++
++private:
++  // private because we are reference counted
++  virtual ~CDVDDrmPrimeInfo();
++
++  long m_refs;
++  AVFrame* m_frame;
++};
++
++namespace RKMPP
++{
++
++class CDecoder
++  : public CDVDVideoCodecFFmpeg::IHardwareDecoder
++{
++public:
++  CDecoder(CProcessInfo& processInfo);
++  virtual ~CDecoder();
++  bool Open(AVCodecContext* avctx, AVCodecContext* mainctx, const enum AVPixelFormat, unsigned int surfaces = 0) override;
++  int Decode(AVCodecContext* avctx, AVFrame* frame) override;
++  bool GetPicture(AVCodecContext* avctx, AVFrame* frame, DVDVideoPicture* picture) override;
++  void ClearPicture(DVDVideoPicture* picture) override;
++  int Check(AVCodecContext* avctx) override;
++  unsigned GetAllowedReferences() override;
++  const std::string Name() override { return "rkmpp"; }
++
++protected:
++  CProcessInfo& m_processInfo;
++};
++
++}
++
++#endif
+diff --git a/xbmc/cores/VideoPlayer/VideoRenderers/RenderFormats.h b/xbmc/cores/VideoPlayer/VideoRenderers/RenderFormats.h
+index 39f62fa616..f1b9b3e85b 100644
+--- a/xbmc/cores/VideoPlayer/VideoRenderers/RenderFormats.h
++++ b/xbmc/cores/VideoPlayer/VideoRenderers/RenderFormats.h
+@@ -45,6 +45,7 @@ enum ERenderFormat {
+   RENDER_FMT_IMXMAP,
+   RENDER_FMT_MMAL,
+   RENDER_FMT_AML,
++  RENDER_FMT_RKMPP,
+ };
+ 
+ struct CRenderInfo
+diff --git a/xbmc/cores/VideoPlayer/VideoRenderers/RenderManager.cpp b/xbmc/cores/VideoPlayer/VideoRenderers/RenderManager.cpp
+index 420b5b5d8e..4a326207b8 100644
+--- a/xbmc/cores/VideoPlayer/VideoRenderers/RenderManager.cpp
++++ b/xbmc/cores/VideoPlayer/VideoRenderers/RenderManager.cpp
+@@ -111,6 +111,7 @@ static std::string GetRenderFormatName(ERenderFormat format)
+     case RENDER_FMT_IMXMAP:    return "IMXMAP";
+     case RENDER_FMT_MMAL:      return "MMAL";
+     case RENDER_FMT_AML:       return "AMLCODEC";
++    case RENDER_FMT_RKMPP:     return "RKMPP";
+     case RENDER_FMT_NONE:      return "NONE";
+   }
+   return "UNKNOWN";

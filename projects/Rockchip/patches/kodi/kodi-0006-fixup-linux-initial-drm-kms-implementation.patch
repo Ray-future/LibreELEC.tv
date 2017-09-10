@@ -1,0 +1,61 @@
+From 59be410bb133d2dfb14bc4f410667683d67325a5 Mon Sep 17 00:00:00 2001
+From: Jonas Karlman <jonas@kwiboo.se>
+Date: Thu, 25 May 2017 17:23:22 +0200
+Subject: [PATCH 06/10] fixup! [linux] initial drm/kms implementation
+
+---
+ xbmc/windowing/gbm/GBMUtils.cpp     |  1 +
+ xbmc/windowing/gbm/GLContextEGL.cpp | 14 ++++++++++++--
+ 2 files changed, 13 insertions(+), 2 deletions(-)
+
+diff --git a/xbmc/windowing/gbm/GBMUtils.cpp b/xbmc/windowing/gbm/GBMUtils.cpp
+index 523994e66e..1be0ae5611 100644
+--- a/xbmc/windowing/gbm/GBMUtils.cpp
++++ b/xbmc/windowing/gbm/GBMUtils.cpp
+@@ -21,6 +21,7 @@
+ #include <errno.h>
+ #include <fcntl.h>
+ #include <poll.h>
++#include <stdint.h>
+ #include <stdio.h>
+ #include <stdlib.h>
+ #include <string.h>
+diff --git a/xbmc/windowing/gbm/GLContextEGL.cpp b/xbmc/windowing/gbm/GLContextEGL.cpp
+index 05406ce102..392080ba83 100644
+--- a/xbmc/windowing/gbm/GLContextEGL.cpp
++++ b/xbmc/windowing/gbm/GLContextEGL.cpp
+@@ -25,6 +25,7 @@
+ #include "utils/log.h"
+ 
+ #include <EGL/eglext.h>
++#include <string.h>
+ 
+ CGLContextEGL::CGLContextEGL() :
+   m_eglDisplay(EGL_NO_DISPLAY),
+@@ -67,8 +68,14 @@ bool CGLContextEGL::CreateDisplay(EGLDisplay display,
+     EGL_NONE
+   };
+ 
+-#ifdef EGL_EXT_platform_base
+-  if (m_eglDisplay == EGL_NO_DISPLAY)
++  const char *client_extensions = eglQueryString(EGL_NO_DISPLAY, EGL_EXTENSIONS);
++  CLog::Log(LOGNOTICE, "EGL_EXTENSIONS = %s", client_extensions);
++
++#if defined(EGL_EXT_platform_base) && defined(EGL_KHR_platform_gbm)
++  if (m_eglDisplay == EGL_NO_DISPLAY &&
++      client_extensions != NULL &&
++      strstr(client_extensions, "EGL_EXT_platform_base") &&
++      strstr(client_extensions, "EGL_KHR_platform_gbm"))
+   {
+     PFNEGLGETPLATFORMDISPLAYEXTPROC getPlatformDisplayEXT = (PFNEGLGETPLATFORMDISPLAYEXTPROC)eglGetProcAddress("eglGetPlatformDisplayEXT");
+     if (getPlatformDisplayEXT)
+@@ -110,6 +117,9 @@ bool CGLContextEGL::CreateDisplay(EGLDisplay display,
+     return false;
+   }
+ 
++  const char *display_extensions = eglQueryString(m_eglDisplay, EGL_EXTENSIONS);
++  CLog::Log(LOGNOTICE, "EGL_EXTENSIONS = %s", display_extensions);
++
+   return true;
+ }
+ 

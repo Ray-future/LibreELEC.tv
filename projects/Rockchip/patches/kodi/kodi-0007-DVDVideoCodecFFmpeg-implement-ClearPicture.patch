@@ -1,0 +1,49 @@
+From 86614959c567686dae2134f8336016b1d0aeead2 Mon Sep 17 00:00:00 2001
+From: Jonas Karlman <jonas@kwiboo.se>
+Date: Fri, 26 May 2017 20:53:19 +0200
+Subject: [PATCH 07/10] DVDVideoCodecFFmpeg: implement ClearPicture
+
+---
+ xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecFFmpeg.cpp | 8 ++++++++
+ xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecFFmpeg.h   | 2 ++
+ 2 files changed, 10 insertions(+)
+
+diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecFFmpeg.cpp b/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecFFmpeg.cpp
+index df2445d295..8b5a4bd050 100644
+--- a/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecFFmpeg.cpp
++++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecFFmpeg.cpp
+@@ -967,6 +967,14 @@ bool CDVDVideoCodecFFmpeg::GetPicture(DVDVideoPicture* pDvdVideoPicture)
+   return true;
+ }
+ 
++bool CDVDVideoCodecFFmpeg::ClearPicture(DVDVideoPicture* pDvdVideoPicture)
++{
++  if (m_pHardware)
++    m_pHardware->ClearPicture(pDvdVideoPicture);
++
++  return CDVDVideoCodec::ClearPicture(pDvdVideoPicture);
++}
++
+ int CDVDVideoCodecFFmpeg::FilterOpen(const std::string& filters, bool scale)
+ {
+   int result;
+diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecFFmpeg.h b/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecFFmpeg.h
+index 3b4b622e03..aa0bd793f1 100644
+--- a/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecFFmpeg.h
++++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecFFmpeg.h
+@@ -50,6 +50,7 @@ public:
+     virtual bool Open(AVCodecContext* avctx, AVCodecContext* mainctx, const enum AVPixelFormat, unsigned int surfaces) = 0;
+     virtual int  Decode(AVCodecContext* avctx, AVFrame* frame) = 0;
+     virtual bool GetPicture(AVCodecContext* avctx, AVFrame* frame, DVDVideoPicture* picture) = 0;
++    virtual void ClearPicture(DVDVideoPicture* picture) {};
+     virtual int  Check(AVCodecContext* avctx) = 0;
+     virtual void Reset() {}
+     virtual unsigned GetAllowedReferences() { return 0; }
+@@ -66,6 +67,7 @@ public:
+   virtual void Reopen() override;
+   bool GetPictureCommon(DVDVideoPicture* pDvdVideoPicture);
+   virtual bool GetPicture(DVDVideoPicture* pDvdVideoPicture) override;
++  virtual bool ClearPicture(DVDVideoPicture* pDvdVideoPicture) override;
+   virtual void SetDropState(bool bDrop) override;
+   virtual const char* GetName() override { return m_name.c_str(); }; // m_name is never changed after open
+   virtual unsigned GetConvergeCount() override;

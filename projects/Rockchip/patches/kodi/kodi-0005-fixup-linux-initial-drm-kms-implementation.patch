@@ -1,0 +1,509 @@
+From 022957d0aa4415add14dab3464830f8d5b4877e0 Mon Sep 17 00:00:00 2001
+From: Lukas Rusak <lorusak@gmail.com>
+Date: Tue, 16 May 2017 12:39:38 -0700
+Subject: [PATCH 05/10] fixup! [linux] initial drm/kms implementation
+
+---
+ xbmc/windowing/gbm/GBMUtils.cpp                | 78 +++++++++++++++-----------
+ xbmc/windowing/gbm/GBMUtils.h                  |  6 +-
+ xbmc/windowing/gbm/GLContextEGL.cpp            | 48 ++++++++++++++--
+ xbmc/windowing/gbm/GLContextEGL.h              |  7 ++-
+ xbmc/windowing/gbm/WinSystemGbm.cpp            | 27 ++++++++-
+ xbmc/windowing/gbm/WinSystemGbm.h              |  5 ++
+ xbmc/windowing/gbm/WinSystemGbmGLESContext.cpp |  9 ++-
+ 7 files changed, 130 insertions(+), 50 deletions(-)
+
+diff --git a/xbmc/windowing/gbm/GBMUtils.cpp b/xbmc/windowing/gbm/GBMUtils.cpp
+index 7455374c14..523994e66e 100644
+--- a/xbmc/windowing/gbm/GBMUtils.cpp
++++ b/xbmc/windowing/gbm/GBMUtils.cpp
+@@ -38,6 +38,8 @@
+ static struct drm *m_drm = new drm;
+ static struct drm_fb *m_drm_fb = new drm_fb;
+ 
++static struct gbm *m_gbm = new gbm;
++
+ static struct gbm_bo *m_bo = nullptr;
+ static struct gbm_bo *m_next_bo = nullptr;
+ 
+@@ -50,49 +52,59 @@ static struct pollfd m_drm_fds;
+ static drmEventContext m_drm_evctx;
+ static int flip_happening = 0;
+ 
++drm * CGBMUtils::GetDrm()
++{
++  return m_drm;
++}
++
++gbm * CGBMUtils::GetGbm()
++{
++  return m_gbm;
++}
++
+ bool CGBMUtils::InitGbm(RESOLUTION_INFO res)
+ {
+   GetMode(res);
+ 
+-  m_drm->gbm->width = m_drm->mode->hdisplay;
+-  m_drm->gbm->height = m_drm->mode->vdisplay;
++  m_gbm->width = m_drm->mode->hdisplay;
++  m_gbm->height = m_drm->mode->vdisplay;
+ 
+-  m_drm->gbm->surface = gbm_surface_create(m_drm->gbm->dev,
+-                                           m_drm->gbm->width,
+-                                           m_drm->gbm->height,
+-                                           GBM_FORMAT_ARGB8888,
+-                                           GBM_BO_USE_SCANOUT | GBM_BO_USE_RENDERING);
++  m_gbm->surface = gbm_surface_create(m_gbm->dev,
++                                      m_gbm->width,
++                                      m_gbm->height,
++                                      GBM_FORMAT_ARGB8888,
++                                      GBM_BO_USE_SCANOUT | GBM_BO_USE_RENDERING);
+ 
+-  if(!m_drm->gbm->surface)
++  if(!m_gbm->surface)
+   {
+     CLog::Log(LOGERROR, "CGBMUtils::%s - failed to create surface", __FUNCTION__);
+     return false;
+   }
+ 
+   CLog::Log(LOGDEBUG, "CGBMUtils::%s - created surface with size %dx%d", __FUNCTION__,
+-                                                                         m_drm->gbm->width,
+-                                                                         m_drm->gbm->height);
++                                                                         m_gbm->width,
++                                                                         m_gbm->height);
+ 
+   return true;
+ }
+ 
+ void CGBMUtils::DestroyGbm()
+ {
+-  if(m_drm->gbm->surface)
++  if(m_gbm->surface)
+   {
+-    gbm_surface_destroy(m_drm->gbm->surface);
++    gbm_surface_destroy(m_gbm->surface);
+   }
+ 
+-  m_drm->gbm->surface = nullptr;
++  m_gbm->surface = nullptr;
+ }
+ 
+ bool CGBMUtils::SetVideoMode(RESOLUTION_INFO res)
+ {
+   GetMode(res);
+ 
+-  gbm_surface_release_buffer(m_drm->gbm->surface, m_bo);
++  gbm_surface_release_buffer(m_gbm->surface, m_bo);
+ 
+-  m_bo = gbm_surface_lock_front_buffer(m_drm->gbm->surface);
++  m_bo = gbm_surface_lock_front_buffer(m_gbm->surface);
+   m_drm_fb = DrmFbGetFromBo(m_bo);
+ 
+   auto ret = drmModeSetCrtc(m_drm->fd,
+@@ -230,7 +242,7 @@ bool CGBMUtils::WaitingForFlip()
+     }
+   }
+ 
+-  gbm_surface_release_buffer(m_drm->gbm->surface, m_bo);
++  gbm_surface_release_buffer(m_gbm->surface, m_bo);
+   m_bo = m_next_bo;
+ 
+   return false;
+@@ -238,7 +250,7 @@ bool CGBMUtils::WaitingForFlip()
+ 
+ bool CGBMUtils::QueueFlip()
+ {
+-  m_next_bo = gbm_surface_lock_front_buffer(m_drm->gbm->surface);
++  m_next_bo = gbm_surface_lock_front_buffer(m_gbm->surface);
+   m_drm_fb = DrmFbGetFromBo(m_next_bo);
+ 
+   auto ret = drmModePageFlip(m_drm->fd,
+@@ -265,7 +277,7 @@ void CGBMUtils::FlipPage()
+ 
+   flip_happening = QueueFlip();
+ 
+-  if(g_Windowing.NoOfBuffers() >= 3 && gbm_surface_has_free_buffers(m_drm->gbm->surface))
++  if(g_Windowing.NoOfBuffers() >= 3 && gbm_surface_has_free_buffers(m_gbm->surface))
+   {
+     return;
+   }
+@@ -367,7 +379,7 @@ bool CGBMUtils::GetPreferredMode()
+   return true;
+ }
+ 
+-drm * CGBMUtils::InitDrm()
++bool CGBMUtils::InitDrm()
+ {
+   const char *device = "/dev/dri/card0";
+ 
+@@ -375,22 +387,22 @@ drm * CGBMUtils::InitDrm()
+ 
+   if(m_drm->fd < 0)
+   {
+-    return nullptr;
++    return false;
+   }
+ 
+   if(!GetResources())
+   {
+-    return nullptr;
++    return false;
+   }
+ 
+   if(!GetConnector())
+   {
+-    return nullptr;
++    return false;
+   }
+ 
+   if(!GetEncoder())
+   {
+-    return nullptr;
++    return false;
+   }
+   else
+   {
+@@ -399,7 +411,7 @@ drm * CGBMUtils::InitDrm()
+ 
+   if(!GetPreferredMode())
+   {
+-    return nullptr;
++    return false;
+   }
+ 
+   for(auto i = 0; i < m_drm_resources->count_crtcs; i++)
+@@ -415,9 +427,8 @@ drm * CGBMUtils::InitDrm()
+ 
+   drmSetMaster(m_drm->fd);
+ 
+-  m_drm->gbm = new gbm;
+-  m_drm->gbm->dev = gbm_create_device(m_drm->fd);
+-  m_drm->gbm->surface = nullptr;
++  m_gbm->dev = gbm_create_device(m_drm->fd);
++  m_gbm->surface = nullptr;
+ 
+   m_drm_fds.fd = m_drm->fd;
+   m_drm_fds.events = POLLIN;
+@@ -428,7 +439,7 @@ drm * CGBMUtils::InitDrm()
+   m_drm->connector_id = m_drm_connector->connector_id;
+   m_orig_crtc = drmModeGetCrtc(m_drm->fd, m_drm->crtc_id);
+ 
+-  return m_drm;
++  return true;
+ }
+ 
+ bool CGBMUtils::RestoreOriginalMode()
+@@ -465,14 +476,14 @@ void CGBMUtils::DestroyDrm()
+ {
+   RestoreOriginalMode();
+ 
+-  if(m_drm->gbm->surface)
++  if(m_gbm->surface)
+   {
+-    gbm_surface_destroy(m_drm->gbm->surface);
++    gbm_surface_destroy(m_gbm->surface);
+   }
+ 
+-  if(m_drm->gbm->dev)
++  if(m_gbm->dev)
+   {
+-    gbm_device_destroy(m_drm->gbm->dev);
++    gbm_device_destroy(m_gbm->dev);
+   }
+ 
+   if(m_drm_encoder)
+@@ -503,9 +514,10 @@ void CGBMUtils::DestroyDrm()
+   m_drm->crtc_id = 0;
+   m_drm->crtc_index = 0;
+   m_drm->fd = -1;
+-  m_drm->gbm = nullptr;
+   m_drm->mode = nullptr;
+ 
++  m_gbm = nullptr;
++
+   m_bo = nullptr;
+   m_next_bo = nullptr;
+ }
+diff --git a/xbmc/windowing/gbm/GBMUtils.h b/xbmc/windowing/gbm/GBMUtils.h
+index aaf7074623..874c10045c 100644
+--- a/xbmc/windowing/gbm/GBMUtils.h
++++ b/xbmc/windowing/gbm/GBMUtils.h
+@@ -52,8 +52,6 @@ struct drm
+ {
+   int fd;
+ 
+-  struct gbm *gbm;
+-
+   struct crtc *crtc;
+   struct connector *connector;
+   int crtc_index;
+@@ -72,7 +70,9 @@ struct drm_fb
+ class CGBMUtils
+ {
+ public:
+-  static drm * InitDrm();
++  static gbm * GetGbm();
++  static drm * GetDrm();
++  static bool InitDrm();
+   static bool InitGbm(RESOLUTION_INFO res);
+   static void DestroyGbm();
+   static bool SetVideoMode(RESOLUTION_INFO res);
+diff --git a/xbmc/windowing/gbm/GLContextEGL.cpp b/xbmc/windowing/gbm/GLContextEGL.cpp
+index 052e97a277..05406ce102 100644
+--- a/xbmc/windowing/gbm/GLContextEGL.cpp
++++ b/xbmc/windowing/gbm/GLContextEGL.cpp
+@@ -20,11 +20,12 @@
+ 
+ #include "GLContextEGL.h"
+ 
+-#include <EGL/eglext.h>
+ #include "guilib/IDirtyRegionSolver.h"
+ #include "settings/AdvancedSettings.h"
+ #include "utils/log.h"
+ 
++#include <EGL/eglext.h>
++
+ CGLContextEGL::CGLContextEGL() :
+   m_eglDisplay(EGL_NO_DISPLAY),
+   m_eglSurface(EGL_NO_SURFACE),
+@@ -38,13 +39,19 @@ CGLContextEGL::~CGLContextEGL()
+   Destroy();
+ }
+ 
+-bool CGLContextEGL::CreateDisplay(gbm_device* display,
++bool CGLContextEGL::CreateDisplay(EGLDisplay display,
+                                   EGLint renderable_type,
+                                   EGLint rendering_api)
+ {
+   EGLint neglconfigs = 0;
+   int major, minor;
+ 
++  EGLint surface_type = EGL_WINDOW_BIT;
++  // for the non-trivial dirty region modes, we need the EGL buffer to be preserved across updates
++  if (g_advancedSettings.m_guiAlgorithmDirtyRegions == DIRTYREGION_SOLVER_COST_REDUCTION ||
++      g_advancedSettings.m_guiAlgorithmDirtyRegions == DIRTYREGION_SOLVER_UNION)
++    surface_type |= EGL_SWAP_BEHAVIOR_PRESERVED_BIT;
++
+   EGLint attribs[] =
+   {
+     EGL_RED_SIZE,        8,
+@@ -55,7 +62,7 @@ bool CGLContextEGL::CreateDisplay(gbm_device* display,
+     EGL_STENCIL_SIZE,    0,
+     EGL_SAMPLE_BUFFERS,  0,
+     EGL_SAMPLES,         0,
+-    EGL_SURFACE_TYPE,    EGL_WINDOW_BIT,
++    EGL_SURFACE_TYPE,    surface_type,
+     EGL_RENDERABLE_TYPE, renderable_type,
+     EGL_NONE
+   };
+@@ -142,13 +149,32 @@ bool CGLContextEGL::BindContext()
+   return true;
+ }
+ 
+-bool CGLContextEGL::CreateSurface(gbm_surface* surface)
++bool CGLContextEGL::SurfaceAttrib()
+ {
+-  EGLNativeWindowType egl_nwin = (EGLNativeWindowType)surface;
++  // for the non-trivial dirty region modes, we need the EGL buffer to be preserved across updates
++  if (g_advancedSettings.m_guiAlgorithmDirtyRegions == DIRTYREGION_SOLVER_COST_REDUCTION ||
++      g_advancedSettings.m_guiAlgorithmDirtyRegions == DIRTYREGION_SOLVER_UNION)
++  {
++    if ((m_eglDisplay == EGL_NO_DISPLAY) || (m_eglSurface == EGL_NO_SURFACE))
++    {
++      return false;
++    }
++
++    if (!eglSurfaceAttrib(m_eglDisplay, m_eglSurface, EGL_SWAP_BEHAVIOR, EGL_BUFFER_PRESERVED))
++    {
++      CLog::Log(LOGDEBUG, "%s: Could not set EGL_SWAP_BEHAVIOR",__FUNCTION__);
++    }
++  }
+ 
++  return true;
++}
++
++bool CGLContextEGL::CreateSurface(EGLNativeWindowType surface)
++{
+   m_eglSurface = eglCreateWindowSurface(m_eglDisplay,
+                                         m_eglConfig,
+-                                        egl_nwin, nullptr);
++                                        surface,
++                                        nullptr);
+ 
+   if (m_eglSurface == EGL_NO_SURFACE)
+   {
+@@ -195,6 +221,16 @@ void CGLContextEGL::Detach()
+   }
+ }
+ 
++bool CGLContextEGL::SetVSync(bool enable)
++{
++  if (!eglSwapInterval(m_eglDisplay, enable))
++  {
++    return false;
++  }
++
++  return true;
++}
++
+ void CGLContextEGL::SwapBuffers()
+ {
+   if (m_eglDisplay == EGL_NO_DISPLAY || m_eglSurface == EGL_NO_SURFACE)
+diff --git a/xbmc/windowing/gbm/GLContextEGL.h b/xbmc/windowing/gbm/GLContextEGL.h
+index 86a5e9f71f..afea42950e 100644
+--- a/xbmc/windowing/gbm/GLContextEGL.h
++++ b/xbmc/windowing/gbm/GLContextEGL.h
+@@ -21,7 +21,6 @@
+ #pragma once
+ 
+ #include "EGL/egl.h"
+-#include "gbm.h"
+ 
+ class CGLContextEGL
+ {
+@@ -29,15 +28,17 @@ public:
+   CGLContextEGL();
+   virtual ~CGLContextEGL();
+ 
+-  bool CreateDisplay(gbm_device* connection,
++  bool CreateDisplay(EGLDisplay display,
+                      EGLint renderable_type,
+                      EGLint rendering_api);
+ 
+-  bool CreateSurface(gbm_surface* surface);
++  bool CreateSurface(EGLNativeWindowType surface);
+   bool CreateContext();
+   bool BindContext();
++  bool SurfaceAttrib();
+   void Destroy();
+   void Detach();
++  bool SetVSync(bool enable);
+   void SwapBuffers();
+ 
+   EGLDisplay m_eglDisplay;
+diff --git a/xbmc/windowing/gbm/WinSystemGbm.cpp b/xbmc/windowing/gbm/WinSystemGbm.cpp
+index 028e8920b7..e851a100e8 100644
+--- a/xbmc/windowing/gbm/WinSystemGbm.cpp
++++ b/xbmc/windowing/gbm/WinSystemGbm.cpp
+@@ -27,18 +27,34 @@
+ #include "utils/log.h"
+ 
+ CWinSystemGbm::CWinSystemGbm() :
+-  m_drm(nullptr)
++  m_gbm(nullptr),
++  m_drm(nullptr),
++  m_nativeDisplay(nullptr),
++  m_nativeWindow(nullptr)
+ {
+   m_eWindowSystem = WINDOW_SYSTEM_GBM;
+ }
+ 
+ bool CWinSystemGbm::InitWindowSystem()
+ {
+-  m_drm = CGBMUtils::InitDrm();
++  if (!CGBMUtils::InitDrm())
++  {
++    CLog::Log(LOGERROR, "CWinSystemGbm::%s - failed to initialize DRM", __FUNCTION__);
++    return false;
++  }
++
++  m_drm = CGBMUtils::GetDrm();
++  m_gbm = CGBMUtils::GetGbm();
++
++  m_nativeDisplay = m_gbm->dev;
+ 
+   if (!m_drm)
+   {
+-    CLog::Log(LOGERROR, "CWinSystemGbm::%s - failed to initialize DRM", __FUNCTION__);
++    return false;
++  }
++
++  if (!m_gbm)
++  {
+     return false;
+   }
+ 
+@@ -49,7 +65,9 @@ bool CWinSystemGbm::InitWindowSystem()
+ bool CWinSystemGbm::DestroyWindowSystem()
+ {
+   CGBMUtils::DestroyDrm();
++  m_nativeDisplay = nullptr;
+   m_drm = nullptr;
++  m_gbm = nullptr;
+ 
+   CLog::Log(LOGDEBUG, "CWinSystemGbm::%s - deinitialized DRM", __FUNCTION__);
+   return true;
+@@ -66,6 +84,8 @@ bool CWinSystemGbm::CreateNewWindow(const std::string& name,
+     return false;
+   }
+ 
++  m_nativeWindow = m_gbm->surface;
++
+   CLog::Log(LOGDEBUG, "CWinSystemGbm::%s - initialized GBM", __FUNCTION__);
+   return true;
+ }
+@@ -73,6 +93,7 @@ bool CWinSystemGbm::CreateNewWindow(const std::string& name,
+ bool CWinSystemGbm::DestroyWindow()
+ {
+   CGBMUtils::DestroyGbm();
++  m_nativeWindow = nullptr;
+ 
+   CLog::Log(LOGDEBUG, "CWinSystemGbm::%s - deinitialized GBM", __FUNCTION__);
+   return true;
+diff --git a/xbmc/windowing/gbm/WinSystemGbm.h b/xbmc/windowing/gbm/WinSystemGbm.h
+index 469f6d5fd0..08a2eecb38 100644
+--- a/xbmc/windowing/gbm/WinSystemGbm.h
++++ b/xbmc/windowing/gbm/WinSystemGbm.h
+@@ -21,6 +21,7 @@
+ #pragma once
+ 
+ #include <gbm.h>
++#include <EGL/egl.h>
+ 
+ #include "threads/CriticalSection.h"
+ #include "windowing/WinSystem.h"
+@@ -55,5 +56,9 @@ public:
+   virtual void Unregister(IDispResource *resource);
+ 
+ protected:
++  gbm* m_gbm;
+   drm* m_drm;
++
++  EGLDisplay m_nativeDisplay;
++  EGLNativeWindowType m_nativeWindow;
+ };
+diff --git a/xbmc/windowing/gbm/WinSystemGbmGLESContext.cpp b/xbmc/windowing/gbm/WinSystemGbmGLESContext.cpp
+index 89ede12c92..34ac539de4 100644
+--- a/xbmc/windowing/gbm/WinSystemGbmGLESContext.cpp
++++ b/xbmc/windowing/gbm/WinSystemGbmGLESContext.cpp
+@@ -28,7 +28,7 @@ bool CWinSystemGbmGLESContext::InitWindowSystem()
+     return false;
+   }
+ 
+-  if (!m_pGLContext.CreateDisplay(m_drm->gbm->dev,
++  if (!m_pGLContext.CreateDisplay(m_nativeDisplay,
+                                   EGL_OPENGL_ES2_BIT,
+                                   EGL_OPENGL_ES_API))
+   {
+@@ -55,7 +55,7 @@ bool CWinSystemGbmGLESContext::CreateNewWindow(const std::string& name,
+     return false;
+   }
+ 
+-  if (!m_pGLContext.CreateSurface(m_drm->gbm->surface))
++  if (!m_pGLContext.CreateSurface(m_nativeWindow))
+   {
+     return false;
+   }
+@@ -70,6 +70,11 @@ bool CWinSystemGbmGLESContext::CreateNewWindow(const std::string& name,
+     return false;
+   }
+ 
++  if (!m_pGLContext.SurfaceAttrib())
++  {
++    return false;
++  }
++
+   return true;
+ }
+ 

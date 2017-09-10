@@ -1,0 +1,328 @@
+From ea099295e8d88522f91cb77cd4eeb9484ae5efcf Mon Sep 17 00:00:00 2001
+From: Jonas Karlman <jonas@kwiboo.se>
+Date: Fri, 26 May 2017 20:53:19 +0200
+Subject: [PATCH 10/10] windowing/gbm: set video plane
+
+---
+ .../VideoRenderers/HwDecRender/RendererRKMPP.cpp   | 10 +++
+ xbmc/windowing/gbm/GBMUtils.cpp                    | 99 +++++++++++++++++++++-
+ xbmc/windowing/gbm/GBMUtils.h                      | 10 +++
+ xbmc/windowing/gbm/WinSystemGbmGLESContext.cpp     | 24 +++++-
+ xbmc/windowing/gbm/WinSystemGbmGLESContext.h       |  9 +-
+ 5 files changed, 148 insertions(+), 4 deletions(-)
+
+diff --git a/xbmc/cores/VideoPlayer/VideoRenderers/HwDecRender/RendererRKMPP.cpp b/xbmc/cores/VideoPlayer/VideoRenderers/HwDecRender/RendererRKMPP.cpp
+index 06363e8723..56c87ab275 100644
+--- a/xbmc/cores/VideoPlayer/VideoRenderers/HwDecRender/RendererRKMPP.cpp
++++ b/xbmc/cores/VideoPlayer/VideoRenderers/HwDecRender/RendererRKMPP.cpp
+@@ -45,6 +45,11 @@ CRendererRKMPP::~CRendererRKMPP()
+   //if (g_advancedSettings.CanLogComponent(LOGVIDEO))
+   //  CLog::Log(LOGDEBUG, "%s::%s - destroy %p", CLASSNAME, __FUNCTION__, this);
+ 
++#ifdef HAVE_GBM
++  // inject empty video frame into gbm windowing system
++  g_Windowing.SetVideoPlane(0, 0, nullptr, m_destRect);
++#endif
++
+   for (int i = 0; i < m_numRenderBuffers; ++i)
+     ReleaseBuffer(i);
+ }
+@@ -156,6 +161,11 @@ void CRendererRKMPP::RenderUpdate(bool clear, unsigned int flags, unsigned int a
+   {
+     //if (g_advancedSettings.CanLogComponent(LOGVIDEO))
+     //  CLog::Log(LOGDEBUG, "%s::%s - drmprime:%p pts:%" PRId64, CLASSNAME, __FUNCTION__, info, info->GetPTS());
++
++#ifdef HAVE_GBM
++    // inject video frame into gbm windowing system
++    g_Windowing.SetVideoPlane(info->GetWidth(), info->GetHeight(), info->GetDrmPrime(), m_destRect);
++#endif
+   }
+ 
+   m_iLastRenderBuffer = m_iRenderBuffer;
+diff --git a/xbmc/windowing/gbm/GBMUtils.cpp b/xbmc/windowing/gbm/GBMUtils.cpp
+index 1be0ae5611..2072b86e35 100644
+--- a/xbmc/windowing/gbm/GBMUtils.cpp
++++ b/xbmc/windowing/gbm/GBMUtils.cpp
+@@ -33,6 +33,7 @@
+ #include "guilib/gui3d.h"
+ #include "utils/log.h"
+ #include "settings/Settings.h"
++#include "settings/AdvancedSettings.h"
+ 
+ #include "GBMUtils.h"
+ 
+@@ -45,6 +46,7 @@ static struct gbm_bo *m_bo = nullptr;
+ static struct gbm_bo *m_next_bo = nullptr;
+ 
+ static drmModeResPtr m_drm_resources = nullptr;
++static drmModePlaneResPtr m_drm_plane_resources = nullptr;
+ static drmModeConnectorPtr m_drm_connector = nullptr;
+ static drmModeEncoderPtr m_drm_encoder = nullptr;
+ static drmModeCrtcPtr m_orig_crtc = nullptr;
+@@ -187,7 +189,7 @@ drm_fb * CGBMUtils::DrmFbGetFromBo(struct gbm_bo *bo)
+   auto ret = drmModeAddFB(m_drm->fd,
+                           width,
+                           height,
+-                          24,
++                          32,
+                           32,
+                           stride,
+                           handle,
+@@ -286,6 +288,74 @@ void CGBMUtils::FlipPage()
+   WaitingForFlip();
+ }
+ 
++void CGBMUtils::SetVideoPlane(uint32_t width, uint32_t height, av_drmprime* drmprime, const CRect& dest)
++{
++  uint32_t gem_handle = 0;
++  uint32_t fb_id = 0;
++
++  if (drmprime)
++  {
++    uint32_t pitches[4] = { 0, 0, 0, 0 };
++    uint32_t offsets[4] = { 0, 0, 0, 0 };
++    uint32_t handles[4] = { 0, 0, 0, 0 };
++
++    int ret = drmPrimeFDToHandle(m_drm->fd, drmprime->fds[0], &gem_handle);
++    if (ret < 0)
++    {
++      CLog::Log(LOGERROR, "CGBMUtils::%s - failed to retrieve the GEM handle, ret = %d", __FUNCTION__, ret);
++      return;
++    }
++
++    handles[0] = gem_handle;
++    pitches[0] = drmprime->strides[0];
++    offsets[0] = drmprime->offsets[0];
++
++    handles[1] = gem_handle;
++    pitches[1] = drmprime->strides[1];
++    offsets[1] = drmprime->offsets[1];
++
++    //if (g_advancedSettings.CanLogComponent(LOGVIDEO))
++    //  CLog::Log(LOGDEBUG, "CGBMUtils::%s - width:%u height:%u hor_stride:%u ver_stride:%u hdisplay:%d vdisplay:%d", __FUNCTION__, width, height, drmprime->strides[0], drmprime->offsets[1] / drmprime->strides[1], m_drm->mode->hdisplay, m_drm->mode->vdisplay);
++
++    ret = drmModeAddFB2(m_drm->fd, width, height, drmprime->format, handles, pitches, offsets, &fb_id, 0);
++    if (ret < 0)
++    {
++      CLog::Log(LOGERROR, "CGBMUtils::%s - failed add drm layer %d", __FUNCTION__, fb_id);
++      return;
++    }
++
++    int32_t crtc_x = (int32_t)dest.x1;
++    int32_t crtc_y = (int32_t)dest.y1;
++    uint32_t crtc_w = (uint32_t)dest.Width();
++    uint32_t crtc_h = (uint32_t)dest.Height();
++    uint32_t src_x = 0;
++    uint32_t src_y = 0;
++    uint32_t src_w = width << 16;
++    uint32_t src_h = height << 16;
++
++    ret = drmModeSetPlane(m_drm->fd, m_drm->video_plane_id, m_drm->crtc_id, fb_id, 0,
++                          crtc_x, crtc_y, crtc_w, crtc_h,
++                          src_x, src_y, src_w, src_h);
++    if (ret < 0)
++    {
++      CLog::Log(LOGERROR, "CGBMUtils::%s - failed to set the plane %d (buffer %d)", __FUNCTION__, m_drm->video_plane_id, fb_id);
++      return;
++    }
++  }
++
++  if (m_drm->video_fb_id)
++    drmModeRmFB(m_drm->fd, m_drm->video_fb_id);
++
++  if (m_drm->video_gem_handle)
++  {
++    struct drm_gem_close gem_close = { .handle = m_drm->video_gem_handle };
++    drmIoctl(m_drm->fd, DRM_IOCTL_GEM_CLOSE, &gem_close);
++  }
++
++  m_drm->video_fb_id = fb_id;
++  m_drm->video_gem_handle = gem_handle;
++}
++
+ bool CGBMUtils::GetResources()
+ {
+   m_drm_resources = drmModeGetResources(m_drm->fd);
+@@ -294,6 +364,12 @@ bool CGBMUtils::GetResources()
+     return false;
+   }
+ 
++  m_drm_plane_resources = drmModeGetPlaneResources(m_drm->fd);
++  if (!m_drm_plane_resources)
++  {
++    return false;
++  }
++
+   return true;
+ }
+ 
+@@ -424,6 +500,18 @@ bool CGBMUtils::InitDrm()
+     }
+   }
+ 
++  m_drm->video_plane_id = 0;
++  for (uint32_t i = 0; i < m_drm_plane_resources->count_planes; i++)
++  {
++    drmModePlane *plane = drmModeGetPlane(m_drm->fd, m_drm_plane_resources->planes[i]);
++    if (!plane)
++      continue;
++    if (!m_drm->video_plane_id && plane->possible_crtcs & (1 << m_drm->crtc_index))
++      m_drm->video_plane_id = plane->plane_id;
++    drmModeFreePlane(plane);
++  }
++
++  drmModeFreePlaneResources(m_drm_plane_resources);
+   drmModeFreeResources(m_drm_resources);
+ 
+   drmSetMaster(m_drm->fd);
+@@ -497,6 +585,11 @@ void CGBMUtils::DestroyDrm()
+     drmModeFreeConnector(m_drm_connector);
+   }
+ 
++  if (m_drm_plane_resources)
++  {
++     drmModeFreePlaneResources(m_drm_plane_resources);
++  }
++
+   if(m_drm_resources)
+   {
+     drmModeFreeResources(m_drm_resources);
+@@ -508,6 +601,7 @@ void CGBMUtils::DestroyDrm()
+   m_drm_encoder = nullptr;
+   m_drm_connector = nullptr;
+   m_drm_resources = nullptr;
++  m_drm_plane_resources = nullptr;
+ 
+   m_drm->connector = nullptr;
+   m_drm->connector_id = 0;
+@@ -515,6 +609,9 @@ void CGBMUtils::DestroyDrm()
+   m_drm->crtc_id = 0;
+   m_drm->crtc_index = 0;
+   m_drm->fd = -1;
++  m_drm->video_plane_id = 0;
++  m_drm->video_fb_id = 0;
++  m_drm->video_gem_handle = 0;
+   m_drm->mode = nullptr;
+ 
+   m_gbm = nullptr;
+diff --git a/xbmc/windowing/gbm/GBMUtils.h b/xbmc/windowing/gbm/GBMUtils.h
+index 874c10045c..43b00eb13b 100644
+--- a/xbmc/windowing/gbm/GBMUtils.h
++++ b/xbmc/windowing/gbm/GBMUtils.h
+@@ -25,8 +25,13 @@
+ #include <gbm.h>
+ #include <vector>
+ 
++#include "guilib/Geometry.h"
+ #include "guilib/Resolution.h"
+ 
++extern "C" {
++#include "libavcodec/drmprime.h"
++}
++
+ struct gbm
+ {
+   struct gbm_device *dev;
+@@ -59,6 +64,10 @@ struct drm
+   drmModeModeInfo *mode;
+   uint32_t crtc_id;
+   uint32_t connector_id;
++
++  uint32_t video_plane_id;
++  uint32_t video_fb_id;
++  uint32_t video_gem_handle;
+ };
+ 
+ struct drm_fb
+@@ -76,6 +85,7 @@ public:
+   static bool InitGbm(RESOLUTION_INFO res);
+   static void DestroyGbm();
+   static bool SetVideoMode(RESOLUTION_INFO res);
++  static void SetVideoPlane(uint32_t width, uint32_t height, av_drmprime* drmprime, const CRect& dest);
+   static void FlipPage();
+   static void DestroyDrm();
+   static bool GetModes(std::vector<RESOLUTION_INFO> &resolutions);
+diff --git a/xbmc/windowing/gbm/WinSystemGbmGLESContext.cpp b/xbmc/windowing/gbm/WinSystemGbmGLESContext.cpp
+index 34ac539de4..b857435984 100644
+--- a/xbmc/windowing/gbm/WinSystemGbmGLESContext.cpp
++++ b/xbmc/windowing/gbm/WinSystemGbmGLESContext.cpp
+@@ -19,6 +19,8 @@
+  */
+ 
+ #include "WinSystemGbmGLESContext.h"
++#include "linux/XTimeUtils.h"
++#include "settings/AdvancedSettings.h"
+ #include "utils/log.h"
+ 
+ bool CWinSystemGbmGLESContext::InitWindowSystem()
+@@ -95,13 +97,23 @@ bool CWinSystemGbmGLESContext::SetFullScreen(bool fullScreen, RESOLUTION_INFO& r
+   return true;
+ }
+ 
+-void CWinSystemGbmGLESContext::PresentRenderImpl(bool rendered)
++void CWinSystemGbmGLESContext::PresentRender(bool rendered, bool videoLayer)
+ {
+-  if (rendered)
++  if (!m_bRenderCreated)
++    return;
++
++  //if (g_advancedSettings.CanLogComponent(LOGVIDEO))
++  //  CLog::Log(LOGDEBUG, "CWinSystemGbmGLESContext::%s - rendered:%d videoLayer:%d", __FUNCTION__, rendered, videoLayer);
++
++  if (rendered || videoLayer)
+   {
+     m_pGLContext.SwapBuffers();
+     CGBMUtils::FlipPage();
+   }
++
++  // if video is rendered to a separate layer, we should not block this thread
++  if (!rendered && !videoLayer)
++    Sleep(40);
+ }
+ 
+ EGLDisplay CWinSystemGbmGLESContext::GetEGLDisplay() const
+@@ -123,3 +135,11 @@ EGLConfig  CWinSystemGbmGLESContext::GetEGLConfig() const
+ {
+   return m_pGLContext.m_eglConfig;
+ }
++
++void CWinSystemGbmGLESContext::SetVideoPlane(uint32_t width, uint32_t height, av_drmprime* drmprime, const CRect& dest) const
++{
++  //if (g_advancedSettings.CanLogComponent(LOGVIDEO))
++  //  CLog::Log(LOGDEBUG, "CWinSystemGbmGLESContext::%s - width:%u height:%u drmprime:%p", __FUNCTION__, width, height, drmprime);
++
++  CGBMUtils::SetVideoPlane(width, height, drmprime, dest);
++}
+diff --git a/xbmc/windowing/gbm/WinSystemGbmGLESContext.h b/xbmc/windowing/gbm/WinSystemGbmGLESContext.h
+index 55d3145f2f..4d43e06119 100644
+--- a/xbmc/windowing/gbm/WinSystemGbmGLESContext.h
++++ b/xbmc/windowing/gbm/WinSystemGbmGLESContext.h
+@@ -25,6 +25,10 @@
+ #include "utils/GlobalsHandling.h"
+ #include "WinSystemGbm.h"
+ 
++extern "C" {
++#include "libavcodec/drmprime.h"
++}
++
+ class CWinSystemGbmGLESContext : public CWinSystemGbm, public CRenderSystemGLES
+ {
+ public:
+@@ -38,13 +42,16 @@ public:
+                        PHANDLE_EVENT_FUNC userFunction) override;
+ 
+   bool SetFullScreen(bool fullScreen, RESOLUTION_INFO& res, bool blankOtherDisplays) override;
++  void PresentRender(bool rendered, bool videoLayer) override;
+   EGLDisplay GetEGLDisplay() const;
+   EGLSurface GetEGLSurface() const;
+   EGLContext GetEGLContext() const;
+   EGLConfig  GetEGLConfig() const;
++
++  void SetVideoPlane(uint32_t width, uint32_t height, av_drmprime* drmprime, const CRect& dest) const;
+ protected:
+   void SetVSyncImpl(bool enable) override { return; };
+-  void PresentRenderImpl(bool rendered) override;
++  void PresentRenderImpl(bool rendered) override {};
+ 
+ private:
+   CGLContextEGL m_pGLContext;

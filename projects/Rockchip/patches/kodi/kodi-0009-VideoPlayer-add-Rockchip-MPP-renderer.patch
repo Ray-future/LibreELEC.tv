@@ -1,0 +1,335 @@
+From ca08abd186b04b728ab41d887f917757ed581301 Mon Sep 17 00:00:00 2001
+From: Jonas Karlman <jonas@kwiboo.se>
+Date: Fri, 26 May 2017 20:53:19 +0200
+Subject: [PATCH 09/10] VideoPlayer: add Rockchip MPP renderer
+
+---
+ .../VideoRenderers/HwDecRender/CMakeLists.txt      |   5 +
+ .../VideoRenderers/HwDecRender/RendererRKMPP.cpp   | 186 +++++++++++++++++++++
+ .../VideoRenderers/HwDecRender/RendererRKMPP.h     |  72 ++++++++
+ .../VideoPlayer/VideoRenderers/RenderManager.cpp   |  10 ++
+ 4 files changed, 273 insertions(+)
+ create mode 100644 xbmc/cores/VideoPlayer/VideoRenderers/HwDecRender/RendererRKMPP.cpp
+ create mode 100644 xbmc/cores/VideoPlayer/VideoRenderers/HwDecRender/RendererRKMPP.h
+
+diff --git a/xbmc/cores/VideoPlayer/VideoRenderers/HwDecRender/CMakeLists.txt b/xbmc/cores/VideoPlayer/VideoRenderers/HwDecRender/CMakeLists.txt
+index 539cab57bd..2d09d090e3 100644
+--- a/xbmc/cores/VideoPlayer/VideoRenderers/HwDecRender/CMakeLists.txt
++++ b/xbmc/cores/VideoPlayer/VideoRenderers/HwDecRender/CMakeLists.txt
+@@ -43,6 +43,11 @@ if(IMX_FOUND)
+   list(APPEND HEADERS RendererIMX.h)
+ endif()
+ 
++if(RK_FOUND)
++  list(APPEND SOURCES RendererRKMPP.cpp)
++  list(APPEND HEADERS RendererRKMPP.h)
++endif()
++
+ if(CORE_SYSTEM_NAME STREQUAL android)
+   list(APPEND SOURCES RendererMediaCodec.cpp
+                       RendererMediaCodecSurface.cpp)
+diff --git a/xbmc/cores/VideoPlayer/VideoRenderers/HwDecRender/RendererRKMPP.cpp b/xbmc/cores/VideoPlayer/VideoRenderers/HwDecRender/RendererRKMPP.cpp
+new file mode 100644
+index 0000000000..06363e8723
+--- /dev/null
++++ b/xbmc/cores/VideoPlayer/VideoRenderers/HwDecRender/RendererRKMPP.cpp
+@@ -0,0 +1,186 @@
++/*
++ *      Copyright (C) 2017 Team Kodi
++ *      http://kodi.tv
++ *
++ *  This Program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation; either version 2, or (at your option)
++ *  any later version.
++ *
++ *  This Program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this Program; see the file COPYING.  If not, see
++ *  <http://www.gnu.org/licenses/>.
++ *
++ */
++
++#include "RendererRKMPP.h"
++
++#ifdef HAS_RKMPP
++
++#include "cores/VideoPlayer/VideoRenderers/RenderCapture.h"
++#include "settings/AdvancedSettings.h"
++#include "settings/MediaSettings.h"
++#include "utils/log.h"
++#include "windowing/WindowingFactory.h"
++
++#undef CLASSNAME
++#define CLASSNAME "CRendererRKMPP"
++
++CRendererRKMPP::CRendererRKMPP()
++  : m_bConfigured(false)
++  , m_iRenderBuffer(0)
++  , m_iLastRenderBuffer(-1)
++{
++  //if (g_advancedSettings.CanLogComponent(LOGVIDEO))
++  //  CLog::Log(LOGDEBUG, "%s::%s - create %p", CLASSNAME, __FUNCTION__, this);
++}
++
++CRendererRKMPP::~CRendererRKMPP()
++{
++  //if (g_advancedSettings.CanLogComponent(LOGVIDEO))
++  //  CLog::Log(LOGDEBUG, "%s::%s - destroy %p", CLASSNAME, __FUNCTION__, this);
++
++  for (int i = 0; i < m_numRenderBuffers; ++i)
++    ReleaseBuffer(i);
++}
++
++bool CRendererRKMPP::Configure(unsigned int width, unsigned int height, unsigned int d_width, unsigned int d_height, float fps, unsigned flags, ERenderFormat format, unsigned extended_format, unsigned int orientation)
++{
++  CLog::Log(LOGNOTICE, "%s::%s - width:%u height:%u d_width:%u d_height:%u flags:%u orientation:%u configured:%d", CLASSNAME, __FUNCTION__, width, height, d_width, d_height, flags, orientation, m_bConfigured);
++
++  m_sourceWidth = width;
++  m_sourceHeight = height;
++  m_renderOrientation = orientation;
++
++  // Save the flags.
++  m_iFlags = flags;
++  m_format = format;
++
++  // Calculate the input frame aspect ratio.
++  CalculateFrameAspectRatio(d_width, d_height);
++  SetViewMode(CMediaSettings::GetInstance().GetCurrentVideoSettings().m_ViewMode);
++  ManageRenderArea();
++
++  m_bConfigured = true;
++
++  for (int i = 0; i < m_numRenderBuffers; ++i)
++    m_buffers[i].hwPic = nullptr;
++
++  m_iLastRenderBuffer = -1;
++
++  return true;
++}
++
++int CRendererRKMPP::GetImage(YV12Image* image, int source, bool readonly)
++{
++  if (image == nullptr)
++    return -1;
++
++  // take next available buffer
++  if (source == -1)
++    source = (m_iRenderBuffer + 1) % m_numRenderBuffers;
++
++  return source;
++}
++
++void CRendererRKMPP::AddVideoPictureHW(DVDVideoPicture& picture, int index)
++{
++  //if (g_advancedSettings.CanLogComponent(LOGVIDEO))
++  //  CLog::Log(LOGDEBUG, "%s::%s - index:%d drmprime:%p configured:%d", CLASSNAME, __FUNCTION__, index, picture.drmprime, m_bConfigured);
++
++  ReleaseBuffer(index); // probably useless
++
++  BUFFER& buf = m_buffers[index];
++  buf.hwPic = picture.drmprime ? picture.drmprime->Retain() : nullptr;
++}
++
++void CRendererRKMPP::FlipPage(int source)
++{
++  //if (g_advancedSettings.CanLogComponent(LOGVIDEO))
++  //  CLog::Log(LOGDEBUG, "%s::%s - source:%d renderbuffer:%d configured:%d", CLASSNAME, __FUNCTION__, source, m_iRenderBuffer, m_bConfigured);
++
++  if (source >= 0 && source < m_numRenderBuffers)
++    m_iRenderBuffer = source;
++  else
++    m_iRenderBuffer = (m_iRenderBuffer + 1) % m_numRenderBuffers;
++}
++
++void CRendererRKMPP::ReleaseBuffer(int index)
++{
++  BUFFER& buf = m_buffers[index];
++  if (buf.hwPic)
++  {
++    //if (g_advancedSettings.CanLogComponent(LOGVIDEO))
++    //  CLog::Log(LOGDEBUG, "%s::%s - index:%d drmprime:%p", CLASSNAME, __FUNCTION__, index, buf.hwPic);
++
++    CDVDDrmPrimeInfo* info = static_cast<CDVDDrmPrimeInfo *>(buf.hwPic);
++    SAFE_RELEASE(info);
++    buf.hwPic = nullptr;
++  }
++}
++
++bool CRendererRKMPP::NeedBuffer(int index)
++{
++  return m_iLastRenderBuffer == index;
++}
++
++CRenderInfo CRendererRKMPP::GetRenderInfo()
++{
++  CRenderInfo info;
++  info.formats.push_back(RENDER_FMT_RKMPP);
++  info.max_buffer_size = m_numRenderBuffers;
++  info.optimal_buffer_size = m_numRenderBuffers;
++  return info;
++}
++
++void CRendererRKMPP::Update()
++{
++  if (!m_bConfigured)
++    return;
++
++  ManageRenderArea();
++}
++
++void CRendererRKMPP::RenderUpdate(bool clear, unsigned int flags, unsigned int alpha)
++{
++  if (m_iLastRenderBuffer == m_iRenderBuffer)
++    return;
++
++  CDVDDrmPrimeInfo* info = static_cast<CDVDDrmPrimeInfo *>(m_buffers[m_iRenderBuffer].hwPic);
++  if (info)
++  {
++    //if (g_advancedSettings.CanLogComponent(LOGVIDEO))
++    //  CLog::Log(LOGDEBUG, "%s::%s - drmprime:%p pts:%" PRId64, CLASSNAME, __FUNCTION__, info, info->GetPTS());
++  }
++
++  m_iLastRenderBuffer = m_iRenderBuffer;
++}
++
++bool CRendererRKMPP::RenderCapture(CRenderCapture* capture)
++{
++  capture->BeginRender();
++  capture->EndRender();
++  return true;
++}
++
++bool CRendererRKMPP::Supports(ERENDERFEATURE feature)
++{
++  if (feature == RENDERFEATURE_ZOOM ||
++      feature == RENDERFEATURE_STRETCH ||
++      feature == RENDERFEATURE_PIXEL_RATIO)
++    return true;
++
++  return false;
++}
++
++bool CRendererRKMPP::Supports(ESCALINGMETHOD method)
++{
++  return false;
++}
++
++#endif
+diff --git a/xbmc/cores/VideoPlayer/VideoRenderers/HwDecRender/RendererRKMPP.h b/xbmc/cores/VideoPlayer/VideoRenderers/HwDecRender/RendererRKMPP.h
+new file mode 100644
+index 0000000000..76e5843980
+--- /dev/null
++++ b/xbmc/cores/VideoPlayer/VideoRenderers/HwDecRender/RendererRKMPP.h
+@@ -0,0 +1,72 @@
++/*
++ *      Copyright (C) 2017 Team Kodi
++ *      http://kodi.tv
++ *
++ *  This Program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation; either version 2, or (at your option)
++ *  any later version.
++ *
++ *  This Program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this Program; see the file COPYING.  If not, see
++ *  <http://www.gnu.org/licenses/>.
++ *
++ */
++
++#pragma once
++
++#include "system.h"
++
++#ifdef HAS_RKMPP
++
++#include "cores/VideoPlayer/VideoRenderers/BaseRenderer.h"
++#include "DVDCodecs/Video/RKMPP.h"
++
++class CRendererRKMPP : public CBaseRenderer
++{
++public:
++  CRendererRKMPP();
++  virtual ~CRendererRKMPP();
++
++  // Player functions
++  bool Configure(unsigned int width, unsigned int height, unsigned int d_width, unsigned int d_height, float fps, unsigned flags, ERenderFormat format, unsigned extended_format, unsigned int orientation) override;
++  bool IsConfigured() override { return m_bConfigured; };
++  int GetImage(YV12Image* image, int source = -1, bool readonly = false) override;
++  void ReleaseImage(int source, bool preserve = false) override {};
++  void AddVideoPictureHW(DVDVideoPicture& picture, int index) override;
++  void FlipPage(int source) override;
++  void PreInit() override {};
++  void UnInit() override {};
++  void Reset() override {};
++  void ReleaseBuffer(int idx) override;
++  bool NeedBuffer(int idx) override;
++  bool IsGuiLayer() override { return false; };
++  CRenderInfo GetRenderInfo() override;
++  void Update() override;
++  void RenderUpdate(bool clear, unsigned int flags = 0, unsigned int alpha = 255) override;
++  bool RenderCapture(CRenderCapture* capture) override;
++
++  // Feature support
++  bool SupportsMultiPassRendering() override { return false; };
++  bool Supports(ERENDERFEATURE feature) override;
++  bool Supports(ESCALINGMETHOD method) override;
++
++private:
++  bool m_bConfigured;
++
++  int m_iRenderBuffer;
++  int m_iLastRenderBuffer;
++  static const int m_numRenderBuffers = 4;
++
++  struct BUFFER
++  {
++    void *hwPic;
++  } m_buffers[m_numRenderBuffers];
++};
++
++#endif
+diff --git a/xbmc/cores/VideoPlayer/VideoRenderers/RenderManager.cpp b/xbmc/cores/VideoPlayer/VideoRenderers/RenderManager.cpp
+index 4a326207b8..71e8c3ab65 100644
+--- a/xbmc/cores/VideoPlayer/VideoRenderers/RenderManager.cpp
++++ b/xbmc/cores/VideoPlayer/VideoRenderers/RenderManager.cpp
+@@ -55,6 +55,9 @@
+ #if defined(HAS_LIBAMCODEC)
+ #include "HwDecRender/RendererAML.h"
+ #endif
++#if defined(HAS_RKMPP)
++#include "HwDecRender/RendererRKMPP.h"
++#endif
+ #if defined(HAVE_LIBOPENMAX)
+ #include "HwDecRender/RendererOpenMax.h"
+ #endif
+@@ -583,6 +586,12 @@ void CRenderManager::CreateRenderer()
+       m_pRenderer = new CRendererAML;
+ #endif
+     }
++    else if (m_format == RENDER_FMT_RKMPP)
++    {
++#if defined(HAS_RKMPP)
++      m_pRenderer = new CRendererRKMPP;
++#endif
++    }
+     else if (m_format != RENDER_FMT_NONE)
+     {
+ #if defined(HAS_MMAL)
+@@ -1147,6 +1156,7 @@ int CRenderManager::AddVideoPicture(DVDVideoPicture& pic)
+   || pic.format == RENDER_FMT_MEDIACODEC
+   || pic.format == RENDER_FMT_MEDIACODECSURFACE
+   || pic.format == RENDER_FMT_AML
++  || pic.format == RENDER_FMT_RKMPP
+   || pic.format == RENDER_FMT_IMXMAP
+   || pic.format == RENDER_FMT_MMAL
+   || m_pRenderer->IsPictureHW(pic))

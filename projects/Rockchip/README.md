@@ -4,6 +4,8 @@ This project is for Rockchip SoC devices
 
 ## Devices
 
+* [ASUS Tinker Board](devices/TinkerBoard)
+
 ## Code
 
 * FFmpeg: https://github.com/LongChair/FFmpeg/commits/rockchip

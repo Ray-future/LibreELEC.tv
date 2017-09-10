@@ -1,0 +1,112 @@
+diff -Naur a/utils/keytable/rc_keymaps/odroid b/utils/keytable/rc_keymaps/odroid
+--- a/utils/keytable/rc_keymaps/odroid	1970-01-01 00:00:00.000000000 +0000
++++ b/utils/keytable/rc_keymaps/odroid	2017-09-06 00:00:00.000000000 +0000
+@@ -0,0 +1,13 @@
++# table odroid, type: NEC
++0xb2dc KEY_POWER
++0xb288 KEY_MUTE
++0xb282 KEY_HOME
++0xb2ce KEY_OK
++0xb2ca KEY_UP
++0xb299 KEY_LEFT
++0xb2c1 KEY_RIGHT
++0xb2d2 KEY_DOWN
++0xb2c5 KEY_MENU
++0xb29a KEY_BACK
++0xb281 KEY_VOLUMEDOWN
++0xb280 KEY_VOLUMEUP
+diff -Naur a/utils/keytable/rc_keymaps/pine64 b/utils/keytable/rc_keymaps/pine64
+--- a/utils/keytable/rc_keymaps/pine64	1970-01-01 00:00:00.000000000 +0000
++++ b/utils/keytable/rc_keymaps/pine64	2017-09-06 00:00:00.000000000 +0000
+@@ -0,0 +1,26 @@
++# table pine64, type: NEC
++0x404000 KEY_NUMERIC_0
++0x404001 KEY_NUMERIC_1
++0x404002 KEY_NUMERIC_2
++0x404003 KEY_NUMERIC_3
++0x404004 KEY_NUMERIC_4
++0x404005 KEY_NUMERIC_5
++0x404006 KEY_NUMERIC_6
++0x404007 KEY_NUMERIC_7
++0x404008 KEY_NUMERIC_8
++0x404009 KEY_NUMERIC_9
++0x40400a KEY_MUTE
++0x40400b KEY_UP
++0x40400c KEY_BACKSPACE
++0x40400d KEY_OK
++0x40400e KEY_DOWN
++0x404010 KEY_LEFT
++0x404011 KEY_RIGHT
++0x404017 KEY_VOLUMEDOWN
++0x404018 KEY_VOLUMEUP
++0x40401a KEY_HOME
++0x40401d KEY_MENU
++0x40401f KEY_WWW
++0x404045 KEY_BACK
++0x404047 KEY_INFO
++0x40404d KEY_POWER
+diff -Naur a/utils/keytable/rc_keymaps/wetek_hub b/utils/keytable/rc_keymaps/wetek_hub
+--- a/utils/keytable/rc_keymaps/wetek_hub	1970-01-01 00:00:00.000000000 +0000
++++ b/utils/keytable/rc_keymaps/wetek_hub	2017-09-06 00:00:00.000000000 +0000
+@@ -0,0 +1,13 @@
++# table wetek_hub, type: NEC
++0x77f1 KEY_POWER
++0x77f2 KEY_HOME
++0x77f3 KEY_MUTE
++0x77f4 KEY_UP
++0x77f5 KEY_DOWN
++0x77f6 KEY_LEFT
++0x77f7 KEY_RIGHT
++0x77f8 KEY_OK
++0x77f9 KEY_BACK
++0x77fa KEY_MENU
++0x77fb KEY_VOLUMEUP
++0x77fc KEY_VOLUMEDOWN
+diff -Naur a/utils/keytable/rc_keymaps/wetek_play_2 b/utils/keytable/rc_keymaps/wetek_play_2
+--- a/utils/keytable/rc_keymaps/wetek_play_2	1970-01-01 00:00:00.000000000 +0000
++++ b/utils/keytable/rc_keymaps/wetek_play_2	2017-09-06 00:00:00.000000000 +0000
+@@ -0,0 +1,44 @@
++# table wetek_play_2, type: NEC
++0x5e5f02 KEY_POWER
++0x5e5f46 KEY_POWER2
++0x5e5f10 KEY_MUTE
++0x5e5f22 KEY_NUMERIC_1
++0x5e5f23 KEY_NUMERIC_2
++0x5e5f24 KEY_NUMERIC_3
++0x5e5f25 KEY_NUMERIC_4
++0x5e5f26 KEY_NUMERIC_5
++0x5e5f27 KEY_NUMERIC_6
++0x5e5f28 KEY_NUMERIC_7
++0x5e5f29 KEY_NUMERIC_8
++0x5e5f30 KEY_NUMERIC_9
++0x5e5f71 KEY_BACKSPACE
++0x5e5f21 KEY_NUMERIC_0
++0x5e5f72 KEY_CAPSLOCK
++0x5e5f03 KEY_HOME
++0x5e5f48 KEY_MENU
++0x5e5f61 KEY_BACK
++0x5e5f83 KEY_INFO
++0x5e5f84 KEY_COMPOSE
++0x5e5f77 KEY_HELP
++0x5e5f50 KEY_UP
++0x5e5f4b KEY_DOWN
++0x5e5f4c KEY_LEFT
++0x5e5f4d KEY_RIGHT
++0x5e5f47 KEY_OK
++0x5e5f44 KEY_VOLUMEUP
++0x5e5f43 KEY_VOLUMEDOWN
++0x5e5f41 KEY_CHANNELUP
++0x5e5f42 KEY_CHANNELDOWN
++0x5e5f4f KEY_ZENKAKUHANKAKU
++0x5e5f82 KEY_TEXT
++0x5e5f73 KEY_RED
++0x5e5f74 KEY_GREEN
++0x5e5f75 KEY_YELLOW
++0x5e5f76 KEY_BLUE
++0x5e5f67 KEY_PREVIOUS
++0x5e5f79 KEY_REWIND
++0x5e5f80 KEY_FASTFORWARD
++0x5e5f81 KEY_NEXT
++0x5e5f04 KEY_RECORD
++0x5e5f2c KEY_PLAYPAUSE
++0x5e5f2b KEY_STOP

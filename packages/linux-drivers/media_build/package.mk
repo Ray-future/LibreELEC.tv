@@ -45,6 +45,9 @@ make_target() {
     amlogic-*)
       cp $PKG_DIR/config/amlogic.config v4l/.config
       ;;
+    rockchip-*)
+      cp $PKG_DIR/config/rockchip.config v4l/.config
+      ;;
     *)
       if [ "$PROJECT" = Generic ] || [ "$PROJECT" = Virtual ]; then
         if [ -f $PKG_DIR/config/generic.config ]; then

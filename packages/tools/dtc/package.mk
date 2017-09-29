@@ -42,3 +42,8 @@ makeinstall_host() {
   mkdir -p $TOOLCHAIN/bin
     cp -P $PKG_BUILD/dtc $TOOLCHAIN/bin
 }
+
+makeinstall_host() {
+  mkdir -p $TOOLCHAIN/bin
+    cp -P $PKG_BUILD/dtc $TOOLCHAIN/bin
+}

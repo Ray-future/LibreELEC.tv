@@ -35,7 +35,7 @@ case "$LINUX" in
     PKG_PATCH_DIRS="amlogic-3.10"
     ;;
   amlogic-3.14)
-    PKG_VERSION="f6f2e4c"
+    PKG_VERSION="c8c32b4"
     PKG_URL="https://github.com/LibreELEC/linux-amlogic/archive/$PKG_VERSION.tar.gz"
     PKG_SOURCE_DIR="$PKG_NAME-amlogic-$PKG_VERSION*"
     PKG_PATCH_DIRS="amlogic-3.14"
@@ -64,7 +64,7 @@ case "$LINUX" in
     PKG_PATCH_DIRS="default-rpi"
     ;;
   rockchip-4.4)
-    PKG_VERSION="31a29aae"
+    PKG_VERSION="5ab215ee"
     PKG_URL="https://github.com/rockchip-linux/kernel/archive/$PKG_VERSION.tar.gz"
     PKG_SOURCE_DIR="kernel-$PKG_VERSION*"
     PKG_PATCH_DIRS="rockchip-4.4"
@@ -158,7 +158,7 @@ post_patch() {
 }
 
 makeinstall_host() {
-  if [ $TARGET_KERNEL_ARCH = "arm64" ] && [ $TARGET_ARCH == "arm"  ]; then
+  if [ "$TARGET_KERNEL_ARCH" = "arm64" -a "$TARGET_ARCH" = "arm" ]; then
     make ARCH=$TARGET_ARCH INSTALL_HDR_PATH=dest headers_install
   else
     make ARCH=$TARGET_KERNEL_ARCH INSTALL_HDR_PATH=dest headers_install

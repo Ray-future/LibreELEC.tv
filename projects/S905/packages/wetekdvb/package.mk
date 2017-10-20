@@ -36,11 +36,11 @@ make_target() {
 }
 
 makeinstall_target() {
-  mkdir -p $INSTALL/usr/lib/modules/$(get_module_dir)/$PKG_NAME
-  cp wetekdvb.ko $INSTALL/usr/lib/modules/$(get_module_dir)/$PKG_NAME
+  mkdir -p $INSTALL/$(get_full_module_dir)/$PKG_NAME
+  cp wetekdvb.ko $INSTALL/$(get_full_module_dir)/$PKG_NAME
 
-  mkdir -p $INSTALL/usr/lib/firmware
-    cp firmware/* $INSTALL/usr/lib/firmware
+  mkdir -p $INSTALL/$(get_full_firmware_dir)
+    cp firmware/* $INSTALL/$(get_full_firmware_dir)
 }
 
 post_install() {

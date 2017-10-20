@@ -2,24 +2,38 @@
 # setup system defaults
 ################################################################################
 
-    TARGET_CPU="cortex-a53"
-
     case $TARGET_ARCH in
       aarch64)
+        TARGET_CPU="cortex-a53"
         TARGET_CPU_FLAGS="+crc+fp+simd"
+        TARGET_FEATURES="64bit neon"
         ;;
       arm)
+        TARGET_FLOAT=hard
+        TARGET_CPU="cortex-a53"
         TARGET_CPU_FLAGS="+crc"
         TARGET_FPU="neon-fp-armv8"
-        TARGET_FLOAT="hard"
+        TARGET_FEATURES="32bit neon"
         ;;
     esac
 
   # Bootloader to use (syslinux / u-boot / atv-bootloader / bcm2835-bootloader)
     BOOTLOADER="u-boot"
 
+  # u-boot version to use (default)
+    UBOOT_VERSION=""
+
+  # Configuration for u-boot
+    UBOOT_CONFIG=""
+
+  # Target Configfile for u-boot
+    UBOOT_CONFIGFILE=""
+
   # Kernel target
     KERNEL_TARGET="Image.lzo"
+
+  # Kernel extra targets to build
+    KERNEL_UBOOT_EXTRA_TARGET="gxbb_p200.dtb gxbb_p200_2G.dtb gxl_p212_1g.dtb gxl_p212_2g.dtb gxl_p230_2g.dtb"
 
   # Build Android kernel image using mkbootimg
     BUILD_ANDROID_BOOTIMG="yes"
@@ -29,19 +43,6 @@
 
   # Additional kernel make parameters (for example to specify the u-boot loadaddress)
     KERNEL_MAKE_EXTRACMD=""
-
-  # Kernel and u-boot options
-    case $SYSTEM in
-      C2)
-        UBOOT_VERSION="hardkernel"
-        UBOOT_CONFIG="odroidc2_defconfig"
-        UBOOT_CONFIGFILE="boot.ini"
-        KERNEL_UBOOT_EXTRA_TARGET="odroidc2.dtb"
-        ;;
-      *)
-        KERNEL_UBOOT_EXTRA_TARGET="gxbb_p200.dtb gxbb_p200_2G.dtb gxl_p212_1g.dtb gxl_p212_2g.dtb gxl_p230_2g.dtb"
-        ;;
-    esac
 
   # kernel image name
     KERNEL_NAME="kernel.img"

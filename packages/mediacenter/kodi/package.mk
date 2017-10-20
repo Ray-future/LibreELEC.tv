@@ -34,6 +34,16 @@ get_graphicdrivers
 
 PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET dbus"
 
+case $PROJECT in
+  S805|S905|S912)
+    PKG_PATCH_DIRS="amlogic-sX05"
+    if [ "$TARGET_ARCH" = "arm" ]; then
+      CFLAGS="$CFLAGS -mthumb"
+      CXXFLAGS="$CXXFLAGS -mthumb"
+    fi
+    ;;
+esac
+
 if [ "$DISPLAYSERVER" = "x11" ]; then
   PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET libX11 libXext libdrm libXrandr"
   KODI_XORG="-DCORE_PLATFORM_NAME=x11"
@@ -334,6 +344,12 @@ post_makeinstall_target() {
   fi
 
   debug_strip $INSTALL/usr/lib/kodi/kodi.bin
+
+  case $PROJECT in
+    S805|S905|S912)
+      cp $PKG_DIR/scripts/aml-hdmimonitor.sh $INSTALL/usr/lib/kodi/aml-hdmimonitor.sh
+      ;;
+  esac
 }
 
 post_install() {
@@ -346,4 +362,10 @@ post_install() {
   enable_service kodi-waitonnetwork.service
   enable_service kodi.service
   enable_service kodi-lirc-suspend.service
+
+  case $PROJECT in
+    S805|S905|S912)
+      enable_service kodi-aml-hdmimonitor.service
+      ;;
+  esac
 }

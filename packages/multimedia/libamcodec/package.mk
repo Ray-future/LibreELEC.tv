@@ -27,9 +27,9 @@ case $TARGET_KERNEL_ARCH in
     PKG_URL="https://github.com/codesnake/libamcodec/archive/$PKG_VERSION.tar.gz"
     ;;
   arm64)
-    PKG_VERSION="210755d"
-    PKG_SHA256="0c688d80bf1147177acf546230c255404e506ba687ca7bfddd4508d29958c279"
-    PKG_URL="http://amlinux.ru/source/$PKG_NAME-$PKG_VERSION.tar.gz"
+    PKG_VERSION="2fba80c"
+    PKG_SHA256="ace58aeed528d1096d7dd4812d044dbf67ac89eb476b93e019916e44feea06dc"
+    PKG_URL="https://github.com/surkovalex/libamcodec/archive/$PKG_VERSION.tar.gz"
     ;;
 esac
 PKG_DEPENDS_TARGET="toolchain alsa-lib"
@@ -53,4 +53,7 @@ makeinstall_target() {
 
   make -C amadec PREFIX="$INSTALL/usr" install
   make -C amcodec HEADERS_DIR="$INSTALL/usr/include/amcodec" PREFIX="$INSTALL/usr" install
+
+  # kodi prefers libamlplayer
+  ln -sf libamcodec.so $INSTALL/usr/lib/libamplayer.so
 }

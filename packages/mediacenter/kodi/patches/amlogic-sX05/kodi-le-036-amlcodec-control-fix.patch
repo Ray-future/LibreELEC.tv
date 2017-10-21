@@ -1,0 +1,238 @@
+From: afl1
+Date: 2017/10/5
+Subject: [PATCH] VideoPlayer: AMLCodec control fixies
+
+--- a/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp	2017-08-09 14:14:00.726055417 +0200
++++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp	2017-08-09 14:14:07.638597417 +0200
+@@ -254,7 +254,7 @@
+ #define CODEC_TAG_jpeg  (0x6765706a)
+ #define CODEC_TAG_mjpa  (0x61706a6d)
+ 
+-#define RW_WAIT_TIME    (20 * 1000) // 20ms
++#define RW_WAIT_TIME    (5 * 1000) // 20ms
+ 
+ #define P_PRE           (0x02000000)
+ #define F_PRE           (0x03000000)
+@@ -682,7 +682,7 @@
+                 pkt->data += len;
+                 pkt->data_size -= len;
+                 usleep(RW_WAIT_TIME);
+-                CLog::Log(LOGDEBUG, "usleep(RW_WAIT_TIME), len(%d)", len);
++                CLog::Log(LOGDEBUG, "Codec buffer full, try after %d ms, len(%d)", RW_WAIT_TIME / 1000, len);
+                 return PLAYER_SUCCESS;
+             }
+         } else {
+@@ -1442,6 +1442,7 @@
+   m_state = 0;
+   m_frameSizes.clear();
+   m_frameSizeSum = 0;
++  m_hints.pClock = hints.pClock;
+
+   if (!OpenAmlVideo(hints))
+   {
+@@ -1709,6 +1710,12 @@
+   if (!m_opened || !pData)
+     return false;
+ 
++  struct buf_status bs;
++  m_dll->codec_get_vbuf_state(&am_private->vcodec, &bs);
++  if (iSize > (size_t)bs.free_len) {
++    CLog::Log(LOGERROR, "CAMLCodec::AddData: packet to big: %d, probably corrupted", iSize);  
++    return false;
++  }
+   m_frameSizes.push_back(iSize);
+   m_frameSizeSum += iSize;
+ 
+@@ -1729,6 +1730,8 @@
+   am_private->am_pkt.data = pData;
+   am_private->am_pkt.data_size = iSize;
+ 
++    CLog::Log(LOGDEBUG, LOGVIDEO, "CAMLCodec::ADDData: dl:%d sum:%u sz:%u", bs.data_len, m_frameSizeSum, static_cast<unsigned int>(iSize));  
++
+   am_private->am_pkt.newflag    = 1;
+   am_private->am_pkt.isvalid    = 1;
+   am_private->am_pkt.avduration = 0;
+@@ -1769,11 +1769,17 @@
+     Reset();
+     return false;
+   }
++//  else
++//    usleep(2000);
+ 
+-  CLog::Log(LOGDEBUG, LOGVIDEO, "CAMLCodec::AddData: sz: %u, dts_in: %0.4lf[%llX], pts_in: %0.4lf[%llX], overflow:%llx",
++  double diff =  (double)m_cur_pts / PTS_FREQ - (double)m_hints.pClock->GetClock() / DVD_TIME_BASE;
++  m_dll->codec_get_vbuf_state(&am_private->vcodec, &bs);
++  if (iSize > 0) CLog::Log(LOGDEBUG, "CAMLCodec::AddData: dl:%d sum:%u sz:%u dts_in:%0.3lf pts_in:%0.3lf ptsOut:%0.3f ttd:%0.0fms overflow:%llx", bs.data_len, m_frameSizeSum,
+       static_cast<unsigned int>(iSize),
+-      dts / DVD_TIME_BASE, am_private->am_pkt.avdts,
+-      pts / DVD_TIME_BASE, am_private->am_pkt.avpts,
++      dts / DVD_TIME_BASE,
++      pts / DVD_TIME_BASE,
++      static_cast<float>(m_cur_pts)/PTS_FREQ,
++      diff * 1000.0,
+       m_ptsOverflow
+     );
+   return true;
+@@ -1896,7 +1896,7 @@
+   if (drop)
+     vbuf.flags |= V4L2_BUF_FLAG_DONE;
+ 
+-  CLog::Log(LOGDEBUG, LOGVIDEO, "CAMLCodec::ReleaseFrame idx:%u", index);
++  CLog::Log(LOGDEBUG, LOGVIDEO, "CAMLCodec::ReleaseFrame idx:%u drop:%d", index, drop);
+ 
+   if ((ret = m_amlVideoFile->IOControl(VIDIOC_QBUF, &vbuf)) < 0)
+     CLog::Log(LOGERROR, "CAMLCodec::ReleaseFrame - VIDIOC_QBUF failed: %s", strerror(errno));
+@@ -1911,7 +1911,7 @@
+   //Driver change from 10 to 0ms latency, throttle here
+   std::chrono::time_point<std::chrono::system_clock> now(std::chrono::system_clock::now());
+ 
+-  unsigned int waitTime(10);
++  unsigned int waitTime(5);
+ DRAIN:
+   if (m_amlVideoFile->IOControl(VIDIOC_DQBUF, &vbuf) < 0)
+   {
+@@ -1921,7 +1921,11 @@
+     std::chrono::milliseconds elapsed(std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now() - now).count());
+ 
+     if (elapsed < std::chrono::milliseconds(waitTime))
++    {
++      m_try++;
++      CLog::Log(LOGDEBUG, "CAMLCodec::DequeueBuffer: Try again after: %ums", waitTime);
+       std::this_thread::sleep_for(std::chrono::milliseconds(waitTime) - elapsed);
++    } 
+ 
+     if (m_drain && elapsed < std::chrono::milliseconds(100))
+     {
+@@ -1949,6 +1952,9 @@
+     m_cur_pts = vbuf.timestamp.tv_usec;
+   }
+   m_bufferIndex = vbuf.index;
++  if (g_advancedSettings.CanLogComponent(LOGVIDEO))
++    CLog::Log(LOGDEBUG, "CAMLCodec::DequeueBuffer: idx:%u pts:%0.3f", m_bufferIndex, (double)m_cur_pts / PTS_FREQ);
++
+   return 0;
+ }
+ 
+@@ -1955,11 +1953,14 @@
+   struct buf_status bs;
+   m_dll->codec_get_vbuf_state(&am_private->vcodec, &bs);
+ 
+-  //CLog::Log(LOGDEBUG, "CAMLCodec::Decode: buf status: s:%d dl:%d fl:%d rp:%u wp:%u",bs.size, bs.data_len, bs.free_len, bs.read_pointer, bs.write_pointer);
++  CLog::Log(LOGDEBUG, LOGVIDEO, "CAMLCodec::GetTimeSize: len:%d dl:%d fs:%u front:%u", 
++    m_frameSizes.size(), bs.data_len, m_frameSizeSum, m_frameSizes.front()); 
+   while (m_frameSizeSum >  (unsigned int)bs.data_len)
+   {
+     m_frameSizeSum -= m_frameSizes.front();
+     m_frameSizes.pop_front();
++    CLog::Log(LOGDEBUG, LOGVIDEO, "CAMLCodec::GetTimeSize: len:%d dl:%d fs:%u front:%u",
++      m_frameSizes.size(), bs.data_len, m_frameSizeSum, m_frameSizes.front());
+   }
+   if (bs.free_len < (bs.data_len >> 1))
+     return 7.0;
+@@ -1984,8 +1984,15 @@
+     return CDVDVideoCodec::VC_ERROR;
+ 
+   float timesize(GetTimeSize());
+-  if(!m_drain && timesize < 1.0)
++  double ttd =  (double)m_cur_pts / PTS_FREQ - (double)m_hints.pClock->GetClock() / DVD_TIME_BASE;
++  double x = timesize == 0.0 ? 100.0 : ttd > 2.0 ? 0.3 / timesize : ttd / timesize;
++  if ((x > 0.2 && !m_drain && timesize < 1.0) || (m_try > 1 && timesize < 0.3))
++  {
++    m_try = 0;
++    CLog::Log(LOGDEBUG, "CAMLCodec::GetPicture: VC_BUFFER LEV:%0.2f ttd:%0.0fms x:%0.2f",
++      timesize, ttd * 1000.0, x);
+     return CDVDVideoCodec::VC_BUFFER;
++  }
+ 
+   if (DequeueBuffer() == 0)
+   {
+@@ -2142,7 +2142,8 @@
+     pVideoPicture->dts = DVD_NOPTS_VALUE;
+     pVideoPicture->pts = (double)(m_cur_pts + m_ptsOverflow) / PTS_FREQ * DVD_TIME_BASE;
+ 
+-    CLog::Log(LOGDEBUG, LOGVIDEO, "CAMLCodec::GetPicture: index: %u, pts: %0.4lf[%llX], overflow: %llX",m_bufferIndex, pVideoPicture->pts/DVD_TIME_BASE, m_cur_pts, m_ptsOverflow);
++    CLog::Log(LOGDEBUG, LOGVIDEO, "CAMLCodec::GetPicture: index:%u, pts:%0.3lf dur:%0.3lfms overflow:%llX",
++      m_bufferIndex, pVideoPicture->pts/DVD_TIME_BASE, pVideoPicture->iDuration / 1000.0, m_ptsOverflow);
+ 
+     return CDVDVideoCodec::VC_PICTURE;
+   }
+--- a/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.h	2017-10-22 20:35:20.000000000 +0200
++++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.h	2017-11-05 09:22:02.168482426 +0100
+@@ -82,6 +82,7 @@
+   bool             m_opened;
+   bool             m_ptsIs64us;
+   bool             m_drain = false;
++  int              m_try = 0;
+   am_private_t    *am_private;
+   CDVDStreamInfo   m_hints;
+   int              m_speed;
+--- a/xbmc/cores/VideoPlayer/VideoPlayer.cpp	2017-08-09 15:15:54.203655824 +0200
++++ b/xbmc/cores/VideoPlayer/VideoPlayer.cpp	2017-08-09 21:44:18.266213954 +0200
+@@ -1734,6 +1735,8 @@
+   if (CheckSceneSkip(m_CurrentVideo))
+     drop = true;
+ 
++  CLog::Log(LOGDEBUG, "CVideoPlayer::ProcesVideoData size:%d dts:%0.3f pts:%0.3f dur:%0.3fms, clock:%0.3f level:%d", 
++    pPacket->iSize, pPacket->dts/1000000, pPacket->pts/1000000, pPacket->duration/1000.0, m_clock.GetClock()/1000000.0, m_processInfo->GetLevelVQ());
+   m_VideoPlayerVideo->SendMessage(new CDVDMsgDemuxerPacket(pPacket, drop));
+   m_CurrentVideo.packets++;
+ }
+--- a/xbmc/cores/VideoPlayer/VideoPlayerVideo.cpp	2017-08-10 00:33:35.164554941 +0200
++++ b/xbmc/cores/VideoPlayer/VideoPlayerVideo.cpp	2017-08-10 11:51:08.091697999 +0200
+@@ -136,6 +136,7 @@
+   }
+ 
+-  CLog::Log(LOGNOTICE, "Creating video codec with codec id: %i", hint.codec);
++  CLog::Log(LOGNOTICE, "CVideoPlayerVideo::%s - Creating codec: %i",__FUNCTION__,  hint.codec);
++  hint.pClock = m_pClock;
+ 
+   if (m_messageQueue.IsInited())
+   {
+@@ -219,7 +219,8 @@
+   }
+   if (!codec)
+   {
+-    CLog::Log(LOGNOTICE, "Creating video codec with codec id: %i", hint.codec);
++    CLog::Log(LOGNOTICE, "CVideoPlayerVideo::%s - Creating Codec: %i",__FUNCTION__,  hint.codec);
++    hint.pClock = m_pClock;
+     hint.codecOptions |= CODEC_ALLOW_FALLBACK;
+     codec = CDVDFactoryCodec::CreateVideoCodec(hint, m_processInfo);
+     if (!codec)
+@@ -863,6 +868,8 @@
+   // don't wait when going ff
+   if (m_speed > DVD_PLAYSPEED_NORMAL)
+     maxWaitTime = std::max(timeToDisplay, 0);
+   int buffer = m_renderManager.WaitForBuffer(m_bAbortOutput, maxWaitTime);
++  CLog::Log(LOGDEBUG,"CVideoPlayerVideo::%s - ttd:%dms pts:%0.3lf Clock:%0.3f Level:%d",
++        __FUNCTION__, timeToDisplay, pPicture->pts/1000000, iPlayingClock/1000000.0, buffer);
+   if (buffer < 0)
+   {
+--- a/xbmc/cores/VideoPlayer/DVDStreamInfo.h	2017-08-19 19:05:15.000000000 +0200
++++ b/xbmc/cores/VideoPlayer/DVDStreamInfo.h	2017-09-07 15:04:58.009993157 +0200
+@@ -30,6 +30,7 @@
+ extern "C" {
+ #include "libavcodec/avcodec.h"
+ }
++#include "DVDClock.h"
+ 
+ class CDemuxStream;
+ 
+@@ -73,6 +74,7 @@
+   int orientation; // orientation of the video in degress counter clockwise
+   int bitsperpixel;
+   std::string stereo_mode; // stereoscopic 3d mode
++  CDVDClock *pClock;
+ 
+   // AUDIO
+   int channels;
+--- a/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecAmlogic.cpp	2017-09-07 23:44:34.453939999 +0200
++++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecAmlogic.cpp	2017-09-08 00:44:23.871752000 +0200
+@@ -141,6 +141,7 @@
+   }
+ 
+   m_hints = hints;
++  m_hints.pClock = hints.pClock;
+ 
+   switch(m_hints.codec)
+   {
+--

@@ -1,0 +1,114 @@
+From ec35d01d3a59f9dc62035fc74663884b64738d8c Mon Sep 17 00:00:00 2001
+From: RealJohnGalt <johngalt@fake.mail>
+Date: Sun, 23 Jul 2017 16:41:22 -0700
+Subject: [PATCH] AMLUtils: support Nougat-kernel fractional rates
+
+Initially implemented by @kszaq for Krypton, this is now updated for Leia.
+
+This also always sets mode to pass colorspace changes. Previously there
+was an issue for instance if GUI was bt.709@50hz and bt.2020@25fps
+played, the mode wouldn't be set and the colorspace would stay bt.709.
+---
+ xbmc/utils/AMLUtils.cpp | 45 ++++++++++++++++++++++++++++++++++-----------
+ xbmc/utils/AMLUtils.h   |  2 +-
+ 2 files changed, 35 insertions(+), 12 deletions(-)
+
+diff --git a/xbmc/utils/AMLUtils.cpp b/xbmc/utils/AMLUtils.cpp
+index 6ec77ec..38bee15 100644
+--- a/xbmc/utils/AMLUtils.cpp
++++ b/xbmc/utils/AMLUtils.cpp
+@@ -591,18 +591,22 @@ bool aml_get_native_resolution(RESOLUTION_INFO *res)
+ {
+   std::string mode;
+   SysfsUtils::GetString("/sys/class/display/mode", mode);
+-  return aml_mode_to_resolution(mode.c_str(), res);
++  bool result = aml_mode_to_resolution(mode.c_str(), res);
++
++  int fractional_rate;
++  SysfsUtils::GetInt("/sys/class/amhdmitx/amhdmitx0/frac_rate_policy", fractional_rate);
++  if (fractional_rate == 1)
++    res->fRefreshRate /= 1.001;
++
++  return result;
+ }
+ 
+ bool aml_set_native_resolution(const RESOLUTION_INFO &res, std::string framebuffer_name, const int stereo_mode)
+ {
+   bool result = false;
+ 
+-  // Don't set the same mode as current
+-  std::string mode;
+-  SysfsUtils::GetString("/sys/class/display/mode", mode);
+-  if (res.strId != mode)
+-    result = aml_set_display_resolution(res.strId.c_str(), framebuffer_name);
++  // Always set mode to pass colorspace changes
++  result = aml_set_display_resolution(res, framebuffer_name);
+ 
+   aml_handle_scale(res);
+   aml_handle_display_stereo_mode(stereo_mode);
+@@ -630,10 +634,21 @@ bool aml_probe_resolutions(std::vector<RESOLUTION_INFO> &resolutions)
+     {
+       if (aml_mode_to_resolution(i->c_str(), &res))
+         resolutions.push_back(res);
++
++      switch ((int)res.fRefreshRate)
++      {
++        case 24:
++        case 30:
++        case 60:
++          res.fRefreshRate /= 1.001;
++          res.strMode       = StringUtils::Format("%dx%d @ %.2f%s - Full Screen", res.iScreenWidth, res.iScreenHeight, res.fRefreshRate,
++            res.dwFlags & D3DPRESENTFLAG_INTERLACED ? "i" : "");
++          resolutions.push_back(res);
++          break;
++      }
+     }
+   }
+   return resolutions.size() > 0;
+-
+ }
+ 
+ bool aml_get_preferred_resolution(RESOLUTION_INFO *res)
+@@ -648,14 +663,22 @@ bool aml_get_preferred_resolution(RESOLUTION_INFO *res)
+   return true;
+ }
+ 
+-bool aml_set_display_resolution(const char *resolution, std::string framebuffer_name)
++bool aml_set_display_resolution(const RESOLUTION_INFO &res, std::string framebuffer_name)
+ {
+-  std::string mode = resolution;
++  std::string mode = res.strId.c_str();
++  std::string cur_mode;
++
+   // switch display resolution
++  SysfsUtils::GetString("/sys/class/display/mode", cur_mode);
++
++  if (cur_mode == mode)
++    SysfsUtils::SetString("/sys/class/display/mode", "null");
++
++  int fractional_rate = (res.fRefreshRate == floor(res.fRefreshRate)) ? 0 : 1;
++  SysfsUtils::SetInt("/sys/class/amhdmitx/amhdmitx0/frac_rate_policy", fractional_rate);
++
+   SysfsUtils::SetString("/sys/class/display/mode", mode.c_str());
+ 
+-  RESOLUTION_INFO res;
+-  aml_mode_to_resolution(mode.c_str(), &res);
+   aml_set_framebuffer_resolution(res, framebuffer_name);
+ 
+   return true;
+diff --git a/xbmc/utils/AMLUtils.h b/xbmc/utils/AMLUtils.h
+index aa695d3..4e8054d 100644
+--- a/xbmc/utils/AMLUtils.h
++++ b/xbmc/utils/AMLUtils.h
+@@ -67,7 +67,7 @@ bool aml_get_native_resolution(RESOLUTION_INFO *res);
+ bool aml_set_native_resolution(const RESOLUTION_INFO &res, std::string framebuffer_name, const int stereo_mode);
+ bool aml_probe_resolutions(std::vector<RESOLUTION_INFO> &resolutions);
+ bool aml_get_preferred_resolution(RESOLUTION_INFO *res);
+-bool aml_set_display_resolution(const char *resolution, std::string framebuffer_name);
++bool aml_set_display_resolution(const RESOLUTION_INFO &res, std::string framebuffer_name);
+ void aml_setup_video_scaling(const char *mode);
+ void aml_handle_scale(const RESOLUTION_INFO &res);
+ void aml_handle_display_stereo_mode(const int stereo_mode);
+-- 
+2.13.3
+

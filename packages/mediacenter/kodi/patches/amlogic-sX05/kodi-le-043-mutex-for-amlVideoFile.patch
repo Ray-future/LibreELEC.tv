@@ -1,0 +1,37 @@
+--- a/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.h	2017-11-14 12:48:58.602084999 +0100
++++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.h	2017-11-14 14:33:16.713577000 +0100
+@@ -118,4 +118,5 @@
+   static std::atomic_flag  m_pollSync;
+   static int m_pollDevice;
+   CProcessInfo &m_processInfo;
++  CCriticalSection m_amlVideo_lock;
+ };
+--- a/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp	2017-11-14 12:48:59.050308999 +0100
++++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp	2017-11-14 14:33:14.588514999 +0100
+@@ -2032,8 +2032,11 @@
+ 
+   CLog::Log(LOGDEBUG, LOGVIDEO, "CAMLCodec::ReleaseFrame idx:%u drop:%d", index, drop);
+ 
+-  if ((ret = m_amlVideoFile->IOControl(VIDIOC_QBUF, &vbuf)) < 0)
+-    CLog::Log(LOGERROR, "CAMLCodec::ReleaseFrame - VIDIOC_QBUF failed: %s", strerror(errno));
++  { CSingleLock lock(m_amlVideo_lock);
++    ret = m_amlVideoFile->IOControl(VIDIOC_QBUF, &vbuf);
++  }
++  if (ret < 0)
++      CLog::Log(LOGERROR, "CAMLCodec::ReleaseFrame - VIDIOC_QBUF failed: %s", strerror(errno));
+   return ret;
+ }
+ 
+@@ -2047,6 +2050,10 @@
+ 
+   unsigned int waitTime(5);
+ DRAIN:
+-  if (m_amlVideoFile->IOControl(VIDIOC_DQBUF, &vbuf) < 0)
++  int ret;
++  { CSingleLock lock(m_amlVideo_lock);
++    ret = m_amlVideoFile->IOControl(VIDIOC_DQBUF, &vbuf);
++  }
++  if (ret < 0)
+   {
+     if (errno != EAGAIN)
+--

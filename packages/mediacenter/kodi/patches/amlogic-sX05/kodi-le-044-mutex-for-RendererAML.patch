@@ -1,0 +1,64 @@
+--- a/xbmc/cores/VideoPlayer/VideoRenderers/HwDecRender/RendererAML.h	2017-11-15 09:29:35.455400000 +0100
++++ b/xbmc/cores/VideoPlayer/VideoRenderers/HwDecRender/RendererAML.h	2017-11-15 09:30:32.079697999 +0100
+@@ -68,6 +68,7 @@
+ 
+   int m_prevVPts;
+   bool m_bConfigured;
++  CCriticalSection m_amlRenderer_lock;
+ };
+ 
+ #endif
+--- a/xbmc/cores/VideoPlayer/VideoRenderers/HwDecRender/RendererAML.cpp	2017-11-14 21:16:34.616387000 +0100
++++ b/xbmc/cores/VideoPlayer/VideoRenderers/HwDecRender/RendererAML.cpp	2017-11-15 09:21:14.168882000 +0100
+@@ -96,31 +96,34 @@
+ void CRendererAML::AddVideoPicture(const VideoPicture &picture, int index, double currentClock)
+ {
+   ReleaseBuffer(index);
+-
+-  BUFFER &buf(m_buffers[index]);
+-  if (picture.videoBuffer)
+-  {
+-    buf.videoBuffer = picture.videoBuffer;
+-    buf.videoBuffer->Acquire();
++  { CSingleLock lock(m_amlRenderer_lock);
++    BUFFER &buf(m_buffers[index]);
++    if (picture.videoBuffer)
++    {
++      buf.videoBuffer = picture.videoBuffer;
++      buf.videoBuffer->Acquire();
++    }
+   }
+ }
+ 
+ void CRendererAML::ReleaseBuffer(int idx)
+ {
+-  BUFFER &buf(m_buffers[idx]);
+-  if (buf.videoBuffer)
+-  {
+-    CAMLVideoBuffer *amli(dynamic_cast<CAMLVideoBuffer*>(buf.videoBuffer));
+-    if (amli)
++  { CSingleLock lock(m_amlRenderer_lock);
++    BUFFER &buf(m_buffers[idx]);
++    if (buf.videoBuffer)
+     {
+-      if (amli->m_amlCodec)
++      CAMLVideoBuffer *amli(dynamic_cast<CAMLVideoBuffer*>(buf.videoBuffer));
++      if (amli)
+       {
+-        amli->m_amlCodec->ReleaseFrame(amli->m_bufferIndex, true);
+-        amli->m_amlCodec = nullptr; // Released
++        if (amli->m_amlCodec)
++        {
++          amli->m_amlCodec->ReleaseFrame(amli->m_bufferIndex, true);
++          amli->m_amlCodec = nullptr; // Released
++        }
++        amli->Release();
+       }
+-      amli->Release();
++      buf.videoBuffer = nullptr;
+     }
+-    buf.videoBuffer = nullptr;
+   }
+ }
+ 
+

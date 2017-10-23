@@ -43,6 +43,12 @@ if [ "$MEDIACENTER" = "kodi" ]; then
   PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET LibreELEC-settings \
                                           xmlstarlet"
 
+# streaming media packages
+  PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET inputstream.adaptive \
+                                          inputstream.rtmp \
+                                          imagedecoder.raw \
+                                          vfs.rar"
+
   if [ "$JOYSTICK_SUPPORT" = "yes" ]; then
     PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET peripheral.joystick"
   fi

@@ -1,0 +1,11 @@
+[Unit]
+Description=libwidevine download service
+After=network-online.target kodi.service
+
+[Service]
+Type=simple
+Environment=HOME=/storage
+ExecStart=-/bin/sh -c ". /etc/profile; exec /bin/sh /usr/sbin/getlibwidevine.sh"
+
+[Install]
+WantedBy=kodi.service

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<addon id="repository.netflix" name="Netflix Addon Repository" version="1.0.1" provider-name="libdev + jojo + asciidisco">
+        <extension point="xbmc.addon.repository" name="Netflix Addon Repository">
+                <info compressed="false">https://johtru.com/repo/repo.php</info>
+                <checksum>https://johtru.com/repo/repo.php?md5=true</checksum>
+                <datadir zip="true">https://johtru.com/repo/repo_files</datadir>
+        </extension>
+        <extension point="xbmc.addon.metadata">
+                <summary>The Repository for the Kodi Netflix Addon</summary>
+                <summary lang="de">Das Repository für das Kodi Netflix Addon</summary>
+                <description>Provides the Netflix Addons fpr kodi.</description>
+                <description lang="de">Stellt das Kodi Netflix Addon bereit</description>
+                <disclaimer>Some parts of this Repository may not be legal in your country of residence - please check with your local laws before installing.</disclaimer>
+                <platform>all</platform>
+        </extension>
+</addon>
+

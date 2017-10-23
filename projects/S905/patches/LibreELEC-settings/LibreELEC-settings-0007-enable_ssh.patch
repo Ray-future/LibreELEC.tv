@@ -1,0 +1,15 @@
+diff --git a/src/resources/lib/modules/services.py b/src/resources/lib/modules/services.py
+index e1656de..dedf2c5 100644
+--- a/src/resources/lib/modules/services.py
++++ b/src/resources/lib/modules/services.py
+@@ -533,6 +533,10 @@ class services:
+             self.struct['samba']['settings']['samba_autostart']['value'] = '1'
+             self.initialize_samba()
+ 
++            # Enable ssh
++            self.struct['ssh']['settings']['ssh_autostart']['value'] = '1'
++            self.initialize_ssh()
++
+             if hasattr(self, 'samba'):
+                 self.oe.winOeMain.set_wizard_text(self.oe._(32313) + '[CR][CR]' + self.oe._(32312))
+             else:

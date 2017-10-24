@@ -1,0 +1,14 @@
+diff -Naur diffutils-3.6.orig/m4/getopt.m4 diffutils-3.6/m4/getopt.m4
+--- diffutils-3.6.orig/m4/getopt.m4	2017-08-30 14:34:16.436372168 +0200
++++ diffutils-3.6/m4/getopt.m4	2017-08-30 14:34:42.844190480 +0200
+@@ -21,10 +21,6 @@
+       REPLACE_GETOPT=1
+     fi
+   ])
+-  if test $REPLACE_GETOPT = 1; then
+-    dnl Arrange for getopt.h to be created.
+-    gl_GETOPT_SUBSTITUTE_HEADER
+-  fi
+ ])
+ 
+ # Request a POSIX compliant getopt function with GNU extensions (such as

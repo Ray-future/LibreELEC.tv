@@ -17,9 +17,9 @@
 ################################################################################
 
 PKG_NAME="game.libretro.hatari"
-PKG_VERSION="65a81b3"
-PKG_SHA256="4e73bb6998c241a8559b915e00197ef98c93c694b6b21623703a0561369d35e4"
-PKG_REV="103"
+PKG_VERSION="b20ae03"
+PKG_SHA256="aaa72b9ee076b64b7ab41ecd52c90fce74a75efb9c32c928c4a76fd013b2aac1"
+PKG_REV="104"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="https://github.com/kodi-game/game.libretro.hatari"

@@ -17,8 +17,8 @@
 ################################################################################
 
 PKG_NAME="libretro-stella"
-PKG_VERSION="abcd658"
-PKG_SHA256="9d93af933a0f77e4bf9824d1d799941226b838a337ccc9bae279f0ade1bdbf63"
+PKG_VERSION="dfe86f9"
+PKG_SHA256="b8a4246ed0392846e53227d81025e755f9af93c58ead74c1db793f96c7aecab3"
 PKG_ARCH="any"
 PKG_LICENSE="GPLv2"
 PKG_SITE="https://github.com/libretro/stella-libretro"

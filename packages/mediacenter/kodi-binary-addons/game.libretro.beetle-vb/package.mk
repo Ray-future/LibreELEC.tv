@@ -17,9 +17,9 @@
 ################################################################################
 
 PKG_NAME="game.libretro.beetle-vb"
-PKG_VERSION="531c1b7"
-PKG_SHA256="e383600f31f0dcd4354b2d752aca4eb3bfc58e777f86eac29739c51e3c358c41"
-PKG_REV="103"
+PKG_VERSION="bbed978"
+PKG_SHA256="b8ad8bf18691b4da2c52051ec841131bbce9bc74e73ad44ab962cbec56310f36"
+PKG_REV="104"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="https://github.com/kodi-game/game.libretro.beetle-vb"

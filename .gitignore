@@ -28,3 +28,6 @@ mkpkg-temp
 # crap
 .DS_Store
 .directory
+
+# update tools git directories
+/tools/mkpkg/*.git/

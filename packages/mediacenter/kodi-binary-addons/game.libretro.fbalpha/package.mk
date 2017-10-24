@@ -17,9 +17,9 @@
 ################################################################################
 
 PKG_NAME="game.libretro.fbalpha"
-PKG_VERSION="f21e7a0"
-PKG_SHA256="661df436997819ab2db22eed935eee7ab2b54463b3ec246fad634a35af8fb13c"
-PKG_REV="103"
+PKG_VERSION="620ac5f"
+PKG_SHA256="0607bbda0deea9f1cd621b32b5a32d3eb77c0a3af8c0995a53d8900f2f477e13"
+PKG_REV="104"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="https://github.com/kodi-game/game.libretro.fbalpha"

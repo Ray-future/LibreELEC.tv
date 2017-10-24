@@ -17,8 +17,8 @@
 ################################################################################
 
 PKG_NAME="libretro-vecx"
-PKG_VERSION="4e6961a"
-PKG_SHA256="680d0cc8678b7bf9e345005507a3e9c840c9fc8d02a70fa5064d6656169aea60"
+PKG_VERSION="56382b9"
+PKG_SHA256="66735f08421c873254e326e2d12b75991d3d0bb0f739bf07a213294c28b6b06f"
 PKG_ARCH="any"
 PKG_LICENSE="GPLv3"
 PKG_SITE="https://github.com/libretro/libretro-vecx"

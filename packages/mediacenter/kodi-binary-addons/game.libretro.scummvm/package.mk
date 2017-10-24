@@ -17,9 +17,9 @@
 ################################################################################
 
 PKG_NAME="game.libretro.scummvm"
-PKG_VERSION="0830587"
-PKG_SHA256="6365ac5a3f4f9c876fa86782b1e667a922643df534a93a4b15d4d2a96fa44199"
-PKG_REV="103"
+PKG_VERSION="d1f46a7"
+PKG_SHA256="0f37a8b718bc82db00835d246f233f1db15480a797b08ca2ca6439dd50cfb012"
+PKG_REV="104"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="https://github.com/kodi-game/game.libretro.scummvm"

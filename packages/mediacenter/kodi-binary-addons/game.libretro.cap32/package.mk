@@ -17,9 +17,9 @@
 ################################################################################
 
 PKG_NAME="game.libretro.cap32"
-PKG_VERSION="f225016"
-PKG_SHA256="28b4f8a983e10b707b001cec4066cbd41b2f3e737b07bd86482c904b9d48b4d0"
-PKG_REV="103"
+PKG_VERSION="bc45bd6"
+PKG_SHA256="741c2fe55aaa71ec9b1c55cb2d1cb64b9a434192081fbba36b17647bfc9cd416"
+PKG_REV="104"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="https://github.com/kodi-game/game.libretro.cap32"

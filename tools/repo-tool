@@ -107,7 +107,7 @@ upload() {
   fi
   touch_addons_xml
   update_addons_xml
-  rsync -av --progress --delete "$RSYNC_SHELL" target/addons/$ADDON_VERSION $RSYNC_REPO
+  rsync -av --progress --delete target/addons/$ADDON_VERSION $RSYNC_REPO
 }
 
 build() {

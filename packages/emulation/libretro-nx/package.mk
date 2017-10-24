@@ -17,8 +17,8 @@
 ################################################################################
 
 PKG_NAME="libretro-nx"
-PKG_VERSION="af3762e"
-PKG_SHA256="030a3f761127248dd5c6ce57b76e2884fb0a06432d21d47ef0df30dbdc10812e"
+PKG_VERSION="edc96c3"
+PKG_SHA256="c8d7ce3bfa5556410d986ca81f4217eca5ba92739a9bf9d9b879887329206ed1"
 PKG_ARCH="any"
 PKG_LICENSE="GPLv3"
 PKG_SITE="https://github.com/libretro/nxengine-libretro"

@@ -17,9 +17,9 @@
 ################################################################################
 
 PKG_NAME="game.libretro.2048"
-PKG_VERSION="ec99c48"
-PKG_SHA256="a45dfd7aee8ec4bc7e89f474f99e2d7184f2a263e9a6fee7d26ace1a43dfcc8d"
-PKG_REV="103"
+PKG_VERSION="f324226"
+PKG_SHA256="409845b46739379b7d3134c3e589ae46f066e69af1249e7ec6136884290b0e64"
+PKG_REV="104"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="https://github.com/kodi-game/game.libretro.2048"

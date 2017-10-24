@@ -17,8 +17,8 @@
 ################################################################################
 
 PKG_NAME="libretro-beetle-psx"
-PKG_VERSION="b1ff7d9"
-PKG_SHA256="a68f255244aee5ac8a20945de79968f69875e3ddd8ad62b76e8c82ad4e91bad2"
+PKG_VERSION="7616e01"
+PKG_SHA256="a80bbe415ea88e38b6fb79888c97055272f3361fd458d396810eab4fee544925"
 PKG_ARCH="any"
 PKG_LICENSE="GPLv2"
 PKG_SITE="https://github.com/libretro/beetle-psx-libretro"

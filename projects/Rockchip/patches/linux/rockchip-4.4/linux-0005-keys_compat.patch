@@ -1,0 +1,15 @@
+diff --git a/arch/arm64/Kconfig b/arch/arm64/Kconfig
+index 190471794853..45f77ff5ad14 100644
+--- a/arch/arm64/Kconfig
++++ b/arch/arm64/Kconfig
+@@ -1025,6 +1025,10 @@ config SYSVIPC_COMPAT
+ 	def_bool y
+ 	depends on COMPAT && SYSVIPC
+ 
++config KEYS_COMPAT
++	def_bool y
++	depends on COMPAT && KEYS
++
+ endmenu
+ 
+ menu "Power management options"

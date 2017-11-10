@@ -127,7 +127,11 @@ echo -e "NAME=\"$DISTRONAME\"" > $INSTALL/etc/os-release
 echo -e "VERSION=\"$LIBREELEC_VERSION\"" >> $INSTALL/etc/os-release
 echo -e "ID=\"libreelec\"" >> $INSTALL/etc/os-release
 echo -e "VERSION_ID=\"$OS_VERSION\"" >> $INSTALL/etc/os-release
-echo -e "PRETTY_NAME=\"$DISTRONAME ($LIBREELEC_BUILD): $LIBREELEC_VERSION\"" >> $INSTALL/etc/os-release
+if [ -n "$CUSTOM_PRETTY_NAME" ]; then
+   echo -e "PRETTY_NAME=\"$CUSTOM_PRETTY_NAME\"" >> $INSTALL/etc/os-release
+else
+   echo -e "PRETTY_NAME=\"$DISTRONAME ($LIBREELEC_BUILD): $LIBREELEC_VERSION\"" >> $INSTALL/etc/os-release
+fi
 echo -e "HOME_URL=\"https://libreelec.tv\"" >> $INSTALL/etc/os-release
 echo -e "BUG_REPORT_URL=\"$ORIGIN_URL\"" >> $INSTALL/etc/os-release
 echo -e "BUILD_ID=\"$GIT_HASH\"" >> $INSTALL/etc/os-release
@@ -141,7 +145,13 @@ echo "$GREETING1" >> $INSTALL/etc/issue
 echo "$GREETING2" >> $INSTALL/etc/issue
 echo "$GREETING3" >> $INSTALL/etc/issue
 echo "$GREETING4" >> $INSTALL/etc/issue
-echo "$DISTRONAME ($LIBREELEC_BUILD): $LIBREELEC_VERSION ($LIBREELEC_ARCH)" >> $INSTALL/etc/issue
+
+if [ -n "$CUSTOM_ISSUE" ]; then
+   echo "$CUSTOM_ISSUE" >> $INSTALL/etc/issue
+else
+   echo "$DISTRONAME ($LIBREELEC_BUILD): $LIBREELEC_VERSION ($LIBREELEC_ARCH)" >> $INSTALL/etc/issue
+fi
+
 
 ln -sf /etc/issue $INSTALL/etc/motd
 

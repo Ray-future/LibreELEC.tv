@@ -1,7 +1,7 @@
 From cd0236ef771fd72e2975ca294ba2f1872d7dbc0b Mon Sep 17 00:00:00 2001
 From: Jonas Karlman <jonas@kwiboo.se>
 Date: Sun, 22 Oct 2017 12:48:24 +0200
-Subject: [PATCH 2/2] rockchip: tinker: enable rockchip video driver
+Subject: [PATCH] rockchip: tinker: enable rockchip video driver
 
 ---
  configs/tinker-rk3288_defconfig | 5 +++++

@@ -20,11 +20,11 @@ diff --git a/Makefile.ffmpeg b/Makefile.ffmpeg
  
  $(LIB_ROOT)/$(YASM)/.tvh_build: \
  		$(LIB_ROOT)/$(YASM)/.tvh_download
--	cd $(LIB_ROOT)/$(YASM) && $(CONFIGURE)
-+	cd $(LIB_ROOT)/$(YASM) && $(CONFIGURE) CC=$(HOST_CC)
+-	cd $(LIB_ROOT)/$(YASM) && $(CONFIGURE_PI) \
++	cd $(LIB_ROOT)/$(YASM) && $(CONFIGURE_PI) CC=$(HOST_CC) \
+ 		--libdir=/$(EPREFIX0)/lib
  	DESTDIR=$(EBUILDIR) \
  		$(MAKE) -C $(LIB_ROOT)/$(YASM) install
- 	@touch $@
 @@ -238,6 +241,7 @@ $(LIB_ROOT)/$(LIBX265)/.tvh_build: \
  	cd $(LIB_ROOT)/$(LIBX265)/build/linux && cmake -G "Unix Makefiles" \
  		-DCMAKE_INSTALL_PREFIX="/ffmpeg" \
@@ -52,9 +52,9 @@ diff --git a/Makefile.ffmpeg b/Makefile.ffmpeg
  		--disable-examples \
  		--disable-docs \
 @@ -359,7 +363,8 @@ $(LIB_ROOT)/$(LIBTHEORA)/.tvh_build: \
- 		$(LIB_ROOT)/$(LIBTHEORA)/.tvh_download
  	cd $(LIB_ROOT)/$(LIBTHEORA) && \
  		CFLAGS="$(CFLAGS_PI)" $(CONFIGURE) \
+ 		--libdir=/$(EPREFIX0)/lib \
 -		--with-ogg=$(EPREFIX) \
 +		OGG_CFLAGS=-I$(EPREFIX)/include \
 +		OGG_LIBS=-L$(EPREFIX)/lib \
@@ -62,9 +62,9 @@ diff --git a/Makefile.ffmpeg b/Makefile.ffmpeg
  		--disable-spec \
  		$(LIBTHEORA_HOST)
 @@ -406,7 +411,8 @@ $(LIB_ROOT)/$(LIBVORBIS)/.tvh_build: \
- 		$(LIB_ROOT)/$(LIBVORBIS)/.tvh_download
  	cd $(LIB_ROOT)/$(LIBVORBIS) && \
  		CFLAGS="$(CFLAGS_PI)" $(CONFIGURE) \
+		--libdir=/$(EPREFIX0)/lib \
 -		--with-ogg=$(EPREFIX)
 +		OGG_CFLAGS=-I$(EPREFIX)/include \
 +		OGG_LIBS=-L$(EPREFIX)/lib
@@ -80,3 +80,4 @@ diff --git a/Makefile.ffmpeg b/Makefile.ffmpeg
  		--disable-all \
  		--enable-gpl \
  		--extra-cflags="$(ECFLAGS)" \
+

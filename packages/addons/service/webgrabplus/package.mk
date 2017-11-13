@@ -1,6 +1,6 @@
 ################################################################################
 #      This file is part of LibreELEC - https://libreelec.tv
-#      Copyright (C) 2016-present Team LibreELEC
+#      Copyright (C) 2016 Team LibreELEC
 #
 #  LibreELEC is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -17,13 +17,12 @@
 ################################################################################
 
 PKG_NAME="webgrabplus"
-PKG_VERSION="56.29pre-20161021"
-PKG_SHA256="1b11551b8b7a5d6abac39a54c9f609af510297a1e6bc8265927f42b0fb3f4bab"
-PKG_REV="105"
+PKG_VERSION="e3ed835"
+PKG_REV="105f"
 PKG_ARCH="any"
 PKG_LICENSE="prop."
 PKG_SITE="http://www.webgrabplus.com/"
-PKG_URL="https://github.com/awiouy/webgrabplus/archive/$PKG_VERSION.tar.gz"
+PKG_URL="https://github.com/afl1/webgrabplus/archive/$PKG_VERSION.tar.gz"
 PKG_DEPENDS_TARGET="toolchain"
 PKG_SECTION="service"
 PKG_SHORTDESC="WebGrab+Plus: a multi-site incremental xmltv epg grabber"

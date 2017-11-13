@@ -1,6 +1,6 @@
 ################################################################################
-#      This file is part of LibreELEC - https://libreelec.tv
-#      Copyright (C) 2016-present Team LibreELEC
+#      This file is part of LibreELEC - https://LibreELEC.tv
+#      Copyright (C) 2016 Team LibreELEC
 #
 #  LibreELEC is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -15,23 +15,28 @@
 #  You should have received a copy of the GNU General Public License
 #  along with LibreELEC.  If not, see <http://www.gnu.org/licenses/>.
 ################################################################################
-
-PKG_NAME="pcsc-lite"
-PKG_VERSION="1.8.22"
-PKG_VER="4225"
-PKG_SHA256="6a358f61ed3b66a7f6e1f4e794a94c7be4c81b7a58ec360c33791e8d7d9bd405"
+PKG_NAME="ccid"
+PKG_VERSION="1.4.28"
+PKG_VER="4230"
+PKG_SHA256="875836ac5d9d952b40dc1a253a726e74361671864d81337285a3260268f8ade0"
+PKG_REV="1"
 PKG_ARCH="any"
-PKG_LICENSE="GPL"
-PKG_SITE="http://pcsclite.alioth.debian.org/pcsclite.html"
+PKG_LICENSE="LGPL"
+PKG_SITE="http://pcsclite.alioth.debian.org/ccid.html"
 PKG_URL="https://alioth.debian.org/frs/download.php/file/${PKG_VER}/${PKG_NAME}-${PKG_VERSION}.tar.bz2"
-PKG_DEPENDS_TARGET="toolchain libusb"
-PKG_SECTION="service/system"
-PKG_SHORTDESC="Middleware to access a smart card using SCard API (PC/SC)"
-PKG_LONGDESC="Middleware to access a smart card using SCard API (PC/SC)"
-PKG_AUTORECONF="no"
+PKG_DEPENDS_TARGET="toolchain pcsc-lite"
+PKG_PRIORITY="optional"
+PKG_SECTION="driver"
+PKG_SHORTDESC="CCID free software driver"
+PKG_LONGDESC="CCID free software driver"
+PKG_IS_ADDON="no"
+PKG_AUTORECONF="yes"
 
-PKG_CONFIGURE_OPTS_TARGET="--disable-shared \
-            --enable-static \
-            --disable-libudev \
-            --enable-libusb \
-            --enable-usbdropdir=/storage/.kodi/addons/service.system.pcscd-addon/drivers"
+PKG_MAINTAINER="Stefan Saraev (seo at irc.freenode.net)"
+
+PKG_CONFIGURE_OPTS_TARGET="--enable-static --enable-twinserial"
+
+make_target() {
+  make
+  make -C src/ Info.plist
+}

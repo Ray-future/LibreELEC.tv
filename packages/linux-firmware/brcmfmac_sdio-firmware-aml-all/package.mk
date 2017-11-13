@@ -29,8 +29,6 @@ PKG_DEPENDS_TARGET="toolchain"
 PKG_PRIORITY="optional"
 PKG_SECTION="firmware"
 PKG_SHORTDESC="brcmfmac_sdio-firmware-aml: firmware for brcm bluetooth chips used in some Amlogic based devices"
-
-PKG_IS_ADDON="no"
 PKG_AUTORECONF="no"
 
 post_makeinstall_target() {

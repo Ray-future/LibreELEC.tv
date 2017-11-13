@@ -31,9 +31,7 @@ PKG_PRIORITY="optional"
 PKG_SECTION="tools"
 PKG_SHORTDESC="U-Boot bootloader utility tools"
 PKG_LONGDESC="U-Boot bootloader utility tools. This package includes the mkimage program, which allows generation of U-Boot images in various formats, and the fw_printenv and fw_setenv programs to read and modify U-Boot's environment and other tools."
-
 PKG_AUTORECONF="no"
-PKG_IS_ADDON="no"
 
 if [ "$TARGET_ARCH" = "aarch64" ]; then
   UBOOT_TOOLS_ARCH="arm"

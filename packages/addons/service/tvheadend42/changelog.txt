@@ -1,20 +1,18 @@
+43-628
+- release 4.3-628
+
+200
+- release 4.3-488
+- distinguish correctly between DVB-C/ANNEX-B and ATSC-C/ANNEX-B networks
+
 112
-- update to 4.2.3-20
-- changed name
+- release 4.2.2-49
 
 111
-- update to Tvheadend 4.2.2-75
-
-110
-- added tv_grab_file support for compressed files (gz bz2 xz)
-- update to Tvheadend 4.2.1.7
-- fix FRITZ!Box support, AVM Repeater and 6490 are now working
+- release 4.2.2-32
 
 109
-- added custom start options to addon
-- added FRITZ!Box Sat>IP server support to addon
 - update to Tvheadend 4.1.2415
-- fix debug if activated but nothing selected
 
 108
 - added CA (libdvben50221) support

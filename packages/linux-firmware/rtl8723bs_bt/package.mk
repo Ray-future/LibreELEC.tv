@@ -28,6 +28,4 @@ PKG_PRIORITY="optional"
 PKG_SECTION="firmware"
 PKG_SHORTDESC="rtl8723bs_bt"
 PKG_LONGDESC="rtl8723bs_bt"
-
-PKG_IS_ADDON="no"
 PKG_AUTORECONF="no"

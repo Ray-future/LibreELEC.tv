@@ -22,9 +22,7 @@
     esac
 
   # Configuration for u-boot
-    UBOOT_CONFIG="evb-rk3328_defconfig"
-    UBOOT_SOC="rk3328"
-    UBOOT_DTB="rk3328-rock64.dtb"
+    UBOOT_SYSTEM="rk3328"
 
   # Kernel target
     KERNEL_TARGET="Image"
@@ -39,4 +37,4 @@
     KERNEL_NAME="Image"
 
   # kernel serial console
-    EXTRA_CMDLINE="console=uart8250,mmio32,0xff130000"
+    EXTRA_CMDLINE="console=uart8250,mmio32,0xff130000 console=tty0"

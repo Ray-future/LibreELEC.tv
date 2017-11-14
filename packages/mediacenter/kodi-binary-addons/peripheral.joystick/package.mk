@@ -17,9 +17,9 @@
 ################################################################################
 
 PKG_NAME="peripheral.joystick"
-PKG_VERSION="b07d81c"
-PKG_SHA256="d30875c8b62453708c766e8d180dcd7b7de254155a43b4c7a773fa760153580e"
-PKG_REV="7"
+PKG_VERSION="33b43ce"
+PKG_SHA256="1554469f4fbcbb2a37de9c1ece6b1b41c9e71f1087a48cb7f9ec3ae7d425dc41"
+PKG_REV="8"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="https://github.com/xbmc/peripheral.joystick"

@@ -14,9 +14,7 @@
     esac
 
   # Configuration for u-boot
-    UBOOT_CONFIG="miqi-rk3288_config"
-    UBOOT_SOC="rk3288"
-    UBOOT_DTB="rk3288-miqi.dtb"
+    UBOOT_SYSTEM="rk3288"
 
   # Kernel target
     KERNEL_TARGET="zImage"
@@ -32,4 +30,4 @@
     KERNEL_NAME="zImage"
 
   # kernel serial console
-    EXTRA_CMDLINE="console=uart8250,mmio32,0xff690000"
+    EXTRA_CMDLINE="console=uart8250,mmio32,0xff690000 console=tty0"

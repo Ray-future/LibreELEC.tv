@@ -1,5 +1,6 @@
 ################################################################################
 #      This file is part of LibreELEC - https://libreelec.tv
+#      Copyright (C) 2009-2016 Stephan Raue (stephan@openelec.tv)
 #      Copyright (C) 2017-present Team LibreELEC
 #
 #  LibreELEC is free software: you can redistribute it and/or modify
@@ -20,91 +21,49 @@ PKG_NAME="u-boot"
 PKG_VERSION="2017.11-rc3"
 PKG_SHA256="150ce66648460a343407cbf3a3037f8e45d2441847660d17f65bbbf5cc4111e4"
 PKG_ARCH="arm aarch64"
-PKG_LICENSE="GPL"
-PKG_SITE="http://www.denx.de/wiki/U-Boot"
+PKG_SITE="https://www.denx.de/wiki/U-Boot"
 PKG_URL="http://ftp.denx.de/pub/u-boot/u-boot-$PKG_VERSION.tar.bz2"
 PKG_SOURCE_DIR="u-boot-$PKG_VERSION*"
-PKG_DEPENDS_TARGET="toolchain dtc:host Python2:host"
+PKG_DEPENDS_TARGET="toolchain dtc:host"
+PKG_LICENSE="GPL"
 PKG_SECTION="tools"
 PKG_SHORTDESC="u-boot: Universal Bootloader project"
 PKG_LONGDESC="Das U-Boot is a cross-platform bootloader for embedded systems, used as the default boot loader by several board vendors. It is intended to be easy to port and to debug, and runs on many supported architectures, including PPC, ARM, MIPS, x86, m68k, NIOS, and Microblaze."
 PKG_AUTORECONF="no"
 PKG_IS_KERNEL_PKG="yes"
 
-if [ "$UBOOT_SOC" = "rk3328" ]; then
+if [ "$UBOOT_SYSTEM" = "rk3328" ]; then
   PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET rkbin"
   PKG_NEED_UNPACK="$(get_pkg_directory rkbin)"
 fi
 
-pre_configure_target() {
-  if [ -z "$UBOOT_CONFIG" ]; then
-    echo "Please add UBOOT_CONFIG to your project or device options file, aborting."
-    exit 1
-  elif [ -z "$UBOOT_SOC" ]; then
-    echo "Please add UBOOT_SOC to your project or device options file, aborting."
-    exit 1
-  fi
-}
-
 make_target() {
-  CROSS_COMPILE="$TARGET_PREFIX" CFLAGS="" LDFLAGS="" ARCH=arm make mrproper
-  CROSS_COMPILE="$TARGET_PREFIX" CFLAGS="" LDFLAGS="" ARCH=arm make $UBOOT_CONFIG
-  CROSS_COMPILE="$TARGET_PREFIX" CFLAGS="" LDFLAGS="" ARCH=arm make HOSTCC="$HOST_CC" HOSTSTRIP="true"
+  if [ -z "$UBOOT_SYSTEM" ]; then
+    echo "UBOOT_SYSTEM must be set to build an image"
+    echo "see './scripts/uboot_helper' for more information"
+  else
+    CROSS_COMPILE="$TARGET_PREFIX" LDFLAGS="" ARCH=arm make mrproper
+    CROSS_COMPILE="$TARGET_PREFIX" LDFLAGS="" ARCH=arm make $($ROOT/$SCRIPTS/uboot_helper $PROJECT $DEVICE $UBOOT_SYSTEM config)
+    CROSS_COMPILE="$TARGET_PREFIX" LDFLAGS="" ARCH=arm make HOSTCC="$HOST_CC" HOSTSTRIP="true"
+  fi
 }
 
 makeinstall_target() {
   mkdir -p $INSTALL/usr/share/bootloader
-    cp -PRv $PKG_DIR/scripts/update.sh $INSTALL/usr/share/bootloader
 
- if [ "$UBOOT_SOC" = "rk3288" ]; then
-    tools/mkimage \
-      -n $UBOOT_SOC \
-      -T rksd \
-      -d spl/u-boot-spl-dtb.bin \
-      idbloader.img
-    cat u-boot-dtb.bin >> idbloader.img
-
-    cp -PRv idbloader.img $INSTALL/usr/share/bootloader
-  elif [ "$UBOOT_SOC" = "rk3328" ]; then
-    $(get_build_dir rkbin)/tools/loaderimage --pack --uboot u-boot-dtb.bin uboot.img 0x200000
-
-    if [ -f $PROJECT_DIR/$PROJECT/bootloader/rk3328_ddr_786MHz_v1.08.bin ]; then
-      dd if=$PROJECT_DIR/$PROJECT/bootloader/rk3328_ddr_786MHz_v1.08.bin of=ddr.bin bs=4 skip=1
-    else
-      dd if=$(get_build_dir rkbin)/rk33/rk3328_ddr_786MHz_v1.06.bin of=ddr.bin bs=4 skip=1
-    fi
-    tools/mkimage \
-      -n $UBOOT_SOC \
-      -T rksd \
-      -d ddr.bin \
-      idbloader.img
-    if [ -f $PROJECT_DIR/$PROJECT/bootloader/rk3328_miniloader_v2.44.bin ]; then
-      cat $PROJECT_DIR/$PROJECT/bootloader/rk3328_miniloader_v2.44.bin >> idbloader.img
-    else
-      cat $(get_build_dir rkbin)/rk33/rk3328_miniloader_v2.43.bin >> idbloader.img
+    # Only install u-boot.img et al when building a board specific image
+    if [ -n "$UBOOT_SYSTEM" ]; then
+      if [ -f $PROJECT_DIR/$PROJECT/devices/$DEVICE/bootloader/install ]; then
+        . $PROJECT_DIR/$PROJECT/devices/$DEVICE/bootloader/install
+      elif [ -f $PROJECT_DIR/$PROJECT/bootloader/install ]; then
+        . $PROJECT_DIR/$PROJECT/bootloader/install
+      fi
     fi
 
-    cat >trust.ini <<EOF
-[VERSION]
-MAJOR=1
-MINOR=2
-[BL30_OPTION]
-SEC=0
-[BL31_OPTION]
-SEC=1
-PATH=$(get_build_dir rkbin)/rk33/rk3328_bl31_v1.34.bin
-ADDR=0x10000
-[BL32_OPTION]
-SEC=0
-[BL33_OPTION]
-SEC=0
-[OUTPUT]
-PATH=trust.img
-EOF
-    $(get_build_dir rkbin)/tools/trust_merger trust.ini
-
-    cp -PRv idbloader.img $INSTALL/usr/share/bootloader
-    cp -PRv uboot.img $INSTALL/usr/share/bootloader
-    cp -PRv trust.img $INSTALL/usr/share/bootloader
-  fi
+    # Always install the update script
+    if [ -f $PROJECT_DIR/$PROJECT/devices/$DEVICE/bootloader/update.sh ]; then
+      cp -av $PROJECT_DIR/$PROJECT/devices/$DEVICE/bootloader/update.sh $INSTALL/usr/share/bootloader
+    elif [ -f $PROJECT_DIR/$PROJECT/bootloader/update.sh ]; then
+      cp -av $PROJECT_DIR/$PROJECT/bootloader/update.sh $INSTALL/usr/share/bootloader
+    fi
 }

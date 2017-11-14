@@ -1,5 +1,4 @@
 #!/bin/sh
-
 ################################################################################
 #      This file is part of LibreELEC - https://libreelec.tv
 #      Copyright (C) 2017-present Team LibreELEC
@@ -45,17 +44,17 @@ fi
   done
 
 # update bootloader
-  if [ -f "$SYSTEM_ROOT/usr/share/bootloader/idbloader.img" ]; then
+  if [ -f $SYSTEM_ROOT/usr/share/bootloader/idbloader.img ]; then
     echo "*** updating idbloader.img on: $BOOT_DISK ..."
-    dd if=$SYSTEM_ROOT/usr/share/bootloader/idbloader.img of=$BOOT_DISK conv=fsync bs=32k seek=1
+    dd if=$SYSTEM_ROOT/usr/share/bootloader/idbloader.img of=$BOOT_DISK bs=32k seek=1 conv=fsync &>/dev/null
   fi
-  if [ -f "$SYSTEM_ROOT/usr/share/bootloader/uboot.img" ]; then
+  if [ -f $SYSTEM_ROOT/usr/share/bootloader/uboot.img ]; then
     echo "*** updating uboot.img on: $BOOT_DISK ..."
-    dd if=$SYSTEM_ROOT/usr/share/bootloader/uboot.img of=$BOOT_DISK conv=fsync bs=64k seek=128
+    dd if=$SYSTEM_ROOT/usr/share/bootloader/uboot.img of=$BOOT_DISK bs=64k seek=128 conv=fsync &>/dev/null
   fi
-  if [ -f "$SYSTEM_ROOT/usr/share/bootloader/trust.img" ]; then
+  if [ -f $SYSTEM_ROOT/usr/share/bootloader/trust.img ]; then
     echo "*** updating trust.img on: $BOOT_DISK ..."
-    dd if=$SYSTEM_ROOT/usr/share/bootloader/trust.img of=$BOOT_DISK conv=fsync bs=64k seek=192
+    dd if=$SYSTEM_ROOT/usr/share/bootloader/trust.img of=$BOOT_DISK bs=64k seek=192 conv=fsync &>/dev/null
   fi
 
 # mount $BOOT_ROOT r/o

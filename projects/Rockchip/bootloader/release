@@ -16,16 +16,23 @@
 #  along with LibreELEC.  If not, see <http://www.gnu.org/licenses/>.
 ################################################################################
 
-# copy files needed for image
 mkdir -p $RELEASE_DIR/3rdparty/bootloader
-  if [ -f $INSTALL/usr/share/bootloader/idbloader.img ]; then
-    cp $INSTALL/usr/share/bootloader/idbloader.img $RELEASE_DIR/3rdparty/bootloader
-  fi
-  if [ -f $INSTALL/usr/share/bootloader/uboot.img ]; then
-    cp $INSTALL/usr/share/bootloader/uboot.img $RELEASE_DIR/3rdparty/bootloader
-  fi
-  if [ -f $INSTALL/usr/share/bootloader/trust.img ]; then
-    cp $INSTALL/usr/share/bootloader/trust.img $RELEASE_DIR/3rdparty/bootloader
+  if [ -n "$UBOOT_SYSTEM" ]; then
+    BOOTLOADER_DIR=$(get_build_dir $BOOTLOADER)
+    if [ -f $BOOTLOADER_DIR/idbloader.img ]; then
+      cp -a $BOOTLOADER_DIR/idbloader.img $RELEASE_DIR/3rdparty/bootloader
+    fi
+    if [ -f $BOOTLOADER_DIR/uboot.img ]; then
+      cp -a $BOOTLOADER_DIR/uboot.img $RELEASE_DIR/3rdparty/bootloader
+    fi
+    if [ -f $BOOTLOADER_DIR/trust.img ]; then
+      cp -a $BOOTLOADER_DIR/trust.img $RELEASE_DIR/3rdparty/bootloader
+    fi
   fi
 
-  cp $INSTALL/usr/share/bootloader/*.dtb $RELEASE_DIR/3rdparty/bootloader
+  LINUX_DTS_DIR=$(get_build_dir linux)/arch/$TARGET_KERNEL_ARCH/boot/dts
+  for dtb in $LINUX_DTS_DIR/*.dtb LINUX_DTS_DIR/*/*.dtb; do
+    if [ -f $dtb ]; then
+      cp -a $dtb $RELEASE_DIR/3rdparty/bootloader
+    fi
+  done

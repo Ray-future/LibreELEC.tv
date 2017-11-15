@@ -32,8 +32,10 @@ fi
 
 if [ -n "$PKG_ADDON_PROJECTS" -a ! "$PKG_ADDON_PROJECTS" = "any" ]; then
   if ! listcontains "${PKG_ADDON_PROJECTS}" "${DEVICE:-${PROJECT}}"; then
-    echo "*** ERROR: $PKG_ADDON_ID: '${DEVICE:-${PROJECT}}' not supported ***"
-    exit 0
+    if ! listcontains "${PKG_ADDON_PROJECTS}" "${PROJECT}"; then
+      echo "*** ERROR: $PKG_ADDON_ID: '${DEVICE:-${PROJECT}}' not supported ***"
+      exit 0
+    fi
   fi
 fi
 

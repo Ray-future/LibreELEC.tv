@@ -41,6 +41,10 @@ echo 0 > /sys/class/graphics/fb1/free_scale
 # set initial video state
 echo 1 > /sys/class/video/disable_video
 
+# change CPU affinity for cec and dwc_otg
+echo 2 > /proc/irq/231/smp_affinity
+echo 4 > /proc/irq/63/smp_affinity
+
 # Set framebuffer geometry to match the resolution
 case $hdmimode in
   480*)            X=720  Y=480  ;;

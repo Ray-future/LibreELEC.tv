@@ -42,11 +42,19 @@ PKG_CONFIGURE_OPTS_TARGET="--disable-nls \
             --without-libiconv-prefix \
             --without-libintl-prefix"
 
+pre_configure_target() {
+  export LDFLAGS="$LDFLAGS -pthread"
+}
+
 post_patch() {
   mkdir -p $PKG_BUILD/build-aux/
     touch $PKG_BUILD/build-aux/config.rpath
     touch $PKG_BUILD/libdvbv5-po/Makefile.in.in
     touch $PKG_BUILD/v4l-utils-po/Makefile.in.in
+}
+
+pre_configure_target() {
+  export LDFLAGS="$LDFLAGS -pthread"
 }
 
 make_target() {

@@ -17,8 +17,8 @@
 ################################################################################
 
 PKG_NAME="kodi"
-PKG_VERSION="055f6ee"
-PKG_SHA256="bbdca237bafcdcf28c0d4a3e6309ca616ab9ca4a35f3fcef5de8bac3ad2f6cc6"
+PKG_VERSION="28db1a8"
+PKG_SHA256="3e4818f9c06cb0bed97b59509fd7120b32809226f6d77c75b81aeb28e89d7f07"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="http://www.kodi.tv"
@@ -231,6 +231,7 @@ PKG_CMAKE_OPTS_TARGET="-DNATIVEPREFIX=$TOOLCHAIN \
                        -DENABLE_EVENTCLIENTS=ON \
                        -DENABLE_LDGOLD=ON \
                        -DENABLE_DEBUGFISSION=OFF \
+                       -DENABLE_APP_AUTONAME=OFF \
                        $KODI_ARCH \
                        $KODI_NEON \
                        $KODI_VDPAU \

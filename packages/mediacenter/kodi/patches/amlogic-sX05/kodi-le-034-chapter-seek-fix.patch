@@ -41,7 +41,7 @@ Subject: [PATCH] VideoPlayer: chapter seek fix
    if (m_pFormatContext->start_time != (int64_t)AV_NOPTS_VALUE && !ismp3)
      seek_pts += m_pFormatContext->start_time;
  
-+  CLog::Log(LOGDEBUG, "CDVDDemuxFFmpeg::%s - seek pts:%0.4f start_time:%lld", __FUNCTION__, (double)seek_pts/AV_TIME_BASE, m_pFormatContext->start_time);
++  CLog::Log(LOGDEBUG, "CDVDDemuxFFmpeg::%s - seek pts:%0.3f context start_time:%0.3f", __FUNCTION__, time / DVD_TIME_BASE, (double)m_pFormatContext->start_time / AV_TIME_BASE );
    int ret;
    {
      CSingleLock lock(m_critSection);
@@ -53,14 +53,14 @@ Subject: [PATCH] VideoPlayer: chapter seek fix
 -
 +  {
 +    CLog::Log(LOGDEBUG, "CDVDDemuxFFmpeg::%s - seek ended up on time %0.3fs", __FUNCTION__, m_currentPts / DVD_TIME_BASE);
-+    double diff = (double)seek_pts/AV_TIME_BASE - m_currentPts / DVD_TIME_BASE;
++    double diff = (time - m_currentPts) / DVD_TIME_BASE;
 +    if (diff > 1.0)
 +    {
 +      ret = av_seek_frame(m_pFormatContext, -1, seek_pts + (int)(diff *  AV_TIME_BASE / 2), backwards ? AVSEEK_FLAG_BACKWARD : 0);
 +      if (ret >= 0)
 +        UpdateCurrentPTS();
 +      CLog::Log(LOGDEBUG, "CDVDDemuxFFmpeg::%s - 2.seek ended up on time %0.3fs", __FUNCTION__, m_currentPts / DVD_TIME_BASE);
-+      double diff1 = (double)seek_pts/AV_TIME_BASE - m_currentPts / DVD_TIME_BASE;
++      double diff1 = (time - m_currentPts) / DVD_TIME_BASE;
 +      if (diff1 > 1.0)
 +      {
 +        ret = av_seek_frame(m_pFormatContext, -1, seek_pts + (int)((diff + diff1) *  AV_TIME_BASE / 2), backwards ? AVSEEK_FLAG_BACKWARD : 0);

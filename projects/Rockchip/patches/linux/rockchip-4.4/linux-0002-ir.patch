@@ -1,4 +1,4 @@
-From 1dc3dd7e80a63c951b8551393007e2af7ce93cd2 Mon Sep 17 00:00:00 2001
+From be7217ba3970b1300dd6e2ba8e5ee4745e299ecf Mon Sep 17 00:00:00 2001
 From: Eric Nelson <eric@nelint.com>
 Date: Sat, 3 Oct 2015 08:18:50 -0700
 Subject: [PATCH 01/10] UPSTREAM: [media] rc-core: define a default timeout for
@@ -28,7 +28,7 @@ index ec921f6538c7..f6494709e230 100644
  #define US_TO_NS(usec)		((usec) * 1000)
  #define MS_TO_US(msec)		((msec) * 1000)
 
-From 3936a27b58de10cd46fea8ea2eb8aa88384b55c8 Mon Sep 17 00:00:00 2001
+From f30c1ab95072452db5823e0373e5bc6192ceee0e Mon Sep 17 00:00:00 2001
 From: Eric Nelson <eric@nelint.com>
 Date: Wed, 23 Sep 2015 11:07:08 -0300
 Subject: [PATCH 02/10] UPSTREAM: [media] rc: gpio-ir-recv: add timeout on idle
@@ -123,7 +123,7 @@ index 7dbc9ca6d885..f62e3f1f9d9d 100644
  	gpio_free(gpio_dev->gpio_nr);
  	kfree(gpio_dev);
 
-From 6ca51342bb4d92810c81f8bdfa9e632ddd5fc3b5 Mon Sep 17 00:00:00 2001
+From 317657902133ae593661f815935cc05da7bb8ce6 Mon Sep 17 00:00:00 2001
 From: Sean Young <sean@mess.org>
 Date: Thu, 26 Jan 2017 14:37:33 -0200
 Subject: [PATCH 03/10] UPSTREAM: [media] gpio-ir: do not allow a timeout of 0
@@ -152,7 +152,7 @@ index f62e3f1f9d9d..56cf716d0cd4 100644
  	rcdev->max_timeout = 10 * IR_DEFAULT_TIMEOUT;
  	if (pdata->allowed_protos)
 
-From 2005c0284c38ad137ed8bc45fc9f164ebbff2786 Mon Sep 17 00:00:00 2001
+From 409c016dc4bb566b61452fbec68420d63f1b9a45 Mon Sep 17 00:00:00 2001
 From: Sean Young <sean@mess.org>
 Date: Thu, 15 Dec 2016 07:37:48 -0200
 Subject: [PATCH 04/10] UPSTREAM: [media] rc: unify nec32 protocol scancode
@@ -313,7 +313,7 @@ index 454e06295692..5cc1b456e329 100644
  
  static struct rc_map_list tivo_map = {
 
-From 9f1c6420da8fa2c798ce0ac1123a50f1a29c615b Mon Sep 17 00:00:00 2001
+From 50fd518a538f4a37512823953ad75a22b35307de Mon Sep 17 00:00:00 2001
 From: Jonas Karlman <jonas@kwiboo.se>
 Date: Wed, 6 Sep 2017 18:39:09 +0200
 Subject: [PATCH 05/10] [media] rc/keymaps: add keytable for Pine64 IR Remote
@@ -422,7 +422,7 @@ index 7c4bbc4dfab4..3a34a9631dd1 100644
  #define RC_MAP_PINNACLE_GREY             "rc-pinnacle-grey"
  #define RC_MAP_PINNACLE_PCTV_HD          "rc-pinnacle-pctv-hd"
 
-From db1fde71dc3ebdc6651f690a8357ef576b677b52 Mon Sep 17 00:00:00 2001
+From 54f0e98b63d176d2ecfeb45f5ff2605bcff1b5a5 Mon Sep 17 00:00:00 2001
 From: Jonas Karlman <jonas@kwiboo.se>
 Date: Wed, 6 Sep 2017 18:39:09 +0200
 Subject: [PATCH 06/10] arm64: dts: rockchip: rk3328-rock64: add ir-receiver
@@ -464,7 +464,7 @@ index 9bd60b7c3d46..8369c6ef5508 100644
  
  &rkvdec {
 
-From a636d61de3f24941ef6270f2988461796a791304 Mon Sep 17 00:00:00 2001
+From 42ccb5483f85b73b63926aa9e6cd6f1ac5dd904b Mon Sep 17 00:00:00 2001
 From: Jonas Karlman <jonas@kwiboo.se>
 Date: Wed, 6 Sep 2017 18:39:09 +0200
 Subject: [PATCH 07/10] [media] rc/keymaps: add keytable for ODROID IR Remote
@@ -560,7 +560,7 @@ index 3a34a9631dd1..f1badbfbca90 100644
  #define RC_MAP_PINE64                    "rc-pine64"
  #define RC_MAP_PINNACLE_COLOR            "rc-pinnacle-color"
 
-From 6c1ce5d39bf5af66b3879468cc7125a5380502ab Mon Sep 17 00:00:00 2001
+From 2b987baf0c0630d60bb29a52da797faa0af99b62 Mon Sep 17 00:00:00 2001
 From: Jonas Karlman <jonas@kwiboo.se>
 Date: Wed, 6 Sep 2017 18:39:09 +0200
 Subject: [PATCH 08/10] [media] rc/keymaps: add keytable for WeTek Hub Remote
@@ -656,7 +656,7 @@ index f1badbfbca90..cd8590c99e22 100644
  #define RC_MAP_VIDEOMATE_S350            "rc-videomate-s350"
  #define RC_MAP_VIDEOMATE_TV_PVR          "rc-videomate-tv-pvr"
 
-From d8b71eb739d805595663ffd775f90b1bbcddb901 Mon Sep 17 00:00:00 2001
+From 6b8942f6c047212b388c6b90a28092e295ec4044 Mon Sep 17 00:00:00 2001
 From: Jonas Karlman <jonas@kwiboo.se>
 Date: Wed, 6 Sep 2017 18:39:09 +0200
 Subject: [PATCH 09/10] [media] rc/keymaps: add keytable for WeTek Play 2
@@ -783,7 +783,7 @@ index cd8590c99e22..93cac05a5170 100644
  #define RC_MAP_VIDEOMATE_S350            "rc-videomate-s350"
  #define RC_MAP_VIDEOMATE_TV_PVR          "rc-videomate-tv-pvr"
 
-From 32c677fa8e133ea7f9fcd28e9a591050a5c887bc Mon Sep 17 00:00:00 2001
+From e2ad07d79adb731e9c99281a13e57ed850014a8a Mon Sep 17 00:00:00 2001
 From: Jonas Karlman <jonas@kwiboo.se>
 Date: Mon, 30 Oct 2017 23:47:18 +0100
 Subject: [PATCH 10/10] arm64: dts: rockchip: rk3328-rockbox: add ir-receiver
@@ -793,7 +793,7 @@ Subject: [PATCH 10/10] arm64: dts: rockchip: rk3328-rockbox: add ir-receiver
  1 file changed, 14 insertions(+)
 
 diff --git a/arch/arm64/boot/dts/rockchip/rk3328-rockbox.dts b/arch/arm64/boot/dts/rockchip/rk3328-rockbox.dts
-index 06e0993b2707..5ce5606da1b1 100644
+index 105e3baab286..19a26c334afc 100644
 --- a/arch/arm64/boot/dts/rockchip/rk3328-rockbox.dts
 +++ b/arch/arm64/boot/dts/rockchip/rk3328-rockbox.dts
 @@ -84,6 +84,14 @@

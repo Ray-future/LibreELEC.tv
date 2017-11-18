@@ -1,7 +1,7 @@
-From 50d5dead58faf32b31d8ccb1ed90d33e06b29157 Mon Sep 17 00:00:00 2001
+From d2341b014f6a7bafa1d3cf55e0f108da49045e76 Mon Sep 17 00:00:00 2001
 From: Jonas Karlman <jonas@kwiboo.se>
 Date: Sun, 13 Aug 2017 10:24:19 +0200
-Subject: [PATCH 01/41] arm: dts: rk3288-miniarm: update dts
+Subject: [PATCH 01/44] arm: dts: rk3288-miniarm: update dts
 
 ---
  arch/arm/boot/dts/rk3288-miniarm.dts | 26 ++++++++++++++++++++------
@@ -91,10 +91,10 @@ index b746ad79b291..adeb3eeb51a7 100644
  	supports-sdio;
  };
 
-From a4704ad5c730dee31d7804b402252777206c0c4f Mon Sep 17 00:00:00 2001
+From 291a04d1e45895e531cbfc5c9964239b4d50bd95 Mon Sep 17 00:00:00 2001
 From: Jonas Karlman <jonas@kwiboo.se>
 Date: Sun, 13 Aug 2017 10:24:26 +0200
-Subject: [PATCH 02/41] arm64: dts: rockchip: rk3328: update dtsi
+Subject: [PATCH 02/44] arm64: dts: rockchip: rk3328: update dtsi
 
 ---
  arch/arm64/boot/dts/rockchip/rk3328.dtsi | 27 ++++++++++++++++++++-------
@@ -218,10 +218,10 @@ index 05932aad0e69..f48a9d524d59 100644
  		clock-names = "biu", "ciu";
  		fifo-depth = <0x100>;
 
-From 8cb1c08a679e46f753fd4fac54b6e72e2df57eac Mon Sep 17 00:00:00 2001
+From 52756cbab7e5ec77dfce80219f7f125e07dcc8ab Mon Sep 17 00:00:00 2001
 From: LongChair <LongChair@hotmail.com>
 Date: Thu, 15 Jun 2017 21:00:59 +0200
-Subject: [PATCH 03/41] arm64: dts: rockchip: rk3328: add missing operating
+Subject: [PATCH 03/44] arm64: dts: rockchip: rk3328: add missing operating
  performance point
 
 ---
@@ -244,10 +244,10 @@ index f48a9d524d59..653659019bc2 100644
  
  	vpu_service: vpu-service@ff350000 {
 
-From 2b428d7c8d2b4dc05d9fdc7fdc1295d0de0f13c7 Mon Sep 17 00:00:00 2001
+From c1692e116a310ffd8d6007a117e67fb5ee8a53cc Mon Sep 17 00:00:00 2001
 From: Jonas Karlman <jonas@kwiboo.se>
 Date: Sun, 13 Aug 2017 10:24:28 +0200
-Subject: [PATCH 04/41] arm64: dts: rockchip: add rk3328-box board
+Subject: [PATCH 04/44] arm64: dts: rockchip: add rk3328-box board
 
 ---
  arch/arm64/boot/dts/rockchip/Makefile       |   1 +
@@ -256,7 +256,7 @@ Subject: [PATCH 04/41] arm64: dts: rockchip: add rk3328-box board
  create mode 100644 arch/arm64/boot/dts/rockchip/rk3328-box.dts
 
 diff --git a/arch/arm64/boot/dts/rockchip/Makefile b/arch/arm64/boot/dts/rockchip/Makefile
-index ceb44188c44e..86a277c9e157 100644
+index d2891cac266a..9e22e3b6c3ab 100644
 --- a/arch/arm64/boot/dts/rockchip/Makefile
 +++ b/arch/arm64/boot/dts/rockchip/Makefile
 @@ -1,3 +1,4 @@
@@ -764,10 +764,10 @@ index 000000000000..adb017c0d070
 +	status = "okay";
 +};
 
-From d12d2d05aa20ba8c4a3e75fe125e4ac6d3604937 Mon Sep 17 00:00:00 2001
+From 309385d98c5e66d0125cc3e91e7356080b23add1 Mon Sep 17 00:00:00 2001
 From: wlcheah <wlcheah@syabas.com>
 Date: Fri, 30 Jun 2017 12:27:25 +0800
-Subject: [PATCH 05/41] arm64: dts: rockchip: add rk3328-rock64 board
+Subject: [PATCH 05/44] arm64: dts: rockchip: add rk3328-rock64 board
 
 (cherry picked from commit 8bbdca5562e9167d233c85655effde3c11ab6bf2)
 ---
@@ -777,7 +777,7 @@ Subject: [PATCH 05/41] arm64: dts: rockchip: add rk3328-rock64 board
  create mode 100644 arch/arm64/boot/dts/rockchip/rk3328-rock64.dts
 
 diff --git a/arch/arm64/boot/dts/rockchip/Makefile b/arch/arm64/boot/dts/rockchip/Makefile
-index 86a277c9e157..96f05aa49622 100644
+index 9e22e3b6c3ab..6fbea4cac9a8 100644
 --- a/arch/arm64/boot/dts/rockchip/Makefile
 +++ b/arch/arm64/boot/dts/rockchip/Makefile
 @@ -1,5 +1,6 @@
@@ -1288,10 +1288,10 @@ index 000000000000..e496c5697f02
 +	status = "okay";
 +};
 
-From 9ebf5118894c95424045f65fcd8343127f6d1c3d Mon Sep 17 00:00:00 2001
+From e7087983106ce33539d218dc6ca32824e27f7f4e Mon Sep 17 00:00:00 2001
 From: Jonas Karlman <jonas@kwiboo.se>
 Date: Sun, 13 Aug 2017 10:24:29 +0200
-Subject: [PATCH 06/41] arm64: dts: rockchip: rk3328-rock64: sync with
+Subject: [PATCH 06/44] arm64: dts: rockchip: rk3328-rock64: sync with
  ayufan-rock64
 
 ---
@@ -1483,10 +1483,10 @@ index e496c5697f02..174816a58560 100644
  
  &spdif {
 
-From 95c4c6132f81a67e88c8ad99e4030fef01a7f9aa Mon Sep 17 00:00:00 2001
+From 17f86792936cafe2e000ad6318c9ce5dbcff99e4 Mon Sep 17 00:00:00 2001
 From: Jonas Karlman <jonas@kwiboo.se>
 Date: Sun, 13 Aug 2017 10:24:31 +0200
-Subject: [PATCH 07/41] arm64: dts: rockchip: rk3328-rock64: sync with mainline
+Subject: [PATCH 07/44] arm64: dts: rockchip: rk3328-rock64: sync with mainline
 
 ---
  arch/arm64/boot/dts/rockchip/rk3328-rock64.dts | 34 +++++++++++++++++++-------
@@ -1582,10 +1582,10 @@ index 174816a58560..ca9c030d34bb 100644
  	vccio6-supply = <&vcc_io>;
  	pmuio-supply = <&vcc_io>;
 
-From 30c24137d2e47e0ae0920d27a287bd761df5d553 Mon Sep 17 00:00:00 2001
+From 5a178d8b005898131d430ec6d8470ddf078066c4 Mon Sep 17 00:00:00 2001
 From: Jonas Karlman <jonas@kwiboo.se>
 Date: Sun, 13 Aug 2017 10:24:32 +0200
-Subject: [PATCH 08/41] arm64: dts: rockchip: rk3328-rock64: add hdmiphy
+Subject: [PATCH 08/44] arm64: dts: rockchip: rk3328-rock64: add hdmiphy
 
 ---
  arch/arm64/boot/dts/rockchip/rk3328-rock64.dts | 4 ++++
@@ -1607,10 +1607,10 @@ index ca9c030d34bb..aec36ad42333 100644
  	status = "okay";
  
 
-From 3d8f8101f5d6012bd832a3a253b74a98f6333e53 Mon Sep 17 00:00:00 2001
+From 3d996468b75456d4dc550f90718cebf810b956eb Mon Sep 17 00:00:00 2001
 From: Jonas Karlman <jonas@kwiboo.se>
 Date: Sun, 13 Aug 2017 10:24:33 +0200
-Subject: [PATCH 09/41] arm64: dts: rockchip: rk3328-rock64: add gpio-leds
+Subject: [PATCH 09/44] arm64: dts: rockchip: rk3328-rock64: add gpio-leds
 
 ---
  arch/arm64/boot/dts/rockchip/rk3328-rock64.dts | 14 ++++++++++++++
@@ -1642,10 +1642,10 @@ index aec36ad42333..6f0ed5ba9d30 100644
  		compatible = "simple-audio-card";
  		simple-audio-card,format = "i2s";
 
-From 71b51ae0865c36c9a7a0ab35b2fa857ac6f72d38 Mon Sep 17 00:00:00 2001
+From 86ec5318cfef720d9dff021c88d2fdb5044fd919 Mon Sep 17 00:00:00 2001
 From: Jonas Karlman <jonas@kwiboo.se>
 Date: Sun, 13 Aug 2017 10:24:36 +0200
-Subject: [PATCH 10/41] arm64: dts: rockchip: rk3328-rock64: rename and reorder
+Subject: [PATCH 10/44] arm64: dts: rockchip: rk3328-rock64: rename and reorder
  sound
 
 ---
@@ -1704,10 +1704,10 @@ index 6f0ed5ba9d30..b3a026d5af7e 100644
  			sound-dai = <&spdif>;
  		};
 
-From cd50f9a6c699a9c4824adfe5938b82e242949240 Mon Sep 17 00:00:00 2001
+From 512e674e5854044a614332ad97b7955cbf39cdb5 Mon Sep 17 00:00:00 2001
 From: Jonas Karlman <jonas@kwiboo.se>
 Date: Sun, 27 Aug 2017 20:50:55 +0200
-Subject: [PATCH 11/41] arm64: dts: rockchip: rk3328-rock64: add i2s1 and spdif
+Subject: [PATCH 11/44] arm64: dts: rockchip: rk3328-rock64: add i2s1 and spdif
  pinctrl
 
 ---
@@ -1745,10 +1745,10 @@ index b3a026d5af7e..a54f83faf37d 100644
  	status = "okay";
  };
 
-From 0002581af508cf872d2e82295607329a429c6c61 Mon Sep 17 00:00:00 2001
+From 45bf4d0374a3b1b82dec4450088041be46c27cbb Mon Sep 17 00:00:00 2001
 From: Jonas Karlman <jonas@kwiboo.se>
 Date: Mon, 30 Oct 2017 22:29:06 +0100
-Subject: [PATCH 12/41] arm64: dts: rockchip: rk3328-rock64: add uart2
+Subject: [PATCH 12/44] arm64: dts: rockchip: rk3328-rock64: add uart2
 
 ---
  arch/arm64/boot/dts/rockchip/rk3328-rock64.dts | 4 ++++
@@ -1770,22 +1770,22 @@ index a54f83faf37d..d017aa4be181 100644
  	otg-vbus-gpios = <&gpio0 RK_PD3 GPIO_ACTIVE_HIGH>;
  	status = "okay";
 
-From d0a1943c789d5c2d6c772ca48f531eef75331481 Mon Sep 17 00:00:00 2001
+From c3904e91fa7520598192bbbe826b790013897b38 Mon Sep 17 00:00:00 2001
 From: Jonas Karlman <jonas@kwiboo.se>
 Date: Mon, 30 Oct 2017 23:02:39 +0100
-Subject: [PATCH 13/41] arm64: dts: rockchip: add rk3328-rockbox board
+Subject: [PATCH 13/44] arm64: dts: rockchip: add rk3328-rockbox board
 
 ---
- arch/arm64/boot/dts/rockchip/rk3328-rockbox.dts | 536 ++++++++++++++++++++++++
- 1 file changed, 536 insertions(+)
+ arch/arm64/boot/dts/rockchip/rk3328-rockbox.dts | 535 ++++++++++++++++++++++++
+ 1 file changed, 535 insertions(+)
  create mode 100644 arch/arm64/boot/dts/rockchip/rk3328-rockbox.dts
 
 diff --git a/arch/arm64/boot/dts/rockchip/rk3328-rockbox.dts b/arch/arm64/boot/dts/rockchip/rk3328-rockbox.dts
 new file mode 100644
-index 000000000000..06e0993b2707
+index 000000000000..105e3baab286
 --- /dev/null
 +++ b/arch/arm64/boot/dts/rockchip/rk3328-rockbox.dts
-@@ -0,0 +1,536 @@
+@@ -0,0 +1,535 @@
 +/*
 + * Copyright (c) 2017 PINE64
 + *
@@ -1936,7 +1936,7 @@ index 000000000000..06e0993b2707
 +	wireless-wlan {
 +		compatible = "wlan-platdata";
 +		rockchip,grf = <&grf>;
-+		wifi_chip_type = "rtl8189es";
++		wifi_chip_type = "rtl8189fs";
 +		sdio_vref = <1800>;
 +		WIFI,poweren_gpio = <&gpio1 18 GPIO_ACTIVE_HIGH>;
 +		WIFI,host_wake_irq = <&gpio1 19 GPIO_ACTIVE_HIGH>;
@@ -2233,7 +2233,6 @@ index 000000000000..06e0993b2707
 +	bus-width = <4>;
 +	cap-mmc-highspeed;
 +	cap-sd-highspeed;
-+	cd-gpios = <&gpio1 RK_PA5 GPIO_ACTIVE_LOW>;
 +	disable-wp;
 +	max-frequency = <150000000>;
 +	num-slots = <1>;
@@ -2323,10 +2322,10 @@ index 000000000000..06e0993b2707
 +	status = "okay";
 +};
 
-From 8a5e02d0b79b8b3468549df2898348111e939874 Mon Sep 17 00:00:00 2001
+From a47af42e6bc21b72a3a3f82e685a912ec5f670ee Mon Sep 17 00:00:00 2001
 From: Jonas Karlman <jonas@kwiboo.se>
 Date: Mon, 30 Oct 2017 23:03:52 +0100
-Subject: [PATCH 14/41] arm64: dts: rockchip: rk3328: add operating performance
+Subject: [PATCH 14/44] arm64: dts: rockchip: rk3328: add operating performance
  points
 
 ---
@@ -2357,10 +2356,133 @@ index 653659019bc2..7a3f561f1313 100644
  
  	arm-pmu {
 
-From 81d217ce089532e6c69121c2fccf0a371537c855 Mon Sep 17 00:00:00 2001
+From d35b444abd618bea9d1d8f192dfd3b9dc0e5325e Mon Sep 17 00:00:00 2001
+From: Jonas Karlman <jonas@kwiboo.se>
+Date: Thu, 2 Nov 2017 23:17:46 +0100
+Subject: [PATCH 15/44] arm: dts: rk3288-miqi: update dts
+
+---
+ arch/arm/boot/dts/rk3288-miqi.dts | 56 +++++++++++++++++++++++----------------
+ 1 file changed, 33 insertions(+), 23 deletions(-)
+
+diff --git a/arch/arm/boot/dts/rk3288-miqi.dts b/arch/arm/boot/dts/rk3288-miqi.dts
+index b90b0e5969ec..ffced204abcf 100644
+--- a/arch/arm/boot/dts/rk3288-miqi.dts
++++ b/arch/arm/boot/dts/rk3288-miqi.dts
+@@ -55,29 +55,14 @@
+ 	sound {
+ 		compatible = "simple-audio-card";
+ 		simple-audio-card,format = "i2s";
+-		simple-audio-card,name = "DW-HDMI";
++		simple-audio-card,name = "HDMI";
+ 		simple-audio-card,mclk-fs = <512>;
+-
+-		simple-audio-card,dai-link@0 {  /* I2S - S/PDIF */
+-			format = "i2s";
+-			cpu {
+-				sound-dai = <&i2s>;
+-			};
+-			codec {
+-				sound-dai = <&hdmi>;
+-			};
++		simple-audio-card,cpu {
++			sound-dai = <&i2s>;
++		};
++		simple-audio-card,codec {
++			sound-dai = <&hdmi>;
+ 		};
+-
+-		/*
+-		 * If you want to support more cards,
+-		 * you can add more dai-link node,
+-		 * such as
+-		 *
+-		 *   simple-audio-card,dai-link@1 {
+-		 *       ......
+-		 *   }
+-		 */
+-
+ 	};
+ 
+ 	ext_gmac: external-gmac-clock {
+@@ -181,9 +166,23 @@
+ 	cpu0-supply = <&vdd_cpu>;
+ };
+ 
++&cpu0_opp_table {
++	opp-1704000000 {
++		opp-hz = /bits/ 64 <1704000000>;
++		opp-microvolt = <1350000>;
++		clock-latency-ns = <40000>;
++	};
++	opp-1800000000 {
++		opp-hz = /bits/ 64 <1800000000>;
++		opp-microvolt = <1400000>;
++		clock-latency-ns = <40000>;
++	};
++};
++
+ &gpu {
+ 	status = "okay";
+ 	mali-supply = <&vdd_gpu>;
++	power-off-delay-ms = <200>;
+ };
+ 
+ &emmc {
+@@ -203,6 +202,12 @@
+ 	#size-cells = <0>;
+ 	#sound-dai-cells = <0>;
+ 	status = "okay";
++	/* Don't use vopl for HDMI */
++	ports {
++		hdmi_in: port {
++			/delete-node/ endpoint@1;
++		};
++	};
+ };
+ 
+ &hevc_service {
+@@ -234,14 +239,14 @@
+ 	clock_in_out = "input";
+ 	snps,reset-gpio = <&gpio4 7 0>;
+ 	snps,reset-active-low;
+-	snps,reset-delays-us = <0 10000 1000000>;
++	snps,reset-delays-us = <0 10000 50000>;
+ 	assigned-clocks = <&cru SCLK_MAC>;
+ 	assigned-clock-parents = <&ext_gmac>;
+ 	pinctrl-names = "default";
+ 	pinctrl-0 = <&rgmii_pins>;
+ 	tx_delay = <0x30>;
+ 	rx_delay = <0x10>;
+-	status = "ok";
++	status = "okay";
+ };
+ 
+ /* ----------------------------------------------------------------------------------
+@@ -413,6 +418,7 @@ I2C
+ 
+ &i2s {
+ 	#sound-dai-cells = <0>;
++	rockchip,bclk-fs = <128>;
+ 	status = "okay";
+ };
+ 
+@@ -471,6 +477,10 @@ I2C
+ 
+ &vopl {
+ 	status = "okay";
++	/* Don't use vopl for HDMI */
++	vopl_out: port {
++		/delete-node/ endpoint@0;
++	};
+ };
+ 
+ &vopl_mmu {
+
+From 444181b6971ff232bc8fa9c41b3749cf3f2f26df Mon Sep 17 00:00:00 2001
 From: Chris Zhong <zyw@rock-chips.com>
 Date: Mon, 18 Jul 2016 22:34:34 +0800
-Subject: [PATCH 15/41] UPSTREAM: ASoC: rockchip: correct the spdif clk
+Subject: [PATCH 16/44] UPSTREAM: ASoC: rockchip: correct the spdif clk
 
 The spdif mclk should be 128 times of sample rate, and there is a
 internal divider, the real rate of spdif mclk is mclk / (div + 1).
@@ -2412,10 +2534,10 @@ index 44b8c72e6a16..feaba2ad6022 100644
  		SPDIF_CFGR_CLK_DIV_MASK | SPDIF_CFGR_HALFWORD_ENABLE |
  		SDPIF_CFGR_VDW_MASK,
 
-From e4b5166109089c11636e5258f6dad4f3214bf76c Mon Sep 17 00:00:00 2001
+From c3b731116168c9982dde647f0db574115015c03c Mon Sep 17 00:00:00 2001
 From: Sugar Zhang <sugar.zhang@rock-chips.com>
 Date: Wed, 7 Sep 2016 14:30:21 +0800
-Subject: [PATCH 16/41] UPSTREAM: ASoC: rockchip: spdif: restore register
+Subject: [PATCH 17/44] UPSTREAM: ASoC: rockchip: spdif: restore register
  during runtime_suspend/resume cycle
 
 when step into runtime_suspend, spdif pd will be disabled and loss state.
@@ -2459,10 +2581,10 @@ index feaba2ad6022..cac85a5538d5 100644
  
  static int rk_spdif_hw_params(struct snd_pcm_substream *substream,
 
-From 98fd2c1b8cea1e6176bca61d0c7263ffac13071e Mon Sep 17 00:00:00 2001
+From a0a75a7ce00539236da9d992c71f45f8255769ab Mon Sep 17 00:00:00 2001
 From: Arnaud Pouliquen <arnaud.pouliquen@st.com>
 Date: Tue, 3 Jan 2017 16:52:50 +0100
-Subject: [PATCH 17/41] UPSTREAM: DRM: add help to get ELD speaker allocation
+Subject: [PATCH 18/44] UPSTREAM: DRM: add help to get ELD speaker allocation
 
 Add helper to allow users to retrieve the speaker allocations without
 knowledge of the ELD structure.
@@ -2476,10 +2598,10 @@ Signed-off-by: Mark Brown <broonie@kernel.org>
  1 file changed, 13 insertions(+)
 
 diff --git a/include/drm/drm_edid.h b/include/drm/drm_edid.h
-index e3d74016be31..1a0b1636a16b 100644
+index 85861b63e77a..55201e7e2ede 100644
 --- a/include/drm/drm_edid.h
 +++ b/include/drm/drm_edid.h
-@@ -253,6 +253,7 @@ struct detailed_timing {
+@@ -254,6 +254,7 @@ struct detailed_timing {
  # define DRM_ELD_AUD_SYNCH_DELAY_MAX	0xfa	/* 500 ms */
  
  #define DRM_ELD_SPEAKER			7
@@ -2487,7 +2609,7 @@ index e3d74016be31..1a0b1636a16b 100644
  # define DRM_ELD_SPEAKER_RLRC		(1 << 6)
  # define DRM_ELD_SPEAKER_FLRC		(1 << 5)
  # define DRM_ELD_SPEAKER_RC		(1 << 4)
-@@ -412,6 +413,18 @@ static inline int drm_eld_size(const uint8_t *eld)
+@@ -417,6 +418,18 @@ static inline int drm_eld_size(const uint8_t *eld)
  	return DRM_ELD_HEADER_BLOCK_SIZE + eld[DRM_ELD_BASELINE_ELD_LEN] * 4;
  }
  
@@ -2507,10 +2629,10 @@ index e3d74016be31..1a0b1636a16b 100644
  	int (*get_edid_block)(void *data, u8 *buf, unsigned int block,
  			      size_t len),
 
-From 3f412ce6f5fb63a40d9cc857347c7727c333933c Mon Sep 17 00:00:00 2001
+From c8466f1bc167c31242025e9fbd18b6aba066d154 Mon Sep 17 00:00:00 2001
 From: Arnaud Pouliquen <arnaud.pouliquen@st.com>
 Date: Tue, 3 Jan 2017 16:52:51 +0100
-Subject: [PATCH 18/41] UPSTREAM: ASoC: core: add optional pcm_new callback for
+Subject: [PATCH 19/44] UPSTREAM: ASoC: core: add optional pcm_new callback for
  DAI driver
 
 During probe, DAIs can need to perform some actions that requests
@@ -2588,10 +2710,10 @@ index 49263f3a50b0..c583022d7910 100644
  			INIT_DELAYED_WORK(&rtd->delayed_work,
  						codec2codec_close_delayed_work);
 
-From b1fe3bb8b61326ce5f0b3db28d6559a682c8af87 Mon Sep 17 00:00:00 2001
+From 2c65e9800fb6d63943027b6c19057c33b2b17c03 Mon Sep 17 00:00:00 2001
 From: Arnaud Pouliquen <arnaud.pouliquen@st.com>
 Date: Tue, 3 Jan 2017 16:52:52 +0100
-Subject: [PATCH 19/41] UPSTREAM: ASoC: hdmi-codec: add channel mapping control
+Subject: [PATCH 20/44] UPSTREAM: ASoC: hdmi-codec: add channel mapping control
 
 Add user interface to provide channel mapping.
 In a first step this control is read only.
@@ -3074,10 +3196,10 @@ index 028d60c196ae..cb78d8971b41 100644
  	snd_soc_unregister_codec(&pdev->dev);
  	return 0;
 
-From f21fb6811ca2d0384fadc48bfa391c315f1bd2b3 Mon Sep 17 00:00:00 2001
+From d0c080937257cb4cd6b13416e84b710b4594fc9e Mon Sep 17 00:00:00 2001
 From: Christophe Jaillet <christophe.jaillet@wanadoo.fr>
 Date: Thu, 15 Jun 2017 07:53:11 +0200
-Subject: [PATCH 20/41] UPSTREAM: ASoC: rockchip: Fix an error handling in
+Subject: [PATCH 21/44] UPSTREAM: ASoC: rockchip: Fix an error handling in
  'rockchip_i2s_probe'
 
 If this memory allocation fail, we must disable what has been enabled.
@@ -3115,10 +3237,10 @@ index 2c7e5ccca2dc..ba32a2ef87b3 100644
  		if (val >= 2 && val <= 8)
  			soc_dai->playback.channels_max = val;
 
-From 6142fb05785522bf17bd9244770bcaf38b43f564 Mon Sep 17 00:00:00 2001
+From 5b57abdd72a2eadc5be8b638f725522d1c2aa61f Mon Sep 17 00:00:00 2001
 From: Romain Perier <romain.perier@collabora.com>
 Date: Fri, 14 Apr 2017 10:31:12 +0200
-Subject: [PATCH 21/41] UPSTREAM: drm: dw-hdmi: add specific I2S and AHB
+Subject: [PATCH 22/44] UPSTREAM: drm: dw-hdmi: add specific I2S and AHB
  functions for stream handling
 
 Currently, CTS+N is forced to zero as a workaround of the IP block for
@@ -3143,10 +3265,10 @@ Link: http://patchwork.freedesktop.org/patch/msgid/20170414083113.4255-2-romain.
  1 file changed, 24 insertions(+), 2 deletions(-)
 
 diff --git a/drivers/gpu/drm/bridge/dw-hdmi.c b/drivers/gpu/drm/bridge/dw-hdmi.c
-index 5156271b0660..d2d920ed29e8 100644
+index 758aa23f1527..626aaac47223 100644
 --- a/drivers/gpu/drm/bridge/dw-hdmi.c
 +++ b/drivers/gpu/drm/bridge/dw-hdmi.c
-@@ -249,6 +249,8 @@ struct dw_hdmi {
+@@ -252,6 +252,8 @@ struct dw_hdmi {
  
  	void (*write)(struct dw_hdmi *hdmi, u8 val, int offset);
  	u8 (*read)(struct dw_hdmi *hdmi, int offset);
@@ -3155,7 +3277,7 @@ index 5156271b0660..d2d920ed29e8 100644
  };
  
  #define HDMI_IH_PHY_STAT0_RX_SENSE \
-@@ -788,13 +790,29 @@ void dw_hdmi_set_sample_rate(struct dw_hdmi *hdmi, unsigned int rate)
+@@ -791,13 +793,29 @@ void dw_hdmi_set_sample_rate(struct dw_hdmi *hdmi, unsigned int rate)
  }
  EXPORT_SYMBOL_GPL(dw_hdmi_set_sample_rate);
  
@@ -3186,7 +3308,7 @@ index 5156271b0660..d2d920ed29e8 100644
  	spin_unlock_irqrestore(&hdmi->audio_lock, flags);
  }
  EXPORT_SYMBOL_GPL(dw_hdmi_audio_enable);
-@@ -805,7 +823,8 @@ void dw_hdmi_audio_disable(struct dw_hdmi *hdmi)
+@@ -808,7 +826,8 @@ void dw_hdmi_audio_disable(struct dw_hdmi *hdmi)
  
  	spin_lock_irqsave(&hdmi->audio_lock, flags);
  	hdmi->audio_enable = false;
@@ -3196,7 +3318,7 @@ index 5156271b0660..d2d920ed29e8 100644
  	spin_unlock_irqrestore(&hdmi->audio_lock, flags);
  }
  EXPORT_SYMBOL_GPL(dw_hdmi_audio_disable);
-@@ -3025,6 +3044,8 @@ int dw_hdmi_bind(struct device *dev, struct device *master,
+@@ -3228,6 +3247,8 @@ int dw_hdmi_bind(struct device *dev, struct device *master,
  		audio.irq = irq;
  		audio.hdmi = hdmi;
  		audio.eld = hdmi->connector.eld;
@@ -3205,7 +3327,7 @@ index 5156271b0660..d2d920ed29e8 100644
  
  		pdevinfo.name = "dw-hdmi-ahb-audio";
  		pdevinfo.data = &audio;
-@@ -3038,6 +3059,7 @@ int dw_hdmi_bind(struct device *dev, struct device *master,
+@@ -3241,6 +3262,7 @@ int dw_hdmi_bind(struct device *dev, struct device *master,
  		audio.write	= hdmi_writeb;
  		audio.read	= hdmi_readb;
  		audio.mod	= hdmi_modb;
@@ -3214,10 +3336,10 @@ index 5156271b0660..d2d920ed29e8 100644
  		pdevinfo.name = "dw-hdmi-i2s-audio";
  		pdevinfo.data = &audio;
 
-From aa40717cd107570a56fcfb8fee8152c586baabf1 Mon Sep 17 00:00:00 2001
+From ec6ef812207325b3deb248551f73485957d8e384 Mon Sep 17 00:00:00 2001
 From: Romain Perier <romain.perier@collabora.com>
 Date: Thu, 20 Apr 2017 14:34:34 +0530
-Subject: [PATCH 22/41] UPSTREAM: drm: dw-hdmi: gate audio clock from the I2S
+Subject: [PATCH 23/44] UPSTREAM: drm: dw-hdmi: gate audio clock from the I2S
  enablement callbacks
 
 Currently, the audio sampler clock is enabled from dw_hdmi_setup() at
@@ -3242,10 +3364,10 @@ Signed-off-by: Archit Taneja <architt@codeaurora.org>
  1 file changed, 14 insertions(+), 6 deletions(-)
 
 diff --git a/drivers/gpu/drm/bridge/dw-hdmi.c b/drivers/gpu/drm/bridge/dw-hdmi.c
-index d2d920ed29e8..abd30e4169d9 100644
+index 626aaac47223..761284e5cb34 100644
 --- a/drivers/gpu/drm/bridge/dw-hdmi.c
 +++ b/drivers/gpu/drm/bridge/dw-hdmi.c
-@@ -790,6 +790,12 @@ void dw_hdmi_set_sample_rate(struct dw_hdmi *hdmi, unsigned int rate)
+@@ -793,6 +793,12 @@ void dw_hdmi_set_sample_rate(struct dw_hdmi *hdmi, unsigned int rate)
  }
  EXPORT_SYMBOL_GPL(dw_hdmi_set_sample_rate);
  
@@ -3258,7 +3380,7 @@ index d2d920ed29e8..abd30e4169d9 100644
  static void dw_hdmi_ahb_audio_enable(struct dw_hdmi *hdmi)
  {
  	hdmi_set_cts_n(hdmi, hdmi->audio_cts, hdmi->audio_n);
-@@ -803,6 +809,12 @@ static void dw_hdmi_ahb_audio_disable(struct dw_hdmi *hdmi)
+@@ -806,6 +812,12 @@ static void dw_hdmi_ahb_audio_disable(struct dw_hdmi *hdmi)
  static void dw_hdmi_i2s_audio_enable(struct dw_hdmi *hdmi)
  {
  	hdmi_set_cts_n(hdmi, hdmi->audio_cts, hdmi->audio_n);
@@ -3271,7 +3393,7 @@ index d2d920ed29e8..abd30e4169d9 100644
  }
  
  void dw_hdmi_audio_enable(struct dw_hdmi *hdmi)
-@@ -1953,11 +1965,6 @@ static void dw_hdmi_enable_video_path(struct dw_hdmi *hdmi)
+@@ -2010,11 +2022,6 @@ static void dw_hdmi_enable_video_path(struct dw_hdmi *hdmi)
  			    HDMI_MC_FLOWCTRL);
  }
  
@@ -3283,7 +3405,7 @@ index d2d920ed29e8..abd30e4169d9 100644
  /* Workaround to clear the overflow condition */
  static void dw_hdmi_clear_overflow(struct dw_hdmi *hdmi)
  {
-@@ -2100,7 +2107,7 @@ static int dw_hdmi_setup(struct dw_hdmi *hdmi, struct drm_display_mode *mode)
+@@ -2163,7 +2170,7 @@ static int dw_hdmi_setup(struct dw_hdmi *hdmi, struct drm_display_mode *mode)
  
  		/* HDMI Initialization Step E - Configure audio */
  		hdmi_clk_regenerator_update_pixel_clock(hdmi);
@@ -3292,7 +3414,7 @@ index d2d920ed29e8..abd30e4169d9 100644
  	}
  
  	/* not for DVI mode */
-@@ -3060,6 +3067,7 @@ int dw_hdmi_bind(struct device *dev, struct device *master,
+@@ -3263,6 +3270,7 @@ int dw_hdmi_bind(struct device *dev, struct device *master,
  		audio.read	= hdmi_readb;
  		audio.mod	= hdmi_modb;
  		hdmi->enable_audio = dw_hdmi_i2s_audio_enable;
@@ -3301,10 +3423,10 @@ index d2d920ed29e8..abd30e4169d9 100644
  		pdevinfo.name = "dw-hdmi-i2s-audio";
  		pdevinfo.data = &audio;
 
-From 59034fba9a491a5f2dab91024a4a88c1f564fb49 Mon Sep 17 00:00:00 2001
+From 2caf1f215208f98c9078cdc73014c20b43f3923b Mon Sep 17 00:00:00 2001
 From: Jonas Karlman <jonas@kwiboo.se>
 Date: Mon, 7 Aug 2017 22:24:15 +0200
-Subject: [PATCH 23/41] drm: dw-hdmi-i2s: sync with upstream
+Subject: [PATCH 24/44] drm: dw-hdmi-i2s: sync with upstream
 
 ---
  drivers/gpu/drm/bridge/dw-hdmi-audio.h     |  1 -
@@ -3380,10 +3502,10 @@ index f1f62d8c1d16..5ff993a35ab6 100644
  		.name = DRIVER_NAME,
  		.owner = THIS_MODULE,
 
-From 48289ec1226edfc4fbe68e10d1a628356953066a Mon Sep 17 00:00:00 2001
+From 35a9f8d09d48756685a814ed9d20bf4d35c6ae8f Mon Sep 17 00:00:00 2001
 From: Jonas Karlman <jonas@kwiboo.se>
 Date: Sun, 2 Apr 2017 11:33:39 +0200
-Subject: [PATCH 24/41] drm: dw-hdmi-i2s: implement get_eld
+Subject: [PATCH 25/44] drm: dw-hdmi-i2s: implement get_eld
 
 ---
  drivers/gpu/drm/bridge/dw-hdmi-audio.h     |  1 +
@@ -3437,10 +3559,10 @@ index 5ff993a35ab6..e7312571e2cb 100644
  
  static int snd_dw_hdmi_probe(struct platform_device *pdev)
 diff --git a/drivers/gpu/drm/bridge/dw-hdmi.c b/drivers/gpu/drm/bridge/dw-hdmi.c
-index abd30e4169d9..bddd28d517fc 100644
+index 761284e5cb34..4370bc8e41e5 100644
 --- a/drivers/gpu/drm/bridge/dw-hdmi.c
 +++ b/drivers/gpu/drm/bridge/dw-hdmi.c
-@@ -3066,6 +3066,7 @@ int dw_hdmi_bind(struct device *dev, struct device *master,
+@@ -3269,6 +3269,7 @@ int dw_hdmi_bind(struct device *dev, struct device *master,
  		audio.write	= hdmi_writeb;
  		audio.read	= hdmi_readb;
  		audio.mod	= hdmi_modb;
@@ -3449,10 +3571,10 @@ index abd30e4169d9..bddd28d517fc 100644
  		hdmi->disable_audio = dw_hdmi_i2s_audio_disable;
  
 
-From 653be2397bca44918c18b9c1ab5130971a494268 Mon Sep 17 00:00:00 2001
+From cb1b2c3984d5027ce9ca919e77c5e66b22aad594 Mon Sep 17 00:00:00 2001
 From: Jonas Karlman <jonas@kwiboo.se>
 Date: Mon, 17 Apr 2017 13:09:16 +0200
-Subject: [PATCH 25/41] drm: dw-hdmi-i2s: configure channel allocation
+Subject: [PATCH 26/44] drm: dw-hdmi-i2s: configure channel allocation
 
 ---
  drivers/gpu/drm/bridge/dw-hdmi-i2s-audio.c | 2 +-
@@ -3472,10 +3594,10 @@ index e7312571e2cb..1d4570e3fbed 100644
  	/* Set LFEPBLDOWN-MIX INH and LSV */
  	hdmi_write(audio, 0x00, HDMI_FC_AUDICONF3);
 
-From 30d43830d28a1cda768da3345c2edc4d303dc8cb Mon Sep 17 00:00:00 2001
+From 87be3d25bbd885fc60380518fa69659a977e5f01 Mon Sep 17 00:00:00 2001
 From: Jonas Karlman <jonas@kwiboo.se>
 Date: Tue, 2 May 2017 18:57:19 +0200
-Subject: [PATCH 26/41] ASoC: hdmi-codec: fix I2S audio in Kodi
+Subject: [PATCH 27/44] ASoC: hdmi-codec: fix I2S audio in Kodi
 
 ---
  sound/soc/codecs/hdmi-codec.c | 1 -
@@ -3494,10 +3616,10 @@ index cb78d8971b41..9ebca57014e4 100644
  	.ops = &hdmi_dai_ops,
  	.pcm_new = hdmi_codec_pcm_new,
 
-From bda8b61097f845816281e8f680b74ce4ea3d5bcd Mon Sep 17 00:00:00 2001
+From 81486e928be78c1dbb59505bfb44984329f0f849 Mon Sep 17 00:00:00 2001
 From: Jonas Karlman <jonas@kwiboo.se>
 Date: Mon, 14 Aug 2017 00:14:05 +0200
-Subject: [PATCH 27/41] ASoC: hdmi-codec: reorder channel map
+Subject: [PATCH 28/44] ASoC: hdmi-codec: reorder channel map
 
 ---
  sound/soc/codecs/hdmi-codec.c | 113 +++++++++++++++++++-----------------------
@@ -3639,10 +3761,10 @@ index 9ebca57014e4..e65060ae8ffc 100644
  
  struct hdmi_codec_priv {
 
-From 868e65b4107b37a8e878ddb049256a990e037667 Mon Sep 17 00:00:00 2001
+From bf5dea79c43851bb9f04e965c50056cd396f65ba Mon Sep 17 00:00:00 2001
 From: Jonas Karlman <jonas@kwiboo.se>
 Date: Sun, 27 Aug 2017 23:32:40 +0200
-Subject: [PATCH 28/41] ASoC: codecs: rk3328: limit to working rates
+Subject: [PATCH 29/44] ASoC: codecs: rk3328: limit to working rates
 
 ---
  sound/soc/codecs/rk3328_codec.c | 7 ++++++-
@@ -3667,10 +3789,10 @@ index ceb2eb6dd69a..d20728bd48ba 100644
  				    SNDRV_PCM_FMTBIT_S20_3LE |
  				    SNDRV_PCM_FMTBIT_S24_LE |
 
-From 0e5f0889bb955aac9fa42fbfd4f59f7906e39de6 Mon Sep 17 00:00:00 2001
+From 0e6033cdb6c49e94f2686adb7f1a1ec765ac50b6 Mon Sep 17 00:00:00 2001
 From: Jonas Karlman <jonas@kwiboo.se>
 Date: Sun, 3 Sep 2017 11:19:19 +0200
-Subject: [PATCH 29/41] arm64: dts: rockchip: rk3328-rock64: use two dai-link
+Subject: [PATCH 30/44] arm64: dts: rockchip: rk3328-rock64: use two dai-link
  for i2s sound
 
 ---
@@ -3758,20 +3880,20 @@ index 53dd085d3ee2..bf7ce34084a9 100644
  	.probe = snd_soc_dummy_probe,
  	.remove = snd_soc_dummy_remove,
 
-From b930a358457cc8319875a0e45c374502ad72946f Mon Sep 17 00:00:00 2001
+From 28f71b0a35d78137411710c9d69cc3f0cc6e9cd0 Mon Sep 17 00:00:00 2001
 From: LongChair <LongChair@hotmail.com>
 Date: Sun, 26 Mar 2017 15:30:15 +0200
-Subject: [PATCH 30/41] video/rockchip: raise up vpu clock
+Subject: [PATCH 31/44] video/rockchip: raise up vpu clock
 
 ---
  drivers/video/rockchip/vcodec/vcodec_service.c | 3 +--
  1 file changed, 1 insertion(+), 2 deletions(-)
 
 diff --git a/drivers/video/rockchip/vcodec/vcodec_service.c b/drivers/video/rockchip/vcodec/vcodec_service.c
-index fdcb65489658..6ff49dfbba70 100644
+index 2155ee6b0025..fd034060cac4 100644
 --- a/drivers/video/rockchip/vcodec/vcodec_service.c
 +++ b/drivers/video/rockchip/vcodec/vcodec_service.c
-@@ -1156,8 +1156,7 @@ static void get_reg_freq(struct vpu_subdev_data *data, struct vpu_reg *reg)
+@@ -1122,8 +1122,7 @@ static void get_reg_freq(struct vpu_subdev_data *data, struct vpu_reg *reg)
  			}
  		}
  		if (data->hw_id == HEVC_ID) {
@@ -3782,20 +3904,20 @@ index fdcb65489658..6ff49dfbba70 100644
  		if (reg->type == VPU_PP)
  			reg->freq = VPU_FREQ_400M;
 
-From 5afc95b036b5f1088e97a87c7defe0fc80003641 Mon Sep 17 00:00:00 2001
+From 699dd5fa5e8970dc607b626eef9d811004111d4f Mon Sep 17 00:00:00 2001
 From: LongChair <LongChair@hotmail.com>
 Date: Sun, 26 Mar 2017 15:30:16 +0200
-Subject: [PATCH 31/41] drm/rockchip: make video overlay bottom layer
+Subject: [PATCH 32/44] drm/rockchip: make video overlay bottom layer
 
 ---
  drivers/gpu/drm/rockchip/rockchip_vop_reg.c | 8 ++++----
  1 file changed, 4 insertions(+), 4 deletions(-)
 
 diff --git a/drivers/gpu/drm/rockchip/rockchip_vop_reg.c b/drivers/gpu/drm/rockchip/rockchip_vop_reg.c
-index 748809fb705d..263fce6a7f10 100644
+index 9a70cddd3ce3..6fbdc9701e97 100644
 --- a/drivers/gpu/drm/rockchip/rockchip_vop_reg.c
 +++ b/drivers/gpu/drm/rockchip/rockchip_vop_reg.c
-@@ -278,9 +278,9 @@ static const struct vop_ctrl rk3288_ctrl_data = {
+@@ -281,9 +281,9 @@ static const struct vop_ctrl rk3288_ctrl_data = {
   */
  static const struct vop_win_data rk3288_vop_win_data[] = {
  	{ .base = 0x00, .phy = &rk3288_win01_data,
@@ -3807,23 +3929,24 @@ index 748809fb705d..263fce6a7f10 100644
  	{ .base = 0x00, .phy = &rk3288_win23_data,
  	  .type = DRM_PLANE_TYPE_OVERLAY,
  	  .area = rk3288_area_data,
-@@ -666,9 +666,9 @@ static const struct vop_intr rk3328_vop_intr = {
+@@ -974,10 +974,10 @@ static const struct vop_csc rk3328_win2_csc = {
  
  static const struct vop_win_data rk3328_vop_win_data[] = {
- 	{ .base = 0xd0, .phy = &rk3288_win01_data,
--	  .type = DRM_PLANE_TYPE_PRIMARY },
--	{ .base = 0x1d0, .phy = &rk3288_win01_data,
- 	  .type = DRM_PLANE_TYPE_OVERLAY },
-+	{ .base = 0x1d0, .phy = &rk3288_win01_data,
-+	  .type = DRM_PLANE_TYPE_PRIMARY },
- 	{ .base = 0x2d0, .phy = &rk3288_win01_data,
- 	  .type = DRM_PLANE_TYPE_CURSOR },
- };
+ 	{ .base = 0xd0, .phy = &rk3288_win01_data,  .csc = &rk3328_win0_csc,
+-	  .type = DRM_PLANE_TYPE_PRIMARY,
++	  .type = DRM_PLANE_TYPE_OVERLAY,
+ 	  .feature = WIN_FEATURE_HDR2SDR | WIN_FEATURE_SDR2HDR },
+ 	{ .base = 0x1d0, .phy = &rk3288_win01_data, .csc = &rk3328_win1_csc,
+-	  .type = DRM_PLANE_TYPE_OVERLAY,
++	  .type = DRM_PLANE_TYPE_PRIMARY,
+ 	  .feature = WIN_FEATURE_SDR2HDR | WIN_FEATURE_PRE_OVERLAY },
+ 	{ .base = 0x2d0, .phy = &rk3288_win01_data, .csc = &rk3328_win2_csc,
+ 	  .type = DRM_PLANE_TYPE_CURSOR,
 
-From 1caa999ddc73fa3343e5b78eb07e0cf418b8ef4a Mon Sep 17 00:00:00 2001
+From f614dd0821115939c1be75a9c94f201b5089f4d9 Mon Sep 17 00:00:00 2001
 From: Jonas Karlman <jonas@kwiboo.se>
 Date: Wed, 29 Mar 2017 23:51:09 +0200
-Subject: [PATCH 32/41] gpu/arm/midgard: default to performance gpu governor
+Subject: [PATCH 33/44] gpu/arm/midgard: default to performance gpu governor
 
 ---
  drivers/gpu/arm/midgard_for_linux/backend/gpu/mali_kbase_devfreq.c | 6 ++----
@@ -3869,10 +3992,10 @@ index 9b00cce9b2b3..739ac83b484f 100644
  /*
   * Power Management poweroff tick granuality. This is in nanoseconds to
 
-From 036a8ef5540ef706c108c148c85a259d2e5cd6f2 Mon Sep 17 00:00:00 2001
+From 54e33469d2a97339dc9346d2759ed0572529398c Mon Sep 17 00:00:00 2001
 From: Jonas Karlman <jonas@kwiboo.se>
 Date: Mon, 17 Apr 2017 13:09:16 +0200
-Subject: [PATCH 33/41] sound/usb/quirks-table: add Realtek ALC4040
+Subject: [PATCH 34/44] sound/usb/quirks-table: add Realtek ALC4040
 
 ---
  sound/usb/quirks-table.h | 9 +++++++++
@@ -3897,10 +4020,10 @@ index 8a59d4782a0f..96e1e2fdc9c3 100644
 +
  #undef USB_DEVICE_VENDOR_SPEC
 
-From a0526ea66a076594fac5fc17e08a7be60e9036b6 Mon Sep 17 00:00:00 2001
+From 398ecee729e0f2e4b025f89c7dd4a6bbcfb627b6 Mon Sep 17 00:00:00 2001
 From: LongChair <LongChair@hotmail.com>
 Date: Mon, 24 Apr 2017 09:48:54 +0200
-Subject: [PATCH 34/41] drm : allow framebuffer and videomodes not to have same
+Subject: [PATCH 35/44] drm : allow framebuffer and videomodes not to have same
  size
 
 DRM legacy doesn't allow that, will be only available with drm atomic.
@@ -3911,10 +4034,10 @@ Although, when running 4K modes, it's preferable to get a 1080p frambuffer that 
  2 files changed, 6 insertions(+), 4 deletions(-)
 
 diff --git a/drivers/gpu/drm/drm_atomic_helper.c b/drivers/gpu/drm/drm_atomic_helper.c
-index 6a8b93423a78..abfef1cd9345 100644
+index 8da8db6db5f1..c4e41eda1706 100644
 --- a/drivers/gpu/drm/drm_atomic_helper.c
 +++ b/drivers/gpu/drm/drm_atomic_helper.c
-@@ -2166,11 +2166,11 @@ int __drm_atomic_helper_set_config(struct drm_mode_set *set,
+@@ -2188,11 +2188,11 @@ int __drm_atomic_helper_set_config(struct drm_mode_set *set,
  	primary_state->src_x = set->x << 16;
  	primary_state->src_y = set->y << 16;
  	if (primary_state->rotation & (BIT(DRM_ROTATE_90) | BIT(DRM_ROTATE_270))) {
@@ -3931,10 +4054,10 @@ index 6a8b93423a78..abfef1cd9345 100644
  
  commit:
 diff --git a/drivers/gpu/drm/drm_crtc.c b/drivers/gpu/drm/drm_crtc.c
-index bd39039886d7..f8667488e7af 100644
+index 7cd13faf83ca..365e3d588163 100644
 --- a/drivers/gpu/drm/drm_crtc.c
 +++ b/drivers/gpu/drm/drm_crtc.c
-@@ -2916,6 +2916,8 @@ int drm_crtc_check_viewport(const struct drm_crtc *crtc,
+@@ -2931,6 +2931,8 @@ int drm_crtc_check_viewport(const struct drm_crtc *crtc,
  
  {
  	int hdisplay, vdisplay;
@@ -3944,17 +4067,17 @@ index bd39039886d7..f8667488e7af 100644
  	drm_crtc_get_hv_timing(mode, &hdisplay, &vdisplay);
  
 
-From 11b6d64cc521625592a47c72069275ad1b4ad0b9 Mon Sep 17 00:00:00 2001
+From 12ab4d741ac1a9805ce849027e6a5bdafd18be08 Mon Sep 17 00:00:00 2001
 From: Jonas Karlman <jonas@kwiboo.se>
 Date: Sun, 28 May 2017 09:08:50 +0200
-Subject: [PATCH 35/41] gpu/arm/mali400: default to performance gpu governor
+Subject: [PATCH 36/44] gpu/arm/mali400: default to performance gpu governor
 
 ---
  drivers/gpu/arm/mali400/mali/linux/mali_devfreq.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/drivers/gpu/arm/mali400/mali/linux/mali_devfreq.c b/drivers/gpu/arm/mali400/mali/linux/mali_devfreq.c
-index 239720043d99..d289145f9107 100644
+index 3eac07d76766..14916ea86905 100644
 --- a/drivers/gpu/arm/mali400/mali/linux/mali_devfreq.c
 +++ b/drivers/gpu/arm/mali400/mali/linux/mali_devfreq.c
 @@ -249,7 +249,7 @@ int mali_devfreq_init(struct mali_device *mdev)
@@ -3967,20 +4090,20 @@ index 239720043d99..d289145f9107 100644
  		mali_devfreq_term_freq_table(mdev);
  		return PTR_ERR(mdev->devfreq);
 
-From 42c5b8ab689098362de482a26bc2eb9af24a6b21 Mon Sep 17 00:00:00 2001
+From 8e9363de6826ead057044ac2eb727b586b036bf9 Mon Sep 17 00:00:00 2001
 From: LongChair <LongChair@hotmail.com>
 Date: Fri, 21 Apr 2017 13:39:12 +0200
-Subject: [PATCH 36/41] drm/rockchip: remove unsupported 4K freqs
+Subject: [PATCH 37/44] drm/rockchip: remove unsupported 4K freqs
 
 ---
  drivers/gpu/drm/rockchip/dw_hdmi-rockchip.c | 3 +++
  1 file changed, 3 insertions(+)
 
 diff --git a/drivers/gpu/drm/rockchip/dw_hdmi-rockchip.c b/drivers/gpu/drm/rockchip/dw_hdmi-rockchip.c
-index 75175e8e765a..bc82b964943c 100644
+index 6827ea7185c1..6ef8f7c16db3 100644
 --- a/drivers/gpu/drm/rockchip/dw_hdmi-rockchip.c
 +++ b/drivers/gpu/drm/rockchip/dw_hdmi-rockchip.c
-@@ -414,6 +414,9 @@ dw_hdmi_rockchip_mode_valid(struct drm_connector *connector,
+@@ -444,6 +444,9 @@ dw_hdmi_rockchip_mode_valid(struct drm_connector *connector,
  	    !drm_mode_is_420(&connector->display_info, mode))
  		return MODE_BAD;
  
@@ -3991,10 +4114,10 @@ index 75175e8e765a..bc82b964943c 100644
  		const struct drm_connector_helper_funcs *funcs;
  
 
-From ac4b5aaabe358563843a9deb2ff6c6d6a3c83f9c Mon Sep 17 00:00:00 2001
+From b03cf0c082297348a5bc512053699cf83318bd6d Mon Sep 17 00:00:00 2001
 From: xuhuicong <xhc@rock-chips.com>
 Date: Fri, 23 Jun 2017 18:56:17 +0800
-Subject: [PATCH 37/41] drm/rockchip: hdmi: fix no sound some time
+Subject: [PATCH 38/44] drm/rockchip: hdmi: fix no sound some time
 
 Change-Id: Ic9f931d9a5b7bca954363293a20ca242eb0bfa6f
 Signed-off-by: xuhuicong <xhc@rock-chips.com>
@@ -4003,10 +4126,10 @@ Signed-off-by: xuhuicong <xhc@rock-chips.com>
  1 file changed, 3 insertions(+), 4 deletions(-)
 
 diff --git a/drivers/gpu/drm/bridge/dw-hdmi.c b/drivers/gpu/drm/bridge/dw-hdmi.c
-index bddd28d517fc..f0d0956adf35 100644
+index 4370bc8e41e5..4721d402a7e3 100644
 --- a/drivers/gpu/drm/bridge/dw-hdmi.c
 +++ b/drivers/gpu/drm/bridge/dw-hdmi.c
-@@ -1830,10 +1830,6 @@ static void hdmi_av_composer(struct dw_hdmi *hdmi,
+@@ -1887,10 +1887,6 @@ static void hdmi_av_composer(struct dw_hdmi *hdmi,
  		HDMI_FC_INVIDCONF_IN_I_P_INTERLACED :
  		HDMI_FC_INVIDCONF_IN_I_P_PROGRESSIVE;
  
@@ -4017,7 +4140,7 @@ index bddd28d517fc..f0d0956adf35 100644
  	hdmi_writeb(hdmi, inv_val, HDMI_FC_INVIDCONF);
  
  	hdisplay = mode->hdisplay;
-@@ -2113,6 +2109,9 @@ static int dw_hdmi_setup(struct dw_hdmi *hdmi, struct drm_display_mode *mode)
+@@ -2176,6 +2172,9 @@ static int dw_hdmi_setup(struct dw_hdmi *hdmi, struct drm_display_mode *mode)
  	/* not for DVI mode */
  	if (hdmi->sink_is_hdmi) {
  		dev_dbg(hdmi->dev, "%s HDMI mode\n", __func__);
@@ -4028,10 +4151,10 @@ index bddd28d517fc..f0d0956adf35 100644
  		/* HDMI Initialization Step F - Configure AVI InfoFrame */
  		hdmi_config_AVI(hdmi, mode);
 
-From f3cdc83f3c726c1c86c179b0f1adcbc6aaa7c141 Mon Sep 17 00:00:00 2001
+From 0b0e6f53e6a8c359a8acb33a7feeb1f7541a07f6 Mon Sep 17 00:00:00 2001
 From: Jonas Karlman <jonas@kwiboo.se>
 Date: Fri, 25 Aug 2017 18:29:35 +0200
-Subject: [PATCH 38/41] video: rockchip: vpu: partial revise for rk322xh
+Subject: [PATCH 39/44] video: rockchip: vpu: partial revise for rk322xh
  feature
 
 ---
@@ -4039,10 +4162,10 @@ Subject: [PATCH 38/41] video: rockchip: vpu: partial revise for rk322xh
  1 file changed, 3 insertions(+), 9 deletions(-)
 
 diff --git a/drivers/video/rockchip/vcodec/vcodec_service.c b/drivers/video/rockchip/vcodec/vcodec_service.c
-index 6ff49dfbba70..12be338f7670 100644
+index fd034060cac4..e77c022eae78 100644
 --- a/drivers/video/rockchip/vcodec/vcodec_service.c
 +++ b/drivers/video/rockchip/vcodec/vcodec_service.c
-@@ -2842,21 +2842,15 @@ static irqreturn_t vdpu_irq(int irq, void *dev_id)
+@@ -2806,21 +2806,15 @@ static irqreturn_t vdpu_irq(int irq, void *dev_id)
  		time_record(task, 1);
  		vpu_debug(DEBUG_IRQ_STATUS, "vdpu_irq dec status %08x\n",
  			  dec_status);
@@ -4068,10 +4191,10 @@ index 6ff49dfbba70..12be338f7670 100644
  		time_diff(task);
  		pservice->irq_status = raw_status;
 
-From dc8cc42d6a53f38a967a9751ea90351f5a74e49f Mon Sep 17 00:00:00 2001
+From 1868e7bd141127e7b2309d75c0f3ff21963dbcab Mon Sep 17 00:00:00 2001
 From: Jonas Karlman <jonas@kwiboo.se>
 Date: Sat, 12 Aug 2017 21:50:15 +0200
-Subject: [PATCH 39/41] net: stmmac: dwmac-rk: change vendor storage id for
+Subject: [PATCH 40/44] net: stmmac: dwmac-rk: change vendor storage id for
  integrated PHY
 
 ---
@@ -4113,17 +4236,17 @@ index 8b7184c5508f..1cd719a8ff4e 100644
  			dev_err(dev, "%s: rk_vendor_write eth mac address failed (%d)",
  					__func__, ret);
 
-From ad950e860ebc84a224541126c812f553c83a3fb3 Mon Sep 17 00:00:00 2001
+From 77c23f82b43e200cdbab91be4802fedae6818d7c Mon Sep 17 00:00:00 2001
 From: Jonas Karlman <jonas@kwiboo.se>
 Date: Mon, 2 Oct 2017 21:53:19 +0200
-Subject: [PATCH 40/41] drm/rockchip: use limited range
+Subject: [PATCH 41/44] drm/rockchip: use limited range
 
 ---
  drivers/gpu/drm/bridge/dw-hdmi.c | 16 ++++++++++++++--
  1 file changed, 14 insertions(+), 2 deletions(-)
 
 diff --git a/drivers/gpu/drm/bridge/dw-hdmi.c b/drivers/gpu/drm/bridge/dw-hdmi.c
-index f0d0956adf35..3330d171cb6c 100644
+index 4721d402a7e3..cee46c8c10bd 100644
 --- a/drivers/gpu/drm/bridge/dw-hdmi.c
 +++ b/drivers/gpu/drm/bridge/dw-hdmi.c
 @@ -144,6 +144,12 @@ static const u16 csc_coeff_rgb_in_eitu709[3][4] = {
@@ -4139,7 +4262,7 @@ index f0d0956adf35..3330d171cb6c 100644
  struct hdmi_vmode {
  	bool mdataenablepolarity;
  
-@@ -1004,7 +1010,9 @@ static void hdmi_video_sample(struct dw_hdmi *hdmi)
+@@ -1007,7 +1013,9 @@ static void hdmi_video_sample(struct dw_hdmi *hdmi)
  
  static int is_color_space_conversion(struct dw_hdmi *hdmi)
  {
@@ -4150,7 +4273,7 @@ index f0d0956adf35..3330d171cb6c 100644
  }
  
  static int is_color_space_decimation(struct dw_hdmi *hdmi)
-@@ -1038,7 +1046,11 @@ static void dw_hdmi_update_csc_coeffs(struct dw_hdmi *hdmi)
+@@ -1041,7 +1049,11 @@ static void dw_hdmi_update_csc_coeffs(struct dw_hdmi *hdmi)
  	u32 csc_scale = 1;
  
  	if (is_color_space_conversion(hdmi)) {
@@ -4164,10 +4287,10 @@ index f0d0956adf35..3330d171cb6c 100644
  						V4L2_YCBCR_ENC_601)
  				csc_coeff = &csc_coeff_rgb_out_eitu601;
 
-From 0e9801525f6cebfff8f87efa1d541ce2ca4061de Mon Sep 17 00:00:00 2001
+From 8a1202ed680a119f4149946de97e1429579e19f2 Mon Sep 17 00:00:00 2001
 From: Jonas Karlman <jonas@kwiboo.se>
 Date: Tue, 31 Oct 2017 21:17:10 +0100
-Subject: [PATCH 41/41] gpio: gpiolib: Make the dynamic gpio base start from
+Subject: [PATCH 42/44] gpio: gpiolib: Make the dynamic gpio base start from
  1000
 
 ---
@@ -4187,3 +4310,87 @@ index 06d345b087f8..daae33ee55b5 100644
  
  	list_for_each_entry_reverse(chip, &gpio_chips, list) {
  		/* found a free space? */
+
+From 214c8cef010c2b9c76748a0b339c6bdba73c2b43 Mon Sep 17 00:00:00 2001
+From: Eric Biggers <ebiggers@google.com>
+Date: Wed, 8 Mar 2017 16:27:04 -0800
+Subject: [PATCH 43/44] UPSTREAM: arm64: support keyctl() system call in 32-bit
+ mode
+
+As is the case for a number of other architectures that have a 32-bit
+compat mode, enable KEYS_COMPAT if both COMPAT and KEYS are enabled.
+This allows AArch32 programs to use the keyctl() system call when
+running on an AArch64 kernel.
+
+Signed-off-by: Eric Biggers <ebiggers@google.com>
+Signed-off-by: Will Deacon <will.deacon@arm.com>
+(cherry picked from commit 5c2a625937ba49bc691089370638223d310cda9a)
+---
+ arch/arm64/Kconfig | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/arch/arm64/Kconfig b/arch/arm64/Kconfig
+index 190471794853..45f77ff5ad14 100644
+--- a/arch/arm64/Kconfig
++++ b/arch/arm64/Kconfig
+@@ -1025,6 +1025,10 @@ config SYSVIPC_COMPAT
+ 	def_bool y
+ 	depends on COMPAT && SYSVIPC
+ 
++config KEYS_COMPAT
++	def_bool y
++	depends on COMPAT && KEYS
++
+ endmenu
+ 
+ menu "Power management options"
+
+From 55fbb19eede1fb352c573adf17a7a6c4860ae2cc Mon Sep 17 00:00:00 2001
+From: Jonas Karlman <jonas@kwiboo.se>
+Date: Sat, 18 Nov 2017 11:09:39 +0100
+Subject: [PATCH 44/44] rockchip: vop: force skip lines if image too big
+
+---
+ drivers/gpu/drm/rockchip/rockchip_drm_vop.c | 12 +++++++++---
+ 1 file changed, 9 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/gpu/drm/rockchip/rockchip_drm_vop.c b/drivers/gpu/drm/rockchip/rockchip_drm_vop.c
+index f7541a53ccba..0ca40d100e8b 100644
+--- a/drivers/gpu/drm/rockchip/rockchip_drm_vop.c
++++ b/drivers/gpu/drm/rockchip/rockchip_drm_vop.c
+@@ -1539,6 +1539,7 @@ static void vop_plane_atomic_update(struct drm_plane *plane,
+ 	int ymirror, xmirror;
+ 	uint32_t val;
+ 	bool rb_swap;
++	int skip_lines = 0;
+ 
+ 	/*
+ 	 * can't update plane when vop is disabled.
+@@ -1551,8 +1552,13 @@ static void vop_plane_atomic_update(struct drm_plane *plane,
+ 		return;
+ 	}
+ 
++	/*
++	 * force skip lines if image too big.
++	 */
+ 	actual_w = drm_rect_width(src) >> 16;
+-	actual_h = drm_rect_height(src) >> 16;
++	if (actual_w == 3840 && is_yuv_support(fb->pixel_format))
++		skip_lines = 1;
++	actual_h = drm_rect_height(src) >> (16 + skip_lines);
+ 	act_info = (actual_h - 1) << 16 | ((actual_w - 1) & 0xffff);
+ 
+ 	dsp_info = (drm_rect_height(dest) - 1) << 16;
+@@ -1574,10 +1580,10 @@ static void vop_plane_atomic_update(struct drm_plane *plane,
+ 	VOP_WIN_SET(vop, win, xmirror, xmirror);
+ 	VOP_WIN_SET(vop, win, ymirror, ymirror);
+ 	VOP_WIN_SET(vop, win, format, vop_plane_state->format);
+-	VOP_WIN_SET(vop, win, yrgb_vir, fb->pitches[0] >> 2);
++	VOP_WIN_SET(vop, win, yrgb_vir, fb->pitches[0] >> (2 - skip_lines));
+ 	VOP_WIN_SET(vop, win, yrgb_mst, vop_plane_state->yrgb_mst);
+ 	if (is_yuv_support(fb->pixel_format)) {
+-		VOP_WIN_SET(vop, win, uv_vir, fb->pitches[1] >> 2);
++		VOP_WIN_SET(vop, win, uv_vir, fb->pitches[1] >> (2 - skip_lines));
+ 		VOP_WIN_SET(vop, win, uv_mst, vop_plane_state->uv_mst);
+ 	}
+ 	VOP_WIN_SET(vop, win, fmt_10, is_yuv_10bit(fb->pixel_format));

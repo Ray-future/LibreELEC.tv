@@ -1,4 +1,4 @@
-From 17d1a70f052041411a0138e3285b9deac012c01f Mon Sep 17 00:00:00 2001
+From 5a3f686caec549d526cc7c92c903cc9ab6cb94fa Mon Sep 17 00:00:00 2001
 From: Kamil Trzcinski <ayufan@ayufan.eu>
 Date: Tue, 4 Jul 2017 00:13:13 +0200
 Subject: [PATCH] Use MTD for vendor storage

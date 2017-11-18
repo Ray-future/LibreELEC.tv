@@ -1,7 +1,7 @@
 From d2341b014f6a7bafa1d3cf55e0f108da49045e76 Mon Sep 17 00:00:00 2001
 From: Jonas Karlman <jonas@kwiboo.se>
 Date: Sun, 13 Aug 2017 10:24:19 +0200
-Subject: [PATCH 01/44] arm: dts: rk3288-miniarm: update dts
+Subject: [PATCH 01/45] arm: dts: rk3288-miniarm: update dts
 
 ---
  arch/arm/boot/dts/rk3288-miniarm.dts | 26 ++++++++++++++++++++------
@@ -94,7 +94,7 @@ index b746ad79b291..adeb3eeb51a7 100644
 From 291a04d1e45895e531cbfc5c9964239b4d50bd95 Mon Sep 17 00:00:00 2001
 From: Jonas Karlman <jonas@kwiboo.se>
 Date: Sun, 13 Aug 2017 10:24:26 +0200
-Subject: [PATCH 02/44] arm64: dts: rockchip: rk3328: update dtsi
+Subject: [PATCH 02/45] arm64: dts: rockchip: rk3328: update dtsi
 
 ---
  arch/arm64/boot/dts/rockchip/rk3328.dtsi | 27 ++++++++++++++++++++-------
@@ -221,7 +221,7 @@ index 05932aad0e69..f48a9d524d59 100644
 From 52756cbab7e5ec77dfce80219f7f125e07dcc8ab Mon Sep 17 00:00:00 2001
 From: LongChair <LongChair@hotmail.com>
 Date: Thu, 15 Jun 2017 21:00:59 +0200
-Subject: [PATCH 03/44] arm64: dts: rockchip: rk3328: add missing operating
+Subject: [PATCH 03/45] arm64: dts: rockchip: rk3328: add missing operating
  performance point
 
 ---
@@ -247,7 +247,7 @@ index f48a9d524d59..653659019bc2 100644
 From c1692e116a310ffd8d6007a117e67fb5ee8a53cc Mon Sep 17 00:00:00 2001
 From: Jonas Karlman <jonas@kwiboo.se>
 Date: Sun, 13 Aug 2017 10:24:28 +0200
-Subject: [PATCH 04/44] arm64: dts: rockchip: add rk3328-box board
+Subject: [PATCH 04/45] arm64: dts: rockchip: add rk3328-box board
 
 ---
  arch/arm64/boot/dts/rockchip/Makefile       |   1 +
@@ -767,7 +767,7 @@ index 000000000000..adb017c0d070
 From 309385d98c5e66d0125cc3e91e7356080b23add1 Mon Sep 17 00:00:00 2001
 From: wlcheah <wlcheah@syabas.com>
 Date: Fri, 30 Jun 2017 12:27:25 +0800
-Subject: [PATCH 05/44] arm64: dts: rockchip: add rk3328-rock64 board
+Subject: [PATCH 05/45] arm64: dts: rockchip: add rk3328-rock64 board
 
 (cherry picked from commit 8bbdca5562e9167d233c85655effde3c11ab6bf2)
 ---
@@ -1291,7 +1291,7 @@ index 000000000000..e496c5697f02
 From e7087983106ce33539d218dc6ca32824e27f7f4e Mon Sep 17 00:00:00 2001
 From: Jonas Karlman <jonas@kwiboo.se>
 Date: Sun, 13 Aug 2017 10:24:29 +0200
-Subject: [PATCH 06/44] arm64: dts: rockchip: rk3328-rock64: sync with
+Subject: [PATCH 06/45] arm64: dts: rockchip: rk3328-rock64: sync with
  ayufan-rock64
 
 ---
@@ -1486,7 +1486,7 @@ index e496c5697f02..174816a58560 100644
 From 17f86792936cafe2e000ad6318c9ce5dbcff99e4 Mon Sep 17 00:00:00 2001
 From: Jonas Karlman <jonas@kwiboo.se>
 Date: Sun, 13 Aug 2017 10:24:31 +0200
-Subject: [PATCH 07/44] arm64: dts: rockchip: rk3328-rock64: sync with mainline
+Subject: [PATCH 07/45] arm64: dts: rockchip: rk3328-rock64: sync with mainline
 
 ---
  arch/arm64/boot/dts/rockchip/rk3328-rock64.dts | 34 +++++++++++++++++++-------
@@ -1585,7 +1585,7 @@ index 174816a58560..ca9c030d34bb 100644
 From 5a178d8b005898131d430ec6d8470ddf078066c4 Mon Sep 17 00:00:00 2001
 From: Jonas Karlman <jonas@kwiboo.se>
 Date: Sun, 13 Aug 2017 10:24:32 +0200
-Subject: [PATCH 08/44] arm64: dts: rockchip: rk3328-rock64: add hdmiphy
+Subject: [PATCH 08/45] arm64: dts: rockchip: rk3328-rock64: add hdmiphy
 
 ---
  arch/arm64/boot/dts/rockchip/rk3328-rock64.dts | 4 ++++
@@ -1610,7 +1610,7 @@ index ca9c030d34bb..aec36ad42333 100644
 From 3d996468b75456d4dc550f90718cebf810b956eb Mon Sep 17 00:00:00 2001
 From: Jonas Karlman <jonas@kwiboo.se>
 Date: Sun, 13 Aug 2017 10:24:33 +0200
-Subject: [PATCH 09/44] arm64: dts: rockchip: rk3328-rock64: add gpio-leds
+Subject: [PATCH 09/45] arm64: dts: rockchip: rk3328-rock64: add gpio-leds
 
 ---
  arch/arm64/boot/dts/rockchip/rk3328-rock64.dts | 14 ++++++++++++++
@@ -1645,7 +1645,7 @@ index aec36ad42333..6f0ed5ba9d30 100644
 From 86ec5318cfef720d9dff021c88d2fdb5044fd919 Mon Sep 17 00:00:00 2001
 From: Jonas Karlman <jonas@kwiboo.se>
 Date: Sun, 13 Aug 2017 10:24:36 +0200
-Subject: [PATCH 10/44] arm64: dts: rockchip: rk3328-rock64: rename and reorder
+Subject: [PATCH 10/45] arm64: dts: rockchip: rk3328-rock64: rename and reorder
  sound
 
 ---
@@ -1707,7 +1707,7 @@ index 6f0ed5ba9d30..b3a026d5af7e 100644
 From 512e674e5854044a614332ad97b7955cbf39cdb5 Mon Sep 17 00:00:00 2001
 From: Jonas Karlman <jonas@kwiboo.se>
 Date: Sun, 27 Aug 2017 20:50:55 +0200
-Subject: [PATCH 11/44] arm64: dts: rockchip: rk3328-rock64: add i2s1 and spdif
+Subject: [PATCH 11/45] arm64: dts: rockchip: rk3328-rock64: add i2s1 and spdif
  pinctrl
 
 ---
@@ -1748,7 +1748,7 @@ index b3a026d5af7e..a54f83faf37d 100644
 From 45bf4d0374a3b1b82dec4450088041be46c27cbb Mon Sep 17 00:00:00 2001
 From: Jonas Karlman <jonas@kwiboo.se>
 Date: Mon, 30 Oct 2017 22:29:06 +0100
-Subject: [PATCH 12/44] arm64: dts: rockchip: rk3328-rock64: add uart2
+Subject: [PATCH 12/45] arm64: dts: rockchip: rk3328-rock64: add uart2
 
 ---
  arch/arm64/boot/dts/rockchip/rk3328-rock64.dts | 4 ++++
@@ -1773,7 +1773,7 @@ index a54f83faf37d..d017aa4be181 100644
 From c3904e91fa7520598192bbbe826b790013897b38 Mon Sep 17 00:00:00 2001
 From: Jonas Karlman <jonas@kwiboo.se>
 Date: Mon, 30 Oct 2017 23:02:39 +0100
-Subject: [PATCH 13/44] arm64: dts: rockchip: add rk3328-rockbox board
+Subject: [PATCH 13/45] arm64: dts: rockchip: add rk3328-rockbox board
 
 ---
  arch/arm64/boot/dts/rockchip/rk3328-rockbox.dts | 535 ++++++++++++++++++++++++
@@ -2325,7 +2325,7 @@ index 000000000000..105e3baab286
 From a47af42e6bc21b72a3a3f82e685a912ec5f670ee Mon Sep 17 00:00:00 2001
 From: Jonas Karlman <jonas@kwiboo.se>
 Date: Mon, 30 Oct 2017 23:03:52 +0100
-Subject: [PATCH 14/44] arm64: dts: rockchip: rk3328: add operating performance
+Subject: [PATCH 14/45] arm64: dts: rockchip: rk3328: add operating performance
  points
 
 ---
@@ -2359,7 +2359,7 @@ index 653659019bc2..7a3f561f1313 100644
 From d35b444abd618bea9d1d8f192dfd3b9dc0e5325e Mon Sep 17 00:00:00 2001
 From: Jonas Karlman <jonas@kwiboo.se>
 Date: Thu, 2 Nov 2017 23:17:46 +0100
-Subject: [PATCH 15/44] arm: dts: rk3288-miqi: update dts
+Subject: [PATCH 15/45] arm: dts: rk3288-miqi: update dts
 
 ---
  arch/arm/boot/dts/rk3288-miqi.dts | 56 +++++++++++++++++++++++----------------
@@ -2482,7 +2482,7 @@ index b90b0e5969ec..ffced204abcf 100644
 From 444181b6971ff232bc8fa9c41b3749cf3f2f26df Mon Sep 17 00:00:00 2001
 From: Chris Zhong <zyw@rock-chips.com>
 Date: Mon, 18 Jul 2016 22:34:34 +0800
-Subject: [PATCH 16/44] UPSTREAM: ASoC: rockchip: correct the spdif clk
+Subject: [PATCH 16/45] UPSTREAM: ASoC: rockchip: correct the spdif clk
 
 The spdif mclk should be 128 times of sample rate, and there is a
 internal divider, the real rate of spdif mclk is mclk / (div + 1).
@@ -2537,7 +2537,7 @@ index 44b8c72e6a16..feaba2ad6022 100644
 From c3b731116168c9982dde647f0db574115015c03c Mon Sep 17 00:00:00 2001
 From: Sugar Zhang <sugar.zhang@rock-chips.com>
 Date: Wed, 7 Sep 2016 14:30:21 +0800
-Subject: [PATCH 17/44] UPSTREAM: ASoC: rockchip: spdif: restore register
+Subject: [PATCH 17/45] UPSTREAM: ASoC: rockchip: spdif: restore register
  during runtime_suspend/resume cycle
 
 when step into runtime_suspend, spdif pd will be disabled and loss state.
@@ -2584,7 +2584,7 @@ index feaba2ad6022..cac85a5538d5 100644
 From a0a75a7ce00539236da9d992c71f45f8255769ab Mon Sep 17 00:00:00 2001
 From: Arnaud Pouliquen <arnaud.pouliquen@st.com>
 Date: Tue, 3 Jan 2017 16:52:50 +0100
-Subject: [PATCH 18/44] UPSTREAM: DRM: add help to get ELD speaker allocation
+Subject: [PATCH 18/45] UPSTREAM: DRM: add help to get ELD speaker allocation
 
 Add helper to allow users to retrieve the speaker allocations without
 knowledge of the ELD structure.
@@ -2632,7 +2632,7 @@ index 85861b63e77a..55201e7e2ede 100644
 From c8466f1bc167c31242025e9fbd18b6aba066d154 Mon Sep 17 00:00:00 2001
 From: Arnaud Pouliquen <arnaud.pouliquen@st.com>
 Date: Tue, 3 Jan 2017 16:52:51 +0100
-Subject: [PATCH 19/44] UPSTREAM: ASoC: core: add optional pcm_new callback for
+Subject: [PATCH 19/45] UPSTREAM: ASoC: core: add optional pcm_new callback for
  DAI driver
 
 During probe, DAIs can need to perform some actions that requests
@@ -2713,7 +2713,7 @@ index 49263f3a50b0..c583022d7910 100644
 From 2c65e9800fb6d63943027b6c19057c33b2b17c03 Mon Sep 17 00:00:00 2001
 From: Arnaud Pouliquen <arnaud.pouliquen@st.com>
 Date: Tue, 3 Jan 2017 16:52:52 +0100
-Subject: [PATCH 20/44] UPSTREAM: ASoC: hdmi-codec: add channel mapping control
+Subject: [PATCH 20/45] UPSTREAM: ASoC: hdmi-codec: add channel mapping control
 
 Add user interface to provide channel mapping.
 In a first step this control is read only.
@@ -3199,7 +3199,7 @@ index 028d60c196ae..cb78d8971b41 100644
 From d0c080937257cb4cd6b13416e84b710b4594fc9e Mon Sep 17 00:00:00 2001
 From: Christophe Jaillet <christophe.jaillet@wanadoo.fr>
 Date: Thu, 15 Jun 2017 07:53:11 +0200
-Subject: [PATCH 21/44] UPSTREAM: ASoC: rockchip: Fix an error handling in
+Subject: [PATCH 21/45] UPSTREAM: ASoC: rockchip: Fix an error handling in
  'rockchip_i2s_probe'
 
 If this memory allocation fail, we must disable what has been enabled.
@@ -3240,7 +3240,7 @@ index 2c7e5ccca2dc..ba32a2ef87b3 100644
 From 5b57abdd72a2eadc5be8b638f725522d1c2aa61f Mon Sep 17 00:00:00 2001
 From: Romain Perier <romain.perier@collabora.com>
 Date: Fri, 14 Apr 2017 10:31:12 +0200
-Subject: [PATCH 22/44] UPSTREAM: drm: dw-hdmi: add specific I2S and AHB
+Subject: [PATCH 22/45] UPSTREAM: drm: dw-hdmi: add specific I2S and AHB
  functions for stream handling
 
 Currently, CTS+N is forced to zero as a workaround of the IP block for
@@ -3339,7 +3339,7 @@ index 758aa23f1527..626aaac47223 100644
 From ec6ef812207325b3deb248551f73485957d8e384 Mon Sep 17 00:00:00 2001
 From: Romain Perier <romain.perier@collabora.com>
 Date: Thu, 20 Apr 2017 14:34:34 +0530
-Subject: [PATCH 23/44] UPSTREAM: drm: dw-hdmi: gate audio clock from the I2S
+Subject: [PATCH 23/45] UPSTREAM: drm: dw-hdmi: gate audio clock from the I2S
  enablement callbacks
 
 Currently, the audio sampler clock is enabled from dw_hdmi_setup() at
@@ -3426,7 +3426,7 @@ index 626aaac47223..761284e5cb34 100644
 From 2caf1f215208f98c9078cdc73014c20b43f3923b Mon Sep 17 00:00:00 2001
 From: Jonas Karlman <jonas@kwiboo.se>
 Date: Mon, 7 Aug 2017 22:24:15 +0200
-Subject: [PATCH 24/44] drm: dw-hdmi-i2s: sync with upstream
+Subject: [PATCH 24/45] drm: dw-hdmi-i2s: sync with upstream
 
 ---
  drivers/gpu/drm/bridge/dw-hdmi-audio.h     |  1 -
@@ -3505,7 +3505,7 @@ index f1f62d8c1d16..5ff993a35ab6 100644
 From 35a9f8d09d48756685a814ed9d20bf4d35c6ae8f Mon Sep 17 00:00:00 2001
 From: Jonas Karlman <jonas@kwiboo.se>
 Date: Sun, 2 Apr 2017 11:33:39 +0200
-Subject: [PATCH 25/44] drm: dw-hdmi-i2s: implement get_eld
+Subject: [PATCH 25/45] drm: dw-hdmi-i2s: implement get_eld
 
 ---
  drivers/gpu/drm/bridge/dw-hdmi-audio.h     |  1 +
@@ -3574,7 +3574,7 @@ index 761284e5cb34..4370bc8e41e5 100644
 From cb1b2c3984d5027ce9ca919e77c5e66b22aad594 Mon Sep 17 00:00:00 2001
 From: Jonas Karlman <jonas@kwiboo.se>
 Date: Mon, 17 Apr 2017 13:09:16 +0200
-Subject: [PATCH 26/44] drm: dw-hdmi-i2s: configure channel allocation
+Subject: [PATCH 26/45] drm: dw-hdmi-i2s: configure channel allocation
 
 ---
  drivers/gpu/drm/bridge/dw-hdmi-i2s-audio.c | 2 +-
@@ -3597,7 +3597,7 @@ index e7312571e2cb..1d4570e3fbed 100644
 From 87be3d25bbd885fc60380518fa69659a977e5f01 Mon Sep 17 00:00:00 2001
 From: Jonas Karlman <jonas@kwiboo.se>
 Date: Tue, 2 May 2017 18:57:19 +0200
-Subject: [PATCH 27/44] ASoC: hdmi-codec: fix I2S audio in Kodi
+Subject: [PATCH 27/45] ASoC: hdmi-codec: fix I2S audio in Kodi
 
 ---
  sound/soc/codecs/hdmi-codec.c | 1 -
@@ -3619,7 +3619,7 @@ index cb78d8971b41..9ebca57014e4 100644
 From 81486e928be78c1dbb59505bfb44984329f0f849 Mon Sep 17 00:00:00 2001
 From: Jonas Karlman <jonas@kwiboo.se>
 Date: Mon, 14 Aug 2017 00:14:05 +0200
-Subject: [PATCH 28/44] ASoC: hdmi-codec: reorder channel map
+Subject: [PATCH 28/45] ASoC: hdmi-codec: reorder channel map
 
 ---
  sound/soc/codecs/hdmi-codec.c | 113 +++++++++++++++++++-----------------------
@@ -3764,7 +3764,7 @@ index 9ebca57014e4..e65060ae8ffc 100644
 From bf5dea79c43851bb9f04e965c50056cd396f65ba Mon Sep 17 00:00:00 2001
 From: Jonas Karlman <jonas@kwiboo.se>
 Date: Sun, 27 Aug 2017 23:32:40 +0200
-Subject: [PATCH 29/44] ASoC: codecs: rk3328: limit to working rates
+Subject: [PATCH 29/45] ASoC: codecs: rk3328: limit to working rates
 
 ---
  sound/soc/codecs/rk3328_codec.c | 7 ++++++-
@@ -3792,7 +3792,7 @@ index ceb2eb6dd69a..d20728bd48ba 100644
 From 0e6033cdb6c49e94f2686adb7f1a1ec765ac50b6 Mon Sep 17 00:00:00 2001
 From: Jonas Karlman <jonas@kwiboo.se>
 Date: Sun, 3 Sep 2017 11:19:19 +0200
-Subject: [PATCH 30/44] arm64: dts: rockchip: rk3328-rock64: use two dai-link
+Subject: [PATCH 30/45] arm64: dts: rockchip: rk3328-rock64: use two dai-link
  for i2s sound
 
 ---
@@ -3883,7 +3883,7 @@ index 53dd085d3ee2..bf7ce34084a9 100644
 From 28f71b0a35d78137411710c9d69cc3f0cc6e9cd0 Mon Sep 17 00:00:00 2001
 From: LongChair <LongChair@hotmail.com>
 Date: Sun, 26 Mar 2017 15:30:15 +0200
-Subject: [PATCH 31/44] video/rockchip: raise up vpu clock
+Subject: [PATCH 31/45] video/rockchip: raise up vpu clock
 
 ---
  drivers/video/rockchip/vcodec/vcodec_service.c | 3 +--
@@ -3907,7 +3907,7 @@ index 2155ee6b0025..fd034060cac4 100644
 From 699dd5fa5e8970dc607b626eef9d811004111d4f Mon Sep 17 00:00:00 2001
 From: LongChair <LongChair@hotmail.com>
 Date: Sun, 26 Mar 2017 15:30:16 +0200
-Subject: [PATCH 32/44] drm/rockchip: make video overlay bottom layer
+Subject: [PATCH 32/45] drm/rockchip: make video overlay bottom layer
 
 ---
  drivers/gpu/drm/rockchip/rockchip_vop_reg.c | 8 ++++----
@@ -3946,7 +3946,7 @@ index 9a70cddd3ce3..6fbdc9701e97 100644
 From f614dd0821115939c1be75a9c94f201b5089f4d9 Mon Sep 17 00:00:00 2001
 From: Jonas Karlman <jonas@kwiboo.se>
 Date: Wed, 29 Mar 2017 23:51:09 +0200
-Subject: [PATCH 33/44] gpu/arm/midgard: default to performance gpu governor
+Subject: [PATCH 33/45] gpu/arm/midgard: default to performance gpu governor
 
 ---
  drivers/gpu/arm/midgard_for_linux/backend/gpu/mali_kbase_devfreq.c | 6 ++----
@@ -3995,7 +3995,7 @@ index 9b00cce9b2b3..739ac83b484f 100644
 From 54e33469d2a97339dc9346d2759ed0572529398c Mon Sep 17 00:00:00 2001
 From: Jonas Karlman <jonas@kwiboo.se>
 Date: Mon, 17 Apr 2017 13:09:16 +0200
-Subject: [PATCH 34/44] sound/usb/quirks-table: add Realtek ALC4040
+Subject: [PATCH 34/45] sound/usb/quirks-table: add Realtek ALC4040
 
 ---
  sound/usb/quirks-table.h | 9 +++++++++
@@ -4023,7 +4023,7 @@ index 8a59d4782a0f..96e1e2fdc9c3 100644
 From 398ecee729e0f2e4b025f89c7dd4a6bbcfb627b6 Mon Sep 17 00:00:00 2001
 From: LongChair <LongChair@hotmail.com>
 Date: Mon, 24 Apr 2017 09:48:54 +0200
-Subject: [PATCH 35/44] drm : allow framebuffer and videomodes not to have same
+Subject: [PATCH 35/45] drm : allow framebuffer and videomodes not to have same
  size
 
 DRM legacy doesn't allow that, will be only available with drm atomic.
@@ -4070,7 +4070,7 @@ index 7cd13faf83ca..365e3d588163 100644
 From 12ab4d741ac1a9805ce849027e6a5bdafd18be08 Mon Sep 17 00:00:00 2001
 From: Jonas Karlman <jonas@kwiboo.se>
 Date: Sun, 28 May 2017 09:08:50 +0200
-Subject: [PATCH 36/44] gpu/arm/mali400: default to performance gpu governor
+Subject: [PATCH 36/45] gpu/arm/mali400: default to performance gpu governor
 
 ---
  drivers/gpu/arm/mali400/mali/linux/mali_devfreq.c | 2 +-
@@ -4093,7 +4093,7 @@ index 3eac07d76766..14916ea86905 100644
 From 8e9363de6826ead057044ac2eb727b586b036bf9 Mon Sep 17 00:00:00 2001
 From: LongChair <LongChair@hotmail.com>
 Date: Fri, 21 Apr 2017 13:39:12 +0200
-Subject: [PATCH 37/44] drm/rockchip: remove unsupported 4K freqs
+Subject: [PATCH 37/45] drm/rockchip: remove unsupported 4K freqs
 
 ---
  drivers/gpu/drm/rockchip/dw_hdmi-rockchip.c | 3 +++
@@ -4117,7 +4117,7 @@ index 6827ea7185c1..6ef8f7c16db3 100644
 From b03cf0c082297348a5bc512053699cf83318bd6d Mon Sep 17 00:00:00 2001
 From: xuhuicong <xhc@rock-chips.com>
 Date: Fri, 23 Jun 2017 18:56:17 +0800
-Subject: [PATCH 38/44] drm/rockchip: hdmi: fix no sound some time
+Subject: [PATCH 38/45] drm/rockchip: hdmi: fix no sound some time
 
 Change-Id: Ic9f931d9a5b7bca954363293a20ca242eb0bfa6f
 Signed-off-by: xuhuicong <xhc@rock-chips.com>
@@ -4154,7 +4154,7 @@ index 4370bc8e41e5..4721d402a7e3 100644
 From 0b0e6f53e6a8c359a8acb33a7feeb1f7541a07f6 Mon Sep 17 00:00:00 2001
 From: Jonas Karlman <jonas@kwiboo.se>
 Date: Fri, 25 Aug 2017 18:29:35 +0200
-Subject: [PATCH 39/44] video: rockchip: vpu: partial revise for rk322xh
+Subject: [PATCH 39/45] video: rockchip: vpu: partial revise for rk322xh
  feature
 
 ---
@@ -4194,7 +4194,7 @@ index fd034060cac4..e77c022eae78 100644
 From 1868e7bd141127e7b2309d75c0f3ff21963dbcab Mon Sep 17 00:00:00 2001
 From: Jonas Karlman <jonas@kwiboo.se>
 Date: Sat, 12 Aug 2017 21:50:15 +0200
-Subject: [PATCH 40/44] net: stmmac: dwmac-rk: change vendor storage id for
+Subject: [PATCH 40/45] net: stmmac: dwmac-rk: change vendor storage id for
  integrated PHY
 
 ---
@@ -4239,7 +4239,7 @@ index 8b7184c5508f..1cd719a8ff4e 100644
 From 77c23f82b43e200cdbab91be4802fedae6818d7c Mon Sep 17 00:00:00 2001
 From: Jonas Karlman <jonas@kwiboo.se>
 Date: Mon, 2 Oct 2017 21:53:19 +0200
-Subject: [PATCH 41/44] drm/rockchip: use limited range
+Subject: [PATCH 41/45] drm/rockchip: use limited range
 
 ---
  drivers/gpu/drm/bridge/dw-hdmi.c | 16 ++++++++++++++--
@@ -4290,7 +4290,7 @@ index 4721d402a7e3..cee46c8c10bd 100644
 From 8a1202ed680a119f4149946de97e1429579e19f2 Mon Sep 17 00:00:00 2001
 From: Jonas Karlman <jonas@kwiboo.se>
 Date: Tue, 31 Oct 2017 21:17:10 +0100
-Subject: [PATCH 42/44] gpio: gpiolib: Make the dynamic gpio base start from
+Subject: [PATCH 42/45] gpio: gpiolib: Make the dynamic gpio base start from
  1000
 
 ---
@@ -4314,7 +4314,7 @@ index 06d345b087f8..daae33ee55b5 100644
 From 214c8cef010c2b9c76748a0b339c6bdba73c2b43 Mon Sep 17 00:00:00 2001
 From: Eric Biggers <ebiggers@google.com>
 Date: Wed, 8 Mar 2017 16:27:04 -0800
-Subject: [PATCH 43/44] UPSTREAM: arm64: support keyctl() system call in 32-bit
+Subject: [PATCH 43/45] UPSTREAM: arm64: support keyctl() system call in 32-bit
  mode
 
 As is the case for a number of other architectures that have a 32-bit
@@ -4348,7 +4348,7 @@ index 190471794853..45f77ff5ad14 100644
 From 55fbb19eede1fb352c573adf17a7a6c4860ae2cc Mon Sep 17 00:00:00 2001
 From: Jonas Karlman <jonas@kwiboo.se>
 Date: Sat, 18 Nov 2017 11:09:39 +0100
-Subject: [PATCH 44/44] rockchip: vop: force skip lines if image too big
+Subject: [PATCH 44/45] rockchip: vop: force skip lines if image too big
 
 ---
  drivers/gpu/drm/rockchip/rockchip_drm_vop.c | 12 +++++++++---
@@ -4394,3 +4394,51 @@ index f7541a53ccba..0ca40d100e8b 100644
  		VOP_WIN_SET(vop, win, uv_mst, vop_plane_state->uv_mst);
  	}
  	VOP_WIN_SET(vop, win, fmt_10, is_yuv_10bit(fb->pixel_format));
+
+From 539e7b07cd3caf2675e4c55b7c1d4bb22dc81d02 Mon Sep 17 00:00:00 2001
+From: Jonas Karlman <jonas@kwiboo.se>
+Date: Sat, 18 Nov 2017 23:17:24 +0100
+Subject: [PATCH 45/45] gpu/arm/midgard: default to performance gpu governor
+
+---
+ drivers/gpu/arm/midgard/backend/gpu/mali_kbase_devfreq.c | 5 ++---
+ drivers/gpu/arm/midgard/mali_kbase_config_defaults.h     | 3 +--
+ 2 files changed, 3 insertions(+), 5 deletions(-)
+
+diff --git a/drivers/gpu/arm/midgard/backend/gpu/mali_kbase_devfreq.c b/drivers/gpu/arm/midgard/backend/gpu/mali_kbase_devfreq.c
+index 0bf5fcd21c03..e578bd0f92dd 100644
+--- a/drivers/gpu/arm/midgard/backend/gpu/mali_kbase_devfreq.c
++++ b/drivers/gpu/arm/midgard/backend/gpu/mali_kbase_devfreq.c
+@@ -232,8 +232,7 @@ int kbase_devfreq_init(struct kbase_device *kbdev)
+ 	dp = &kbdev->devfreq_profile;
+ 
+ 	dp->initial_freq = kbdev->current_freq;
+-	/* .KP : set devfreq_dvfs_interval_in_ms */
+-	dp->polling_ms = 20;
++	dp->polling_ms = 100;
+ 	dp->target = kbase_devfreq_target;
+ 	dp->get_dev_status = kbase_devfreq_status;
+ 	dp->get_cur_freq = kbase_devfreq_cur_freq;
+@@ -243,7 +242,7 @@ int kbase_devfreq_init(struct kbase_device *kbdev)
+ 		return -EFAULT;
+ 
+ 	kbdev->devfreq = devfreq_add_device(kbdev->dev, dp,
+-				"simple_ondemand", NULL);
++				"performance", NULL);
+ 	if (IS_ERR(kbdev->devfreq)) {
+ 		kbase_devfreq_term_freq_table(kbdev);
+ 		return PTR_ERR(kbdev->devfreq);
+diff --git a/drivers/gpu/arm/midgard/mali_kbase_config_defaults.h b/drivers/gpu/arm/midgard/mali_kbase_config_defaults.h
+index e674cc2ea183..0f11388acfd7 100644
+--- a/drivers/gpu/arm/midgard/mali_kbase_config_defaults.h
++++ b/drivers/gpu/arm/midgard/mali_kbase_config_defaults.h
+@@ -157,8 +157,7 @@ enum {
+ /*
+  * Default period for DVFS sampling
+  */
+-// #define DEFAULT_PM_DVFS_PERIOD 100 /* 100ms */
+-#define DEFAULT_PM_DVFS_PERIOD 20 /* 20 ms */
++#define DEFAULT_PM_DVFS_PERIOD 100 /* 100ms */
+ 
+ /*
+  * Power Management poweroff tick granuality. This is in nanoseconds to

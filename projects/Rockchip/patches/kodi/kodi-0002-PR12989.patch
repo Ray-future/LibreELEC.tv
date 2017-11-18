@@ -1,0 +1,27 @@
+From 4e9f446499a63c163fd6e4317fd49b6a88863be4 Mon Sep 17 00:00:00 2001
+From: Lukas Rusak <lorusak@gmail.com>
+Date: Wed, 1 Nov 2017 09:53:07 -0700
+Subject: [PATCH] windowing/gbm: fix setting drm mode when no new window is
+ created
+
+---
+ xbmc/windowing/gbm/WinSystemGbm.cpp | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/xbmc/windowing/gbm/WinSystemGbm.cpp b/xbmc/windowing/gbm/WinSystemGbm.cpp
+index c147ee6d9c28..2c8178e02f76 100644
+--- a/xbmc/windowing/gbm/WinSystemGbm.cpp
++++ b/xbmc/windowing/gbm/WinSystemGbm.cpp
+@@ -133,6 +133,12 @@ bool CWinSystemGbm::ResizeWindow(int newWidth, int newHeight, int newLeft, int n
+ 
+ bool CWinSystemGbm::SetFullScreen(bool fullScreen, RESOLUTION_INFO& res, bool blankOtherDisplays)
+ {
++  if(!CDRMUtils::SetMode(res))
++  {
++    CLog::Log(LOGERROR, "CWinSystemGbm::%s - failed to set DRM mode", __FUNCTION__);
++    return false;
++  }
++
+   auto ret = m_DRM.SetVideoMode(res);
+   if (!ret)
+   {

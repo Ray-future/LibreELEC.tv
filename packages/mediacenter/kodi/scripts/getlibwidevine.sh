@@ -1,9 +1,10 @@
 #!/bin/sh
+set -x
 
 #wait for network to get an ip address
 sleep 30s
 
-CDMDIR=$HOME/.kodi/cdm
+CDMDIR=/storage/.kodi/cdm
 
 [ ! -d $CDMDIR ] && mkdir -p $CDMDIR
 

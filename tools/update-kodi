@@ -1,0 +1,5 @@
+#!/bin/sh
+
+pkg_version=`git ls-remote git://github.com/xbmc/xbmc.git refs/heads/master | head -c 7`
+
+sed -e "s|PKG_VERSION=.*|PKG_VERSION=\"${pkg_version}\"|g" -i packages/mediacenter/kodi/package.mk

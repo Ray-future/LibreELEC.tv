@@ -53,6 +53,6 @@ make_target() {
 }
 
 makeinstall_target() {
-  mkdir -p $INSTALL/usr/lib/modules/$(get_module_dir)/$PKG_NAME
-    cp $PKG_BUILD/rtl8723DS/*.ko $INSTALL/usr/lib/modules/$(get_module_dir)/$PKG_NAME
+  mkdir -p $INSTALL/usr/lib/kernel-overlays/base/lib/modules/$(get_module_dir)/$PKG_NAME
+    cp $PKG_BUILD/rtl8723DS/*.ko $INSTALL/usr/lib/kernel-overlays/base/lib/modules/$(get_module_dir)/$PKG_NAME/
 }

@@ -19,7 +19,7 @@
 PKG_NAME="game.libretro.fceumm"
 PKG_VERSION="cb2fadf"
 PKG_SHA256="b43ea8542d1296b9332d073153a8efc9111e623a7f035a9c80749a28e9b5dc53"
-PKG_REV="104"
+PKG_REV="105"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="https://github.com/kodi-game/game.libretro.fceumm"

@@ -19,7 +19,7 @@
 PKG_NAME="game.libretro.snes9x"
 PKG_VERSION="49e07c1"
 PKG_SHA256="b9b9ca5f9f9f63e9d126cc95e45de2dbca64cb5bb321e660df3024acf3d968b2"
-PKG_REV="104"
+PKG_REV="105"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="https://github.com/kodi-game/game.libretro.snes9x"

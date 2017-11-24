@@ -27,12 +27,4 @@ PKG_SOURCE_DIR="rkbin-$PKG_VERSION*"
 PKG_SECTION="tools"
 PKG_SHORTDESC="rkbin: Rockchip Firmware and Tool Binaries"
 PKG_LONGDESC="rkbin: Rockchip Firmware and Tool Binaries"
-PKG_AUTORECONF="no"
-
-make_target() {
-  : # nothing
-}
-
-makeinstall_target() {
-  : # nothing
-}
+PKG_TOOLCHAIN="manual"

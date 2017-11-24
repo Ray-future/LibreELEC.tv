@@ -28,7 +28,7 @@ PKG_DEPENDS_TARGET="toolchain ffmpeg libass libdrm alsa rkmpp $OPENGLES"
 PKG_SECTION="multimedia"
 PKG_SHORTDESC="mpv: Video player based on MPlayer/mplayer2"
 PKG_LONGDESC="mpv: mpv is a media player based on MPlayer and mplayer2. It supports a wide variety of video file formats, audio and video codecs, and subtitle types."
-PKG_AUTORECONF="no"
+PKG_TOOLCHAIN="manual"
 
 PKG_CONFIGURE_OPTS_TARGET="--disable-libsmbclient --disable-apple-remote --prefix=/usr --enable-drmprime --enable-drm --enable-gbm --enable-egl-drm"
 

@@ -88,5 +88,9 @@
   # build with installer (yes / no)
     INSTALLER_SUPPORT="no"
 
+  # Testpackages for development (yes / no)
+    TESTING="yes"
+    TESTING_DEPENDS="mpv-rockchip"
+
   # Start boot partition at 16MiB, same as https://github.com/rockchip-linux/build images
     SYSTEM_PART_START=32768

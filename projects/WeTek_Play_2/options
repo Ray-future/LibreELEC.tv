@@ -115,7 +115,7 @@
   # for a list of additinoal drivers see packages/linux-drivers
   # Space separated list is supported,
   # e.g. ADDITIONAL_DRIVERS="DRIVER1 DRIVER2"
-    ADDITIONAL_DRIVERS="gpu-aml brcmap6xxx-aml media_build wetekdvb"
+    ADDITIONAL_DRIVERS="gpu-aml brcmap6xxx-aml RTL8192CU RTL8192DU RTL8188EU RTL8192EU RTL8812AU media_build wetekdvb"
 
   # additional Firmware to use (dvb-firmware, misc-firmware, wlan-firmware)
   # Space separated list is supported,

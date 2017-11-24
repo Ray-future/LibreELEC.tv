@@ -17,9 +17,9 @@
 ################################################################################
 
 PKG_NAME="pvr.hdhomerun"
-PKG_VERSION="4fe593c"
-PKG_SHA256="92dbc3abcd1a93d8f726c43f90414f067a5d4be4d1ce90fd7aea4ab4de580664"
-PKG_REV="8"
+PKG_VERSION="3af3e91"
+PKG_SHA256="d27003e108dea71d80f71649f9b2b98634d9093eb532f185e152c33719a648a9"
+PKG_REV="9"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="http://www.kodi.tv"
@@ -28,7 +28,6 @@ PKG_DEPENDS_TARGET="toolchain kodi-platform jsoncpp libhdhomerun"
 PKG_SECTION=""
 PKG_SHORTDESC="pvr.hdhomerun"
 PKG_LONGDESC="pvr.hdhomerun"
-PKG_AUTORECONF="no"
 
 PKG_IS_ADDON="yes"
 PKG_ADDON_TYPE="xbmc.pvrclient"

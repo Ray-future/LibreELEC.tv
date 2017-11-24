@@ -1,453 +1,508 @@
-// This is a example config (hyperion.config.json) with comments, in any case you need to create your own one with HyperCon!
-// location of all configs: /etc/hyperion
-// Webpage: https://www.hyperion-project.org
-
-
 {
-	/// Device configuration contains the following fields: 
-	/// * 'name'       : The user friendly name of the device (only used for display purposes)
-	/// * 'type'       : The type of the device or leds (known types for now are
-	///  APA102, WS2801, P9813, LPD6803, LPD8806, ---------PWM---------, WS2812b (just RPi1), WS281X (RPi1, RPi2, RPi3), --------OTHER--------, PhilipsHUE, AtmoOrb, PiBlaster, Tinkerforge, FadeCandy, RawHID (USB), UDP, SEDU, TPM2, USBASP-WS2801, USBASP-WS2812, ------3rd PARTY------, Adalight, AdalightAPA102, AmbiLed, Atmo, Lightpack, Multi-Lightpack, Paintpack, Test (file), None)
-	/// * [device type specific configuration]
-	/// * 'colorOrder' : The order of the color bytes ('rgb', 'rbg', 'bgr', etc.).
-	"device" :
-	{
-		"name"       : "MyHyperionConfig",
-		"type"       : "file",
-		"output"     : "/dev/null",
-		"rate"     : 1000000,
-		"colorOrder" : "rgb"
-	},
-
-	/// Color manipulation configuration used to tune the output colors to specific surroundings. 
-	/// The configuration contains a list of color-transforms. Each transform contains the 
-	/// following fields:
-	///  * 'channelAdjustment'
-	///  * 'id'   : The unique identifier of the channel adjustments (eg 'device_1')
-	///  * 'leds'   : The indices (or index ranges) of the leds to which this channel adjustment applies
-	///             (eg '0-5, 9, 11, 12-17'). The indices are zero based.
-	///  * 'pureRed'/'pureGreen'/'pureBlue' : The manipulation in the Red-Green-Blue color domain with the 
-	///                           following tuning parameters for each channel:
-	///  * 'temperature'
-	///  * 'id'   : The unique identifier of the temperature (eg 'device_1')
-	///  * 'leds'   : The indices (or index ranges) of the leds to which this temperature applies
-	///             (eg '0-5, 9, 11, 12-17'). The indices are zero based.
-	///  * 'red'/'green'/'blue' : The temperature manipulation in the Red-Green-Blue color domain with the 
-	///                           following tuning parameters for each channel:
-	///  * 'transform'
-	///  * 'id'   : The unique identifier of the color transformation (eg 'device_1')
-	///  * 'leds' : The indices (or index ranges) of the leds to which this color transform applies
-	///             (eg '0-5, 9, 11, 12-17'). The indices are zero based.
-	///  * 'hsv' : The manipulation in the Hue-Saturation-Value color domain with the following 
-	///            tuning parameters:
-	///            - 'saturationGain'  The gain adjustement of the saturation
-	///            - 'luminanceGain'       The gain adjustement of the luminance
-	///            - 'luminanceMinimum'    The minimum luminance (backlight)
-	///  * 'red'/'green'/'blue' : The manipulation in the Red-Green-Blue color domain with the 
-	///                           following tuning parameters for each channel:
-	///            - 'threshold'       The minimum required input value for the channel to be on 
-	///                                (else zero)
-	///            - 'gamma'           The gamma-curve correction factor
-	///
-	/// Next to the list with color transforms there is also a smoothing option.
-	///  * 'smoothing' : Smoothing of the colors in the time-domain with the following tuning 
-	///                  parameters:
-	///            - 'type'            The type of smoothing algorithm ('linear' or 'none')
-	///            - 'time_ms'         The time constant for smoothing algorithm in milliseconds
-	///            - 'updateFrequency' The update frequency of the leds in Hz
-	///            - 'updateDelay'     The delay of the output to leds (in periods of smoothing)
-	"color" :
-	{
-		"channelAdjustment" :
-		[
-			{
-				"id"   : "default",
-				"leds" : "*",
-				"pureRed" :
-				{
-					"redChannel"   : 255,
-					"greenChannel" : 0,
-					"blueChannel"  : 0
-				},
-				"pureGreen" :
-				{
-					"redChannel"   : 0,
-					"greenChannel" : 255,
-					"blueChannel"  : 0
-				},
-				"pureBlue" :
-				{
-					"redChannel"   : 0,
-					"greenChannel" : 0,
-					"blueChannel"  : 255
-				}
-			}
-		],
-		"temperature" :
-		[
-			{
-				"id"   : "default",
-				"leds" : "*",
-				"temperatureValues" :
-				{
-					"red"   : 255,
-					"green" : 255,
-					"blue"  : 255
-				}
-			}
-		],
-		"transform" :
-		[
-			{
-				"id"   : "default",
-				"leds" : "*",
-				"hsl" :
-				{
-					"saturationGain"   : 1.0000,
-					"luminanceGain"    : 1.0000,
-					"luminanceMinimum" : 0.0000
-				},
-				"red" :
-				{
-					"threshold" : 0.0000,
-					"gamma"     : 2.5000
-				},
-				"green" :
-				{
-					"threshold" : 0.0000,
-					"gamma"     : 2.5000
-				},
-				"blue" :
-				{
-					"threshold" : 0.0000,
-					"gamma"     : 2.5000
-				}
-			}
-		],
-
-		"smoothing" :
-		{
-			"type"            : "linear",
-			"time_ms"         : 200,
-			"updateFrequency" : 20.0000,
-			"updateDelay"     : 0,
-			"continuousOutput": true
-		}
-	},
-
-	/// The black border configuration, contains the following items: 
-	///  * enable             : true if the detector should be activated
-	///  * threshold          : Value below which a pixel is regarded as black (value between 0.0 and 1.0)
-	///  * unknownFrameCnt    : Number of frames without any detection before the border is set to 0 (default 600)
-	///  * borderFrameCnt     : Number of frames before a consistent detected border gets set (default 50)
-	///  * maxInconsistentCnt : Number of inconsistent frames that are ignored before a new border gets a chance to proof consistency
-	///  * blurRemoveCnt      : Number of pixels that get removed from the detected border to cut away blur (default 1)
-	///  * mode               : Border detection mode (values=default,classic,osd)
-	"blackborderdetector" :
-	{
-		"enable" : true,
-		"threshold" : 0.0,
-		"unknownFrameCnt" : 600,
-		"borderFrameCnt" : 50,
-		"maxInconsistentCnt" : 10,
-		"blurRemoveCnt" : 1,
-		"mode" : "default"
-	},
-
-	/// The configuration of the effect engine, contains the following items: 
-	///  * paths : An array with absolute/relative location(s) of directories with effects 
-	"effects" : 
-	{
-		"paths" :
-		[
-			"/storage/.kodi/addons/service.hyperion/effects"
-		]
-	},
-
-	/// Boot sequence configuration. Start effect / set color at startup of hyperion
-	/// HINT inital background color is not shown, when any other grabber is active
-	///  * color        : Set initial background color on startup -> set effect to "" (empty) and input the values [R,G,B] and set duration_ms NOT to 0 (use 1) instead 
-	///  * effect       : The effect is shown when hyperion starts
-	///  * duration_ms  : The duration of the selected effect (0=endless)
-	///  * priority     : The priority of the selected effect/initial background color (default=990, if duration is 0)
-	///                   when duration > 0 => priority is set to 0, otherwise priority is set to configured value
-	///                   HINT: lower value result in HIGHER priority!
-	"bootsequence" : 
-	{
-		"color" : [0,0,0],
-		"effect" : "Rainbow swirl fast",
-		"duration_ms" : 3000,
-		"priority" : 990
-	},
-
-	/// Configuration of webserver integrated in hyperion.
-	///  * enable        : enable the server or not
-	///  * document_root : path to hyperion webapp files
-	///  * port          : the port where hyperion webapp is accasible
-	"webConfig" :
-	{
-		"enable" : true,
-		"document_root" : "/storage/.kodi/addons/service.hyperion/webconfig",
-		"port" : 8099
-	},
-
-	/// The configuration of the Json server which enables the json remote interface
-	///  * port : Port at which the json server is started
-	"jsonServer" :
-	{
-		"port" : 19444
-	},
-
-	/// The configuration of the Proto server which enables the protobuffer remote interface
-	///  * port : Port at which the protobuffer server is started
-	"protoServer" :
-	{
-		"port" : 19445
-	},
-
-	///  The configuration for each individual led. This contains the specification of the area 
-	///  averaged of an input image for each led to determine its color. Each item in the list 
-	///  contains the following fields:
-	///  * index: The index of the led. This determines its location in the string of leds; zero 
-	///           being the first led.
-	///  * hscan: The fractional part of the image along the horizontal used for the averaging 
-	///           (minimum and maximum inclusive)
-	///  * vscan: The fractional part of the image along the vertical used for the averaging 
-	///           (minimum and maximum inclusive)
-	"leds" :
-	[
-		{
-			"index" : 0,
-			"hscan" : { "minimum" : 0.5000, "maximum" : 0.5625 },
-			"vscan" : { "minimum" : 0.9200, "maximum" : 1.0000 }
-		},
-		{
-			"index" : 1,
-			"hscan" : { "minimum" : 0.4375, "maximum" : 0.5000 },
-			"vscan" : { "minimum" : 0.9200, "maximum" : 1.0000 }
-		},
-		{
-			"index" : 2,
-			"hscan" : { "minimum" : 0.3750, "maximum" : 0.4375 },
-			"vscan" : { "minimum" : 0.9200, "maximum" : 1.0000 }
-		},
-		{
-			"index" : 3,
-			"hscan" : { "minimum" : 0.3125, "maximum" : 0.3750 },
-			"vscan" : { "minimum" : 0.9200, "maximum" : 1.0000 }
-		},
-		{
-			"index" : 4,
-			"hscan" : { "minimum" : 0.2500, "maximum" : 0.3125 },
-			"vscan" : { "minimum" : 0.9200, "maximum" : 1.0000 }
-		},
-		{
-			"index" : 5,
-			"hscan" : { "minimum" : 0.1875, "maximum" : 0.2500 },
-			"vscan" : { "minimum" : 0.9200, "maximum" : 1.0000 }
-		},
-		{
-			"index" : 6,
-			"hscan" : { "minimum" : 0.1250, "maximum" : 0.1875 },
-			"vscan" : { "minimum" : 0.9200, "maximum" : 1.0000 }
-		},
-		{
-			"index" : 7,
-			"hscan" : { "minimum" : 0.0625, "maximum" : 0.1250 },
-			"vscan" : { "minimum" : 0.9200, "maximum" : 1.0000 }
-		},
-		{
-			"index" : 8,
-			"hscan" : { "minimum" : 0.0000, "maximum" : 0.0625 },
-			"vscan" : { "minimum" : 0.9200, "maximum" : 1.0000 }
-		},
-		{
-			"index" : 9,
-			"hscan" : { "minimum" : 0.0000, "maximum" : 0.0500 },
-			"vscan" : { "minimum" : 0.8571, "maximum" : 1.0000 }
-		},
-		{
-			"index" : 10,
-			"hscan" : { "minimum" : 0.0000, "maximum" : 0.0500 },
-			"vscan" : { "minimum" : 0.7143, "maximum" : 0.8571 }
-		},
-		{
-			"index" : 11,
-			"hscan" : { "minimum" : 0.0000, "maximum" : 0.0500 },
-			"vscan" : { "minimum" : 0.5714, "maximum" : 0.7143 }
-		},
-		{
-			"index" : 12,
-			"hscan" : { "minimum" : 0.0000, "maximum" : 0.0500 },
-			"vscan" : { "minimum" : 0.4286, "maximum" : 0.5714 }
-		},
-		{
-			"index" : 13,
-			"hscan" : { "minimum" : 0.0000, "maximum" : 0.0500 },
-			"vscan" : { "minimum" : 0.2857, "maximum" : 0.4286 }
-		},
-		{
-			"index" : 14,
-			"hscan" : { "minimum" : 0.0000, "maximum" : 0.0500 },
-			"vscan" : { "minimum" : 0.1429, "maximum" : 0.2857 }
-		},
-		{
-			"index" : 15,
-			"hscan" : { "minimum" : 0.0000, "maximum" : 0.0500 },
-			"vscan" : { "minimum" : 0.0000, "maximum" : 0.1429 }
-		},
-		{
-			"index" : 16,
-			"hscan" : { "minimum" : 0.0000, "maximum" : 0.0625 },
-			"vscan" : { "minimum" : 0.0000, "maximum" : 0.0800 }
-		},
-		{
-			"index" : 17,
-			"hscan" : { "minimum" : 0.0625, "maximum" : 0.1250 },
-			"vscan" : { "minimum" : 0.0000, "maximum" : 0.0800 }
-		},
-		{
-			"index" : 18,
-			"hscan" : { "minimum" : 0.1250, "maximum" : 0.1875 },
-			"vscan" : { "minimum" : 0.0000, "maximum" : 0.0800 }
-		},
-		{
-			"index" : 19,
-			"hscan" : { "minimum" : 0.1875, "maximum" : 0.2500 },
-			"vscan" : { "minimum" : 0.0000, "maximum" : 0.0800 }
-		},
-		{
-			"index" : 20,
-			"hscan" : { "minimum" : 0.2500, "maximum" : 0.3125 },
-			"vscan" : { "minimum" : 0.0000, "maximum" : 0.0800 }
-		},
-		{
-			"index" : 21,
-			"hscan" : { "minimum" : 0.3125, "maximum" : 0.3750 },
-			"vscan" : { "minimum" : 0.0000, "maximum" : 0.0800 }
-		},
-		{
-			"index" : 22,
-			"hscan" : { "minimum" : 0.3750, "maximum" : 0.4375 },
-			"vscan" : { "minimum" : 0.0000, "maximum" : 0.0800 }
-		},
-		{
-			"index" : 23,
-			"hscan" : { "minimum" : 0.4375, "maximum" : 0.5000 },
-			"vscan" : { "minimum" : 0.0000, "maximum" : 0.0800 }
-		},
-		{
-			"index" : 24,
-			"hscan" : { "minimum" : 0.5000, "maximum" : 0.5625 },
-			"vscan" : { "minimum" : 0.0000, "maximum" : 0.0800 }
-		},
-		{
-			"index" : 25,
-			"hscan" : { "minimum" : 0.5625, "maximum" : 0.6250 },
-			"vscan" : { "minimum" : 0.0000, "maximum" : 0.0800 }
-		},
-		{
-			"index" : 26,
-			"hscan" : { "minimum" : 0.6250, "maximum" : 0.6875 },
-			"vscan" : { "minimum" : 0.0000, "maximum" : 0.0800 }
-		},
-		{
-			"index" : 27,
-			"hscan" : { "minimum" : 0.6875, "maximum" : 0.7500 },
-			"vscan" : { "minimum" : 0.0000, "maximum" : 0.0800 }
-		},
-		{
-			"index" : 28,
-			"hscan" : { "minimum" : 0.7500, "maximum" : 0.8125 },
-			"vscan" : { "minimum" : 0.0000, "maximum" : 0.0800 }
-		},
-		{
-			"index" : 29,
-			"hscan" : { "minimum" : 0.8125, "maximum" : 0.8750 },
-			"vscan" : { "minimum" : 0.0000, "maximum" : 0.0800 }
-		},
-		{
-			"index" : 30,
-			"hscan" : { "minimum" : 0.8750, "maximum" : 0.9375 },
-			"vscan" : { "minimum" : 0.0000, "maximum" : 0.0800 }
-		},
-		{
-			"index" : 31,
-			"hscan" : { "minimum" : 0.9375, "maximum" : 1.0000 },
-			"vscan" : { "minimum" : 0.0000, "maximum" : 0.0800 }
-		},
-		{
-			"index" : 32,
-			"hscan" : { "minimum" : 0.9500, "maximum" : 1.0000 },
-			"vscan" : { "minimum" : 0.0000, "maximum" : 0.1429 }
-		},
-		{
-			"index" : 33,
-			"hscan" : { "minimum" : 0.9500, "maximum" : 1.0000 },
-			"vscan" : { "minimum" : 0.1429, "maximum" : 0.2857 }
-		},
-		{
-			"index" : 34,
-			"hscan" : { "minimum" : 0.9500, "maximum" : 1.0000 },
-			"vscan" : { "minimum" : 0.2857, "maximum" : 0.4286 }
-		},
-		{
-			"index" : 35,
-			"hscan" : { "minimum" : 0.9500, "maximum" : 1.0000 },
-			"vscan" : { "minimum" : 0.4286, "maximum" : 0.5714 }
-		},
-		{
-			"index" : 36,
-			"hscan" : { "minimum" : 0.9500, "maximum" : 1.0000 },
-			"vscan" : { "minimum" : 0.5714, "maximum" : 0.7143 }
-		},
-		{
-			"index" : 37,
-			"hscan" : { "minimum" : 0.9500, "maximum" : 1.0000 },
-			"vscan" : { "minimum" : 0.7143, "maximum" : 0.8571 }
-		},
-		{
-			"index" : 38,
-			"hscan" : { "minimum" : 0.9500, "maximum" : 1.0000 },
-			"vscan" : { "minimum" : 0.8571, "maximum" : 1.0000 }
-		},
-		{
-			"index" : 39,
-			"hscan" : { "minimum" : 0.9375, "maximum" : 1.0000 },
-			"vscan" : { "minimum" : 0.9200, "maximum" : 1.0000 }
-		},
-		{
-			"index" : 40,
-			"hscan" : { "minimum" : 0.8750, "maximum" : 0.9375 },
-			"vscan" : { "minimum" : 0.9200, "maximum" : 1.0000 }
-		},
-		{
-			"index" : 41,
-			"hscan" : { "minimum" : 0.8125, "maximum" : 0.8750 },
-			"vscan" : { "minimum" : 0.9200, "maximum" : 1.0000 }
-		},
-		{
-			"index" : 42,
-			"hscan" : { "minimum" : 0.7500, "maximum" : 0.8125 },
-			"vscan" : { "minimum" : 0.9200, "maximum" : 1.0000 }
-		},
-		{
-			"index" : 43,
-			"hscan" : { "minimum" : 0.6875, "maximum" : 0.7500 },
-			"vscan" : { "minimum" : 0.9200, "maximum" : 1.0000 }
-		},
-		{
-			"index" : 44,
-			"hscan" : { "minimum" : 0.6250, "maximum" : 0.6875 },
-			"vscan" : { "minimum" : 0.9200, "maximum" : 1.0000 }
-		},
-		{
-			"index" : 45,
-			"hscan" : { "minimum" : 0.5625, "maximum" : 0.6250 },
-			"vscan" : { "minimum" : 0.9200, "maximum" : 1.0000 }
-		}
-	],
-
-	"endOfJson" : "endOfJson"
+    "backgroundEffect": {
+        "color": [
+            255,
+            138,
+            0
+        ],
+        "effect": "Warm mood blobs",
+        "enable": true,
+        "type": "effect"
+    },
+    "blackborderdetector": {
+        "blurRemoveCnt": 1,
+        "borderFrameCnt": 50,
+        "enable": true,
+        "maxInconsistentCnt": 10,
+        "mode": "default",
+        "threshold": 5,
+        "unknownFrameCnt": 600
+    },
+    "boblightServer": {
+        "enable": false,
+        "port": 19333,
+        "priority": 201
+    },
+    "color": {
+        "channelAdjustment": [
+            {
+                "backlightColored": false,
+                "backlightThreshold": 0,
+                "black": [
+                    0,
+                    0,
+                    0
+                ],
+                "blue": [
+                    0,
+                    0,
+                    255
+                ],
+                "brightness": 100,
+                "brightnessCompensation": 100,
+                "cyan": [
+                    0,
+                    255,
+                    255
+                ],
+                "gammaBlue": 1.5,
+                "gammaGreen": 1.5,
+                "gammaRed": 1.5,
+                "green": [
+                    0,
+                    255,
+                    0
+                ],
+                "id": "default",
+                "leds": "*",
+                "magenta": [
+                    255,
+                    0,
+                    255
+                ],
+                "red": [
+                    255,
+                    0,
+                    0
+                ],
+                "white": [
+                    255,
+                    255,
+                    255
+                ],
+                "yellow": [
+                    255,
+                    255,
+                    0
+                ]
+            }
+        ],
+        "imageToLedMappingType": "multicolor_mean"
+    },
+    "device": {
+        "colorOrder": "rgb",
+        "output": "/dev/null",
+        "rate": 1000000,
+        "rewriteTime": 5000,
+        "type": "file"
+    },
+    "effects": {
+        "disable": [
+            ""
+        ],
+        "paths": [
+            "/storage/.kodi/addons/service.hyperion.ng/effects/",
+            "/storage/.kodi/userdata/addon_data/service.hyperion.ng/custom-effects/"
+        ]
+    },
+    "foregroundEffect": {
+        "color": [
+            0,
+            0,
+            255
+        ],
+        "duration_ms": 3000,
+        "effect": "Rainbow swirl fast",
+        "enable": true,
+        "type": "effect"
+    },
+    "forwarder": {
+        "enable": false,
+        "json": [
+            "127.0.0.1:19446"
+        ],
+        "proto": [
+            "127.0.0.1:19447"
+        ]
+    },
+    "framegrabber": {
+        "cropBottom": 0,
+        "cropLeft": 0,
+        "cropRight": 0,
+        "cropTop": 0,
+        "device": "/dev/fb0",
+        "enable": true,
+        "frequency_Hz": 10,
+        "height": 45,
+        "horizontalPixelDecimation": 8,
+        "priority": 250,
+        "type": "auto",
+        "useXGetImage": false,
+        "verticalPixelDecimation": 8,
+        "width": 80
+    },
+    "general": {
+        "name": "My Hyperion Config",
+        "showOptHelp": true
+    },
+    "grabberV4L2": [
+        {
+            "blueSignalThreshold": 5,
+            "cropBottom": 0,
+            "cropLeft": 0,
+            "cropRight": 0,
+            "cropTop": 0,
+            "device": "auto",
+            "enable": false,
+            "frameDecimation": 2,
+            "greenSignalThreshold": 5,
+            "height": 0,
+            "input": 0,
+            "priority": 240,
+            "redSignalThreshold": 5,
+            "sDHOffsetMax": 0.75,
+            "sDHOffsetMin": 0.25,
+            "sDVOffsetMax": 0.75,
+            "sDVOffsetMin": 0.25,
+            "signalDetection": false,
+            "sizeDecimation": 8,
+            "standard": "PAL",
+            "useKodiChecker": false,
+            "width": 0
+        }
+    ],
+    "jsonServer": {
+        "port": 19444
+    },
+    "kodiVideoChecker": {
+        "enable": false,
+        "enable3DDetection": false,
+        "grabAudio": true,
+        "grabMenu": false,
+        "grabPause": false,
+        "grabPictures": true,
+        "grabScreensaver": false,
+        "grabVideo": true,
+        "kodiAddress": "localhost",
+        "kodiTcpPort": 9090
+    },
+    "ledConfig": {
+        "bottom": 8,
+        "edgegap": 0,
+        "glength": 0,
+        "gpos": 0,
+        "hdepth": 8,
+        "left": 5,
+        "overlap": 0,
+        "position": 0,
+        "reverse": false,
+        "right": 5,
+        "top": 8,
+        "vdepth": 5
+    },
+    "leds": [
+        {
+            "hscan": {
+                "maximum": 0.125,
+                "minimum": 0
+            },
+            "index": 0,
+            "vscan": {
+                "maximum": 0.080000000000000002,
+                "minimum": 0
+            }
+        },
+        {
+            "hscan": {
+                "maximum": 0.25,
+                "minimum": 0.125
+            },
+            "index": 1,
+            "vscan": {
+                "maximum": 0.080000000000000002,
+                "minimum": 0
+            }
+        },
+        {
+            "hscan": {
+                "maximum": 0.375,
+                "minimum": 0.25
+            },
+            "index": 2,
+            "vscan": {
+                "maximum": 0.080000000000000002,
+                "minimum": 0
+            }
+        },
+        {
+            "hscan": {
+                "maximum": 0.5,
+                "minimum": 0.375
+            },
+            "index": 3,
+            "vscan": {
+                "maximum": 0.080000000000000002,
+                "minimum": 0
+            }
+        },
+        {
+            "hscan": {
+                "maximum": 0.625,
+                "minimum": 0.5
+            },
+            "index": 4,
+            "vscan": {
+                "maximum": 0.080000000000000002,
+                "minimum": 0
+            }
+        },
+        {
+            "hscan": {
+                "maximum": 0.75,
+                "minimum": 0.625
+            },
+            "index": 5,
+            "vscan": {
+                "maximum": 0.080000000000000002,
+                "minimum": 0
+            }
+        },
+        {
+            "hscan": {
+                "maximum": 0.875,
+                "minimum": 0.75
+            },
+            "index": 6,
+            "vscan": {
+                "maximum": 0.080000000000000002,
+                "minimum": 0
+            }
+        },
+        {
+            "hscan": {
+                "maximum": 1,
+                "minimum": 0.875
+            },
+            "index": 7,
+            "vscan": {
+                "maximum": 0.080000000000000002,
+                "minimum": 0
+            }
+        },
+        {
+            "hscan": {
+                "maximum": 1,
+                "minimum": 0.94999999999999996
+            },
+            "index": 8,
+            "vscan": {
+                "maximum": 0.20000000000000001,
+                "minimum": 0
+            }
+        },
+        {
+            "hscan": {
+                "maximum": 1,
+                "minimum": 0.94999999999999996
+            },
+            "index": 9,
+            "vscan": {
+                "maximum": 0.40000000000000002,
+                "minimum": 0.20000000000000001
+            }
+        },
+        {
+            "hscan": {
+                "maximum": 1,
+                "minimum": 0.94999999999999996
+            },
+            "index": 10,
+            "vscan": {
+                "maximum": 0.59999999999999998,
+                "minimum": 0.40000000000000002
+            }
+        },
+        {
+            "hscan": {
+                "maximum": 1,
+                "minimum": 0.94999999999999996
+            },
+            "index": 11,
+            "vscan": {
+                "maximum": 0.80000000000000004,
+                "minimum": 0.59999999999999998
+            }
+        },
+        {
+            "hscan": {
+                "maximum": 1,
+                "minimum": 0.94999999999999996
+            },
+            "index": 12,
+            "vscan": {
+                "maximum": 1,
+                "minimum": 0.80000000000000004
+            }
+        },
+        {
+            "hscan": {
+                "maximum": 1,
+                "minimum": 0.875
+            },
+            "index": 13,
+            "vscan": {
+                "maximum": 1,
+                "minimum": 0.92000000000000004
+            }
+        },
+        {
+            "hscan": {
+                "maximum": 0.875,
+                "minimum": 0.75
+            },
+            "index": 14,
+            "vscan": {
+                "maximum": 1,
+                "minimum": 0.92000000000000004
+            }
+        },
+        {
+            "hscan": {
+                "maximum": 0.75,
+                "minimum": 0.625
+            },
+            "index": 15,
+            "vscan": {
+                "maximum": 1,
+                "minimum": 0.92000000000000004
+            }
+        },
+        {
+            "hscan": {
+                "maximum": 0.625,
+                "minimum": 0.5
+            },
+            "index": 16,
+            "vscan": {
+                "maximum": 1,
+                "minimum": 0.92000000000000004
+            }
+        },
+        {
+            "hscan": {
+                "maximum": 0.5,
+                "minimum": 0.375
+            },
+            "index": 17,
+            "vscan": {
+                "maximum": 1,
+                "minimum": 0.92000000000000004
+            }
+        },
+        {
+            "hscan": {
+                "maximum": 0.375,
+                "minimum": 0.25
+            },
+            "index": 18,
+            "vscan": {
+                "maximum": 1,
+                "minimum": 0.92000000000000004
+            }
+        },
+        {
+            "hscan": {
+                "maximum": 0.25,
+                "minimum": 0.125
+            },
+            "index": 19,
+            "vscan": {
+                "maximum": 1,
+                "minimum": 0.92000000000000004
+            }
+        },
+        {
+            "hscan": {
+                "maximum": 0.125,
+                "minimum": 0
+            },
+            "index": 20,
+            "vscan": {
+                "maximum": 1,
+                "minimum": 0.92000000000000004
+            }
+        },
+        {
+            "hscan": {
+                "maximum": 0.050000000000000003,
+                "minimum": 0
+            },
+            "index": 21,
+            "vscan": {
+                "maximum": 1,
+                "minimum": 0.80000000000000004
+            }
+        },
+        {
+            "hscan": {
+                "maximum": 0.050000000000000003,
+                "minimum": 0
+            },
+            "index": 22,
+            "vscan": {
+                "maximum": 0.80000000000000004,
+                "minimum": 0.59999999999999998
+            }
+        },
+        {
+            "hscan": {
+                "maximum": 0.050000000000000003,
+                "minimum": 0
+            },
+            "index": 23,
+            "vscan": {
+                "maximum": 0.59999999999999998,
+                "minimum": 0.40000000000000002
+            }
+        },
+        {
+            "hscan": {
+                "maximum": 0.050000000000000003,
+                "minimum": 0
+            },
+            "index": 24,
+            "vscan": {
+                "maximum": 0.40000000000000002,
+                "minimum": 0.20000000000000001
+            }
+        },
+        {
+            "hscan": {
+                "maximum": 0.050000000000000003,
+                "minimum": 0
+            },
+            "index": 25,
+            "vscan": {
+                "maximum": 0.20000000000000001,
+                "minimum": 0
+            }
+        }
+    ],
+    "logger": {
+        "level": "warn"
+    },
+    "protoServer": {
+        "port": 19445
+    },
+    "smoothing": {
+        "continuousOutput": true,
+        "enable": true,
+        "time_ms": 200,
+        "type": "linear",
+        "updateDelay": 0,
+        "updateFrequency": 25
+    },
+    "udpListener": {
+        "address": "239.255.28.01",
+        "enable": false,
+        "port": 2801,
+        "priority": 200,
+        "shared": false,
+        "timeout": 10000
+    },
+    "webConfig": {
+        "document_root": "",
+        "enable": true,
+        "port": 8099
+    }
 }
-

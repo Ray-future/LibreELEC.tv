@@ -27,7 +27,7 @@ PKG_DEPENDS_TARGET="toolchain Python2"
 PKG_SECTION="tools"
 PKG_SHORTDESC="Versatile resource statistics tool"
 PKG_LONGDESC="Versatile resource statistics tool"
-PKG_AUTORECONF="no"
+PKG_TOOLCHAIN="manual"
 
 post_unpack() {
 rm $PKG_BUILD/Makefile

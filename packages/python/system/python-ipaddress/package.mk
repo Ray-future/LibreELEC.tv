@@ -29,9 +29,7 @@ PKG_DEPENDS_TARGET="toolchain Python2 distutilscross:host"
 PKG_SECTION="python/system"
 PKG_SHORTDESC="IPv4/IPv6 manipulation library"
 PKG_LONGDESC="Port of the 3.3+ ipaddress module to 2.6, 2.7, 3.2"
-
-PKG_IS_ADDON="no"
-PKG_AUTORECONF="no"
+PKG_TOOLCHAIN="manual"
 
 make_target() {
   :

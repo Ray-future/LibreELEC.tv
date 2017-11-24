@@ -29,9 +29,7 @@ PKG_DEPENDS_TARGET="toolchain Python2 distutilscross:host openssl python-six pyt
 PKG_SECTION="python/security"
 PKG_SHORTDESC="cryptography is designed to expose cryptographic primitives and recipes to Python developers"
 PKG_LONGDESC="cryptography is designed to expose cryptographic primitives and recipes to Python developers"
-
-PKG_IS_ADDON="no"
-PKG_AUTORECONF="no"
+PKG_TOOLCHAIN="manual"
 
 pre_configure_target() {
   export PYTHONXCPREFIX="$SYSROOT_PREFIX/usr"

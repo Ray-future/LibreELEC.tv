@@ -27,8 +27,7 @@ PKG_DEPENDS_TARGET="xmlstarlet:host"
 PKG_SECTION=""
 PKG_SHORTDESC="Tvh2Kodi provides access to basic Tvheadend server settings from the Kodi interface."
 PKG_LONGDESC="Tvh2Kodi provides access to basic Tvheadend server settings from the Kodi interface."
-PKG_AUTORECONF="no"
-
+PKG_TOOLCHAIN="manual"
 PKG_IS_ADDON="yes"
 
 make_target() {

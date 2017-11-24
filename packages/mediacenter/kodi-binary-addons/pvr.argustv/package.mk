@@ -17,9 +17,9 @@
 ################################################################################
 
 PKG_NAME="pvr.argustv"
-PKG_VERSION="23cc0e8"
-PKG_SHA256="e965a98240f6c7dee277a1a705ac5e26b138b2f1572572aea50bbfef92a54bf3"
-PKG_REV="6"
+PKG_VERSION="5b9bdad"
+PKG_SHA256="b30a5dc99f3f3bb830d24da8d9215be456fdff9238677eb71bc891f5130c19f8"
+PKG_REV="7"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="http://www.kodi.tv"
@@ -28,7 +28,6 @@ PKG_DEPENDS_TARGET="toolchain kodi-platform jsoncpp"
 PKG_SECTION=""
 PKG_SHORTDESC="pvr.argustv"
 PKG_LONGDESC="pvr.argustv"
-PKG_AUTORECONF="no"
 
 PKG_IS_ADDON="yes"
 PKG_ADDON_TYPE="xbmc.pvrclient"

@@ -27,6 +27,4 @@ PKG_DEPENDS_TARGET="toolchain"
 PKG_SECTION="security"
 PKG_SHORTDESC="Sodium is a modern, easy-to-use software library for encryption, decryption, signatures, password hashing and more."
 PKG_LONGDESC="Sodium is a modern, easy-to-use software library for encryption, decryption, signatures, password hashing and more."
-
-PKG_IS_ADDON="no"
-PKG_AUTORECONF="yes"
+PKG_TOOLCHAIN="autotools"

@@ -29,9 +29,7 @@ PKG_DEPENDS_TARGET="toolchain Python2 distutilscross:host pycryptodome pynacl py
 PKG_SECTION="python/security"
 PKG_SHORTDESC="A library that provides cryptographic and general-purpose routines for Secure Systems Lab projects at NYU"
 PKG_LONGDESC="A library that provides cryptographic and general-purpose routines for Secure Systems Lab projects at NYU"
-
-PKG_IS_ADDON="no"
-PKG_AUTORECONF="no"
+PKG_TOOLCHAIN="manual"
 
 make_target() {
   :

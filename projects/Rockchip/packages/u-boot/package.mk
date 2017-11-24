@@ -18,11 +18,11 @@
 ################################################################################
 
 PKG_NAME="u-boot"
-PKG_VERSION="6b5409b"
-PKG_SHA256="3fcedb8f5ba83c32f10960a22cd3e2cf64edf28bcd1caf2f51577381097d925c"
+PKG_VERSION="2017.11-rc3"
+PKG_SHA256="150ce66648460a343407cbf3a3037f8e45d2441847660d17f65bbbf5cc4111e4"
 PKG_ARCH="arm aarch64"
 PKG_SITE="https://www.denx.de/wiki/U-Boot"
-PKG_URL="https://github.com/rockchip-linux/u-boot/archive/$PKG_VERSION.tar.gz"
+PKG_URL="http://ftp.denx.de/pub/u-boot/u-boot-$PKG_VERSION.tar.bz2"
 PKG_SOURCE_DIR="u-boot-$PKG_VERSION*"
 PKG_DEPENDS_TARGET="toolchain dtc:host"
 PKG_LICENSE="GPL"

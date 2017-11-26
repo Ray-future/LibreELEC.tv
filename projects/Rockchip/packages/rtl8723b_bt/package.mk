@@ -26,11 +26,7 @@ PKG_DEPENDS_TARGET="rfkill"
 PKG_SECTION="firmware"
 PKG_SHORTDESC="rtl8723b_bt firmware"
 PKG_LONGDESC="rtl8723b_bt firmware"
-PKG_AUTORECONF="no"
-
-make_target() {
-  : # nothing
-}
+PKG_TOOLCHAIN="manual"
 
 makeinstall_target() {
   mkdir -p $INSTALL/usr/bin

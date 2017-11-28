@@ -28,7 +28,6 @@ PKG_DEPENDS_TARGET="toolchain libdrm"
 PKG_SECTION="multimedia"
 PKG_SHORTDESC="rkmpp: Rockchip Media Process Platform (MPP) module"
 PKG_LONGDESC="rkmpp: Rockchip Media Process Platform (MPP) module"
-PKG_AUTORECONF="no"
 
 if [ "$UBOOT_SYSTEM" = "rk3328" -o "$UBOOT_SYSTEM" = "rk3399" ]; then
   PKG_ENABLE_VP9D="ON"

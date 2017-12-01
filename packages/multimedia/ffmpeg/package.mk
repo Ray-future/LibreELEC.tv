@@ -18,8 +18,8 @@
 
 PKG_NAME="ffmpeg"
 # Current branch is: release/3.4-kodi
-PKG_VERSION="d056a4c"
-PKG_SHA256="c041ac2837473fdafbcbc2605d4104f7a3b9ba4d19e21a27487e3eb8581f7b6c"
+PKG_VERSION="d413620"
+PKG_SHA256="c02de2197f8b70544f018e83f48c1bed2a1b47e1a1aa34ef59d9167fb0d2090a"
 PKG_ARCH="any"
 PKG_LICENSE="LGPLv2.1+"
 PKG_SITE="https://ffmpeg.org"
@@ -94,8 +94,11 @@ pre_configure_target() {
   strip_gold
 
   if [ "$KODIPLAYER_DRIVER" = "bcm2835-driver" ]; then
-    CFLAGS="-I$SYSROOT_PREFIX/usr/include/interface/vcos/pthreads -I$SYSROOT_PREFIX/usr/include/interface/vmcs_host/linux -DRPI=1 $CFLAGS"
+    CFLAGS="-I$SYSROOT_PREFIX/usr/include/interface/vcos/pthreads -I$SYSROOT_PREFIX/usr/include/interface/vmcs_host/linux $CFLAGS"
     FFMPEG_LIBS="-lbcm_host -lvcos -lvchiq_arm -lmmal -lmmal_core -lmmal_util -lvcsm"
+    FFMPEG_RPI="--enable-rpi"
+  else
+    FFMPEG_RPI="--disable-rpi"
   fi
 }
 
@@ -157,6 +160,7 @@ configure_target() {
               $FFMPEG_VAAPI \
               $FFMPEG_VDPAU \
               $FFMPEG_RKMPP \
+              $FFMPEG_RPI \
               --disable-dxva2 \
               --enable-runtime-cpudetect \
               $FFMPEG_TABLES \
@@ -185,6 +189,8 @@ configure_target() {
               --enable-filters \
               --disable-avisynth \
               --enable-bzlib \
+              --disable-lzma \
+              --disable-alsa \
               --disable-frei0r \
               --disable-libopencore-amrnb \
               --disable-libopencore-amrwb \

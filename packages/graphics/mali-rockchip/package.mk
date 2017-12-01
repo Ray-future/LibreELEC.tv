@@ -65,13 +65,6 @@ configure_target() {
   fi
 }
 
-<<<<<<< HEAD
-make_target() {
-  : # nothing
-}
-
-=======
->>>>>>> 77e894e22b733a81d45dcd45d59a1977c749d339
 makeinstall_target() {
   cd $PKG_BUILD
 

@@ -32,11 +32,3 @@ PKG_TOOLCHAIN="manual"
 post_unpack() {
 rm $PKG_BUILD/Makefile
 }
-
-make_target() {
-  : # nothing to do
-}
-
-makeinstall_target() {
-  : # nothing to do
-}

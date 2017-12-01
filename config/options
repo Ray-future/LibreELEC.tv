@@ -1,3 +1,9 @@
+# Do not build as root. Ever.
+if [[ $EUID -eq 0 ]]; then
+  echo "Building as the root user is NOT supported. Use a regular user account for the build." 1>&2
+  exit 1
+fi
+
 # set default language for buildsystem
   export LC_ALL=C
 
@@ -28,9 +34,6 @@ fi
 ROOT="${PWD}"
 DISTRO_DIR="$ROOT/distributions"
 PROJECT_DIR="$ROOT/projects"
-LINUX_DEPENDS="$PROJECT_DIR/$PROJECT/linux $ROOT/packages/linux/package.mk"
-[ -n "$DEVICE" ] && LINUX_DEPENDS+=" $PROJECT_DIR/$PROJECT/devices/$DEVICE/linux"
-[ "$TARGET_ARCH" = "x86_64" ] && LINUX_DEPENDS+=" $ROOT/packages/linux-firmware/intel-ucode/package.mk $ROOT/packages/linux-firmware/x86-firmware/package.mk"
 
 # include versioning
   . config/version
@@ -54,6 +57,9 @@ LINUX_DEPENDS="$PROJECT_DIR/$PROJECT/linux $ROOT/packages/linux/package.mk"
  if [ -f "$PROJECT_DIR/$PROJECT/devices/$DEVICE/options" ]; then
    . $PROJECT_DIR/$PROJECT/devices/$DEVICE/options
  fi
+
+LINUX_DEPENDS="$PROJECT_DIR/$PROJECT/linux/linux.${TARGET_PATCH_ARCH:-$TARGET_ARCH}.conf $PROJECT_DIR/$PROJECT/devices/$DEVICE/linux/linux.${TARGET_PATCH_ARCH:-$TARGET_ARCH}.conf $ROOT/packages/linux/package.mk"
+[ "$TARGET_ARCH" = "x86_64" ] && LINUX_DEPENDS+=" $ROOT/packages/linux-firmware/intel-ucode/package.mk $ROOT/packages/linux-firmware/x86-firmware/package.mk"
 
 # Need to point to your actual cc
 # If you have ccache installed, take care that LOCAL_CC don't point to it

@@ -1,0 +1,1221 @@
+From 1db227d7c8001be785d9b0aee3112f6b2b929f4f Mon Sep 17 00:00:00 2001
+From: Jonas Karlman <jonas@kwiboo.se>
+Date: Sun, 12 Nov 2017 16:53:11 +0100
+Subject: [PATCH 1/8] windowing/gbm: use include files from libdrm
+
+---
+ xbmc/windowing/gbm/DRMLegacy.cpp | 2 +-
+ xbmc/windowing/gbm/DRMUtils.cpp  | 4 ++--
+ xbmc/windowing/gbm/GBMUtils.cpp  | 2 +-
+ 3 files changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/xbmc/windowing/gbm/DRMLegacy.cpp b/xbmc/windowing/gbm/DRMLegacy.cpp
+index 494591c2950f..6f34aa215137 100644
+--- a/xbmc/windowing/gbm/DRMLegacy.cpp
++++ b/xbmc/windowing/gbm/DRMLegacy.cpp
+@@ -25,7 +25,7 @@
+ #include <stdio.h>
+ #include <stdlib.h>
+ #include <string.h>
+-#include <drm/drm_mode.h>
++#include <drm_mode.h>
+ #include <EGL/egl.h>
+ #include <unistd.h>
+ 
+diff --git a/xbmc/windowing/gbm/DRMUtils.cpp b/xbmc/windowing/gbm/DRMUtils.cpp
+index 5ccce273bb2f..143b6ee16ffe 100644
+--- a/xbmc/windowing/gbm/DRMUtils.cpp
++++ b/xbmc/windowing/gbm/DRMUtils.cpp
+@@ -24,8 +24,8 @@
+ #include <stdio.h>
+ #include <stdlib.h>
+ #include <string.h>
+-#include <drm/drm_fourcc.h>
+-#include <drm/drm_mode.h>
++#include <drm_fourcc.h>
++#include <drm_mode.h>
+ #include <EGL/egl.h>
+ #include <unistd.h>
+ 
+diff --git a/xbmc/windowing/gbm/GBMUtils.cpp b/xbmc/windowing/gbm/GBMUtils.cpp
+index f54d6a9ce73f..1a99c7475669 100644
+--- a/xbmc/windowing/gbm/GBMUtils.cpp
++++ b/xbmc/windowing/gbm/GBMUtils.cpp
+@@ -25,7 +25,7 @@
+ #include <stdio.h>
+ #include <stdlib.h>
+ #include <string.h>
+-#include <drm/drm_mode.h>
++#include <drm_mode.h>
+ #include <EGL/egl.h>
+ #include <unistd.h>
+ 
+
+From 9a0fafee1d7fdba9f325d6a91ef7d9d717c82e27 Mon Sep 17 00:00:00 2001
+From: Jonas Karlman <jonas@kwiboo.se>
+Date: Sun, 12 Nov 2017 16:53:11 +0100
+Subject: [PATCH 2/8] windowing/gbm: use fractal refresh rate when pixel clock
+ is uneven
+
+---
+ xbmc/windowing/gbm/DRMUtils.cpp | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/xbmc/windowing/gbm/DRMUtils.cpp b/xbmc/windowing/gbm/DRMUtils.cpp
+index 143b6ee16ffe..bcf9a493508e 100644
+--- a/xbmc/windowing/gbm/DRMUtils.cpp
++++ b/xbmc/windowing/gbm/DRMUtils.cpp
+@@ -391,7 +391,10 @@ bool CDRMUtils::GetModes(std::vector<RESOLUTION_INFO> &resolutions)
+     res.iHeight = m_drm_connector->modes[i].vdisplay;
+     res.iScreenWidth = m_drm_connector->modes[i].hdisplay;
+     res.iScreenHeight = m_drm_connector->modes[i].vdisplay;
+-    res.fRefreshRate = m_drm_connector->modes[i].vrefresh;
++    if (m_drm_connector->modes[i].clock % 10 != 0)
++      res.fRefreshRate = (float)m_drm_connector->modes[i].vrefresh * (1000.0f/1001.0f);
++    else
++      res.fRefreshRate = m_drm_connector->modes[i].vrefresh;
+     res.iSubtitles = static_cast<int>(0.965 * res.iHeight);
+     res.fPixelRatio = 1.0f;
+     res.bFullScreen = true;
+
+From f39973cc72df27e31bba61b832395628a240bd87 Mon Sep 17 00:00:00 2001
+From: Jonas Karlman <jonas@kwiboo.se>
+Date: Sun, 12 Nov 2017 16:53:11 +0100
+Subject: [PATCH 3/8] windowing/gbm: find video plane
+
+---
+ xbmc/windowing/gbm/DRMUtils.cpp | 26 ++++++++++++++++++++++++++
+ xbmc/windowing/gbm/DRMUtils.h   |  1 +
+ 2 files changed, 27 insertions(+)
+
+diff --git a/xbmc/windowing/gbm/DRMUtils.cpp b/xbmc/windowing/gbm/DRMUtils.cpp
+index bcf9a493508e..dfcdf186a3f3 100644
+--- a/xbmc/windowing/gbm/DRMUtils.cpp
++++ b/xbmc/windowing/gbm/DRMUtils.cpp
+@@ -38,6 +38,7 @@
+ static struct drm *m_drm = nullptr;
+ 
+ static drmModeResPtr m_drm_resources = nullptr;
++static drmModePlaneResPtr m_drm_plane_resources = nullptr;
+ static drmModeConnectorPtr m_drm_connector = nullptr;
+ static drmModeEncoderPtr m_drm_encoder = nullptr;
+ static drmModeCrtcPtr m_orig_crtc = nullptr;
+@@ -124,6 +125,12 @@ bool CDRMUtils::GetResources()
+     return false;
+   }
+ 
++  m_drm_plane_resources = drmModeGetPlaneResources(m_drm->fd);
++  if (!m_drm_plane_resources)
++  {
++    return false;
++  }
++
+   return true;
+ }
+ 
+@@ -306,6 +313,18 @@ bool CDRMUtils::InitDrm(drm *drm)
+     }
+   }
+ 
++  m_drm->video_plane_id = 0;
++  for (uint32_t i = 0; i < m_drm_plane_resources->count_planes; i++)
++  {
++    drmModePlane *plane = drmModeGetPlane(m_drm->fd, m_drm_plane_resources->planes[i]);
++    if (!plane)
++      continue;
++    if (!m_drm->video_plane_id && plane->possible_crtcs & (1 << m_drm->crtc_index))
++      m_drm->video_plane_id = plane->plane_id;
++    drmModeFreePlane(plane);
++  }
++
++  drmModeFreePlaneResources(m_drm_plane_resources);
+   drmModeFreeResources(m_drm_resources);
+ 
+   drmSetMaster(m_drm->fd);
+@@ -360,6 +379,11 @@ void CDRMUtils::DestroyDrm()
+     drmModeFreeConnector(m_drm_connector);
+   }
+ 
++  if (m_drm_plane_resources)
++  {
++     drmModeFreePlaneResources(m_drm_plane_resources);
++  }
++
+   if(m_drm_resources)
+   {
+     drmModeFreeResources(m_drm_resources);
+@@ -371,6 +395,7 @@ void CDRMUtils::DestroyDrm()
+   m_drm_encoder = nullptr;
+   m_drm_connector = nullptr;
+   m_drm_resources = nullptr;
++  m_drm_plane_resources = nullptr;
+ 
+   m_drm->connector = nullptr;
+   m_drm->connector_id = 0;
+@@ -378,6 +403,7 @@ void CDRMUtils::DestroyDrm()
+   m_drm->crtc_id = 0;
+   m_drm->crtc_index = 0;
+   m_drm->fd = -1;
++  m_drm->video_plane_id = 0;
+   m_drm->mode = nullptr;
+ }
+ 
+diff --git a/xbmc/windowing/gbm/DRMUtils.h b/xbmc/windowing/gbm/DRMUtils.h
+index bef303ab5c8d..575f99971a25 100644
+--- a/xbmc/windowing/gbm/DRMUtils.h
++++ b/xbmc/windowing/gbm/DRMUtils.h
+@@ -53,6 +53,7 @@ struct drm
+   drmModeModeInfo *mode;
+   uint32_t crtc_id;
+   uint32_t connector_id;
++  uint32_t video_plane_id;
+ };
+ 
+ struct drm_fb
+
+From c1eff7d6b8554dbb320804b231dc6f32ad326a83 Mon Sep 17 00:00:00 2001
+From: Jonas Karlman <jonas@kwiboo.se>
+Date: Sun, 12 Nov 2017 16:53:11 +0100
+Subject: [PATCH 4/8] windowing/gbm: wait for vblank when nothing is rendered
+
+---
+ xbmc/windowing/gbm/DRMUtils.cpp                | 8 ++++++++
+ xbmc/windowing/gbm/DRMUtils.h                  | 1 +
+ xbmc/windowing/gbm/WinSystemGbm.cpp            | 5 +++++
+ xbmc/windowing/gbm/WinSystemGbm.h              | 1 +
+ xbmc/windowing/gbm/WinSystemGbmGLESContext.cpp | 9 ++++++++-
+ xbmc/windowing/gbm/WinSystemGbmGLESContext.h   | 3 ++-
+ 6 files changed, 25 insertions(+), 2 deletions(-)
+
+diff --git a/xbmc/windowing/gbm/DRMUtils.cpp b/xbmc/windowing/gbm/DRMUtils.cpp
+index dfcdf186a3f3..000dcfeb505a 100644
+--- a/xbmc/windowing/gbm/DRMUtils.cpp
++++ b/xbmc/windowing/gbm/DRMUtils.cpp
+@@ -43,6 +43,14 @@ static drmModeConnectorPtr m_drm_connector = nullptr;
+ static drmModeEncoderPtr m_drm_encoder = nullptr;
+ static drmModeCrtcPtr m_orig_crtc = nullptr;
+ 
++void CDRMUtils::WaitVBlank()
++{
++  drmVBlank vbl;
++  vbl.request.type = DRM_VBLANK_RELATIVE;
++  vbl.request.sequence = 1;
++  drmWaitVBlank(m_drm->fd, &vbl);
++}
++
+ bool CDRMUtils::SetMode(RESOLUTION_INFO res)
+ {
+   m_drm->mode = &m_drm_connector->modes[atoi(res.strId.c_str())];
+diff --git a/xbmc/windowing/gbm/DRMUtils.h b/xbmc/windowing/gbm/DRMUtils.h
+index 575f99971a25..841a2757941d 100644
+--- a/xbmc/windowing/gbm/DRMUtils.h
++++ b/xbmc/windowing/gbm/DRMUtils.h
+@@ -69,6 +69,7 @@ class CDRMUtils
+   static void DestroyDrm();
+   static bool GetModes(std::vector<RESOLUTION_INFO> &resolutions);
+   static bool SetMode(RESOLUTION_INFO res);
++  static void WaitVBlank();
+ 
+ protected:
+   static drm_fb * DrmFbGetFromBo(struct gbm_bo *bo);
+diff --git a/xbmc/windowing/gbm/WinSystemGbm.cpp b/xbmc/windowing/gbm/WinSystemGbm.cpp
+index 2c8178e02f76..09aa59c90a91 100644
+--- a/xbmc/windowing/gbm/WinSystemGbm.cpp
++++ b/xbmc/windowing/gbm/WinSystemGbm.cpp
+@@ -153,6 +153,11 @@ void CWinSystemGbm::FlipPage(CGLContextEGL *pGLContext)
+   m_DRM.FlipPage(pGLContext);
+ }
+ 
++void CWinSystemGbm::WaitVBlank()
++{
++  CDRMUtils::WaitVBlank();
++}
++
+ void* CWinSystemGbm::GetVaDisplay()
+ {
+ #if defined(HAVE_LIBVA)
+diff --git a/xbmc/windowing/gbm/WinSystemGbm.h b/xbmc/windowing/gbm/WinSystemGbm.h
+index dd0a3490ded6..149987a22b58 100644
+--- a/xbmc/windowing/gbm/WinSystemGbm.h
++++ b/xbmc/windowing/gbm/WinSystemGbm.h
+@@ -49,6 +49,7 @@ class CWinSystemGbm : public CWinSystemBase
+   bool SetFullScreen(bool fullScreen, RESOLUTION_INFO& res, bool blankOtherDisplays) override;
+ 
+   void FlipPage(CGLContextEGL *m_pGLContext);
++  void WaitVBlank();
+ 
+   void UpdateResolutions() override;
+ 
+diff --git a/xbmc/windowing/gbm/WinSystemGbmGLESContext.cpp b/xbmc/windowing/gbm/WinSystemGbmGLESContext.cpp
+index 7088c7657793..fb7da6a11772 100644
+--- a/xbmc/windowing/gbm/WinSystemGbmGLESContext.cpp
++++ b/xbmc/windowing/gbm/WinSystemGbmGLESContext.cpp
+@@ -134,13 +134,20 @@ bool CWinSystemGbmGLESContext::SetFullScreen(bool fullScreen, RESOLUTION_INFO& r
+   return true;
+ }
+ 
+-void CWinSystemGbmGLESContext::PresentRenderImpl(bool rendered)
++void CWinSystemGbmGLESContext::PresentRender(bool rendered, bool videoLayer)
+ {
++  if (!m_bRenderCreated)
++    return;
++
+   if (rendered)
+   {
+     m_pGLContext.SwapBuffers();
+     CWinSystemGbm::FlipPage(&m_pGLContext);
+   }
++  else
++  {
++    CWinSystemGbm::WaitVBlank();
++  }
+ }
+ 
+ EGLDisplay CWinSystemGbmGLESContext::GetEGLDisplay() const
+diff --git a/xbmc/windowing/gbm/WinSystemGbmGLESContext.h b/xbmc/windowing/gbm/WinSystemGbmGLESContext.h
+index a5baba84d79b..b56f6082267f 100644
+--- a/xbmc/windowing/gbm/WinSystemGbmGLESContext.h
++++ b/xbmc/windowing/gbm/WinSystemGbmGLESContext.h
+@@ -38,13 +38,14 @@ class CWinSystemGbmGLESContext : public CWinSystemGbm, public CRenderSystemGLES
+                        RESOLUTION_INFO& res) override;
+ 
+   bool SetFullScreen(bool fullScreen, RESOLUTION_INFO& res, bool blankOtherDisplays) override;
++  void PresentRender(bool rendered, bool videoLayer) override;
+   EGLDisplay GetEGLDisplay() const;
+   EGLSurface GetEGLSurface() const;
+   EGLContext GetEGLContext() const;
+   EGLConfig  GetEGLConfig() const;
+ protected:
+   void SetVSyncImpl(bool enable) override { return; };
+-  void PresentRenderImpl(bool rendered) override;
++  void PresentRenderImpl(bool rendered) override {};
+ 
+ private:
+   CGLContextEGL m_pGLContext;
+
+From 20726aef05bb1b6a3b94e7704fa1fb05155ad371 Mon Sep 17 00:00:00 2001
+From: Jonas Karlman <jonas@kwiboo.se>
+Date: Sun, 12 Nov 2017 16:53:11 +0100
+Subject: [PATCH 5/8] VideoPlayer: add DRM PRIME video codec
+
+---
+ .../VideoPlayer/DVDCodecs/Video/CMakeLists.txt     |   5 +
+ .../DVDCodecs/Video/DVDVideoCodecDRMPRIME.cpp      | 324 +++++++++++++++++++++
+ .../DVDCodecs/Video/DVDVideoCodecDRMPRIME.h        |  79 +++++
+ 3 files changed, 408 insertions(+)
+ create mode 100644 xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecDRMPRIME.cpp
+ create mode 100644 xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecDRMPRIME.h
+
+diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/CMakeLists.txt b/xbmc/cores/VideoPlayer/DVDCodecs/Video/CMakeLists.txt
+index d8dcd15b4cb4..5099bbecedc9 100644
+--- a/xbmc/cores/VideoPlayer/DVDCodecs/Video/CMakeLists.txt
++++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/CMakeLists.txt
+@@ -51,4 +51,9 @@ if(CORE_SYSTEM_NAME STREQUAL android)
+   list(APPEND HEADERS DVDVideoCodecAndroidMediaCodec.h)
+ endif()
+ 
++if(CORE_PLATFORM_NAME_LC STREQUAL gbm)
++  list(APPEND SOURCES DVDVideoCodecDRMPRIME.cpp)
++  list(APPEND HEADERS DVDVideoCodecDRMPRIME.h)
++endif()
++
+ core_add_library(dvdvideocodecs)
+diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecDRMPRIME.cpp b/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecDRMPRIME.cpp
+new file mode 100644
+index 000000000000..008e495ed628
+--- /dev/null
++++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecDRMPRIME.cpp
+@@ -0,0 +1,324 @@
++/*
++ *      Copyright (C) 2017 Team Kodi
++ *      http://kodi.tv
++ *
++ *  This Program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation; either version 2, or (at your option)
++ *  any later version.
++ *
++ *  This Program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this Program; see the file COPYING.  If not, see
++ *  <http://www.gnu.org/licenses/>.
++ *
++ */
++
++#include "DVDVideoCodecDRMPRIME.h"
++
++#include "cores/VideoPlayer/DVDCodecs/DVDFactoryCodec.h"
++#include "threads/SingleLock.h"
++#include "utils/log.h"
++
++extern "C" {
++#include "libavcodec/avcodec.h"
++#include "libavutil/pixdesc.h"
++}
++
++//------------------------------------------------------------------------------
++// Video Buffers
++//------------------------------------------------------------------------------
++
++CVideoBufferDRMPRIME::CVideoBufferDRMPRIME(IVideoBufferPool& pool, int id)
++  : CVideoBuffer(id)
++{
++  m_pFrame = av_frame_alloc();
++}
++
++CVideoBufferDRMPRIME::~CVideoBufferDRMPRIME()
++{
++  Unref();
++  av_frame_free(&m_pFrame);
++}
++
++void CVideoBufferDRMPRIME::SetRef(AVFrame* frame)
++{
++  av_frame_move_ref(m_pFrame, frame);
++}
++
++void CVideoBufferDRMPRIME::Unref()
++{
++  av_frame_unref(m_pFrame);
++}
++
++//------------------------------------------------------------------------------
++
++class CVideoBufferPoolDRMPRIME
++  : public IVideoBufferPool
++{
++public:
++  ~CVideoBufferPoolDRMPRIME() override;
++  void Return(int id) override;
++  CVideoBuffer* Get() override;
++
++protected:
++  CCriticalSection m_critSection;
++  std::vector<CVideoBufferDRMPRIME*> m_all;
++  std::deque<int> m_used;
++  std::deque<int> m_free;
++};
++
++CVideoBufferPoolDRMPRIME::~CVideoBufferPoolDRMPRIME()
++{
++  for (auto buf : m_all)
++    delete buf;
++}
++
++CVideoBuffer* CVideoBufferPoolDRMPRIME::Get()
++{
++  CSingleLock lock(m_critSection);
++
++  CVideoBufferDRMPRIME* buf = nullptr;
++  if (!m_free.empty())
++  {
++    int idx = m_free.front();
++    m_free.pop_front();
++    m_used.push_back(idx);
++    buf = m_all[idx];
++  }
++  else
++  {
++    int id = m_all.size();
++    buf = new CVideoBufferDRMPRIME(*this, id);
++    m_all.push_back(buf);
++    m_used.push_back(id);
++  }
++
++  buf->Acquire(GetPtr());
++  return buf;
++}
++
++void CVideoBufferPoolDRMPRIME::Return(int id)
++{
++  CSingleLock lock(m_critSection);
++
++  m_all[id]->Unref();
++  auto it = m_used.begin();
++  while (it != m_used.end())
++  {
++    if (*it == id)
++    {
++      m_used.erase(it);
++      break;
++    }
++    else
++      ++it;
++  }
++  m_free.push_back(id);
++}
++
++//------------------------------------------------------------------------------
++// main class
++//------------------------------------------------------------------------------
++
++CDVDVideoCodecDRMPRIME::CDVDVideoCodecDRMPRIME(CProcessInfo& processInfo)
++  : CDVDVideoCodec(processInfo)
++{
++  m_pFrame = av_frame_alloc();
++  m_videoBufferPool = std::make_shared<CVideoBufferPoolDRMPRIME>();
++}
++
++CDVDVideoCodecDRMPRIME::~CDVDVideoCodecDRMPRIME()
++{
++  av_frame_free(&m_pFrame);
++  avcodec_free_context(&m_pCodecContext);
++}
++
++CDVDVideoCodec* CDVDVideoCodecDRMPRIME::Create(CProcessInfo& processInfo)
++{
++  return new CDVDVideoCodecDRMPRIME(processInfo);
++}
++
++void CDVDVideoCodecDRMPRIME::Register()
++{
++  CDVDFactoryCodec::RegisterHWVideoCodec("drm_prime", CDVDVideoCodecDRMPRIME::Create);
++}
++
++AVCodec* CDVDVideoCodecDRMPRIME::FindDecoder(CDVDStreamInfo& hints)
++{
++  AVCodec* codec = nullptr;
++  while ((codec = av_codec_next(codec)))
++  {
++    if (av_codec_is_decoder(codec) && codec->id == hints.codec && codec->pix_fmts)
++    {
++      const AVPixelFormat* fmt = codec->pix_fmts;
++      while (*fmt != AV_PIX_FMT_NONE)
++      {
++        if (*fmt == AV_PIX_FMT_DRM_PRIME)
++          return codec;
++        fmt++;
++      }
++    }
++  }
++
++  return nullptr;
++}
++
++bool CDVDVideoCodecDRMPRIME::Open(CDVDStreamInfo& hints, CDVDCodecOptions& options)
++{
++  AVCodec* pCodec = FindDecoder(hints);
++  if (!pCodec)
++  {
++    CLog::Log(LOGDEBUG, "CDVDVideoCodecDRMPRIME::%s - unable to find decoder for codec %d", __FUNCTION__, hints.codec);
++    return false;
++  }
++
++  CLog::Log(LOGNOTICE, "CDVDVideoCodecDRMPRIME::%s - using decoder %s", __FUNCTION__, pCodec->long_name ? pCodec->long_name : pCodec->name);
++
++  m_pCodecContext = avcodec_alloc_context3(pCodec);
++  if (!m_pCodecContext)
++    return false;
++
++  m_pCodecContext->codec_tag = hints.codec_tag;
++  m_pCodecContext->coded_width = hints.width;
++  m_pCodecContext->coded_height = hints.height;
++  m_pCodecContext->bits_per_coded_sample = hints.bitsperpixel;
++
++  if (hints.extradata && hints.extrasize > 0)
++  {
++    m_pCodecContext->extradata_size = hints.extrasize;
++    m_pCodecContext->extradata = (uint8_t*)av_mallocz(hints.extrasize + AV_INPUT_BUFFER_PADDING_SIZE);
++    memcpy(m_pCodecContext->extradata, hints.extradata, hints.extrasize);
++  }
++
++  if (avcodec_open2(m_pCodecContext, pCodec, nullptr) < 0)
++  {
++    CLog::Log(LOGNOTICE, "CDVDVideoCodecDRMPRIME::%s - unable to open codec", __FUNCTION__);
++    avcodec_free_context(&m_pCodecContext);
++    return false;
++  }
++
++  const char* pixFmtName = av_get_pix_fmt_name(m_pCodecContext->pix_fmt);
++  m_processInfo.SetVideoPixelFormat(pixFmtName ? pixFmtName : "");
++  m_processInfo.SetVideoDimensions(hints.width, hints.height);
++  m_processInfo.SetVideoDeintMethod("none");
++  m_processInfo.SetVideoDAR(hints.aspect);
++
++  if (pCodec->name)
++    m_name = std::string("ff-") + pCodec->name;
++  else
++    m_name = "ffmpeg";
++
++  m_processInfo.SetVideoDecoderName(m_name, true);
++
++  return true;
++}
++
++bool CDVDVideoCodecDRMPRIME::AddData(const DemuxPacket& packet)
++{
++  if (!m_pCodecContext)
++    return true;
++
++  AVPacket avpkt;
++  av_init_packet(&avpkt);
++  avpkt.data = packet.pData;
++  avpkt.size = packet.iSize;
++  avpkt.dts = (packet.dts == DVD_NOPTS_VALUE) ? AV_NOPTS_VALUE : static_cast<int64_t>(packet.dts / DVD_TIME_BASE * AV_TIME_BASE);
++  avpkt.pts = (packet.pts == DVD_NOPTS_VALUE) ? AV_NOPTS_VALUE : static_cast<int64_t>(packet.pts / DVD_TIME_BASE * AV_TIME_BASE);
++  // TODO: avpkt.side_data = static_cast<AVPacketSideData*>(packet.pSideData);
++  // TODO: avpkt.side_data_elems = packet.iSideDataElems;
++
++  int ret = avcodec_send_packet(m_pCodecContext, &avpkt);
++  if (ret == AVERROR(EAGAIN))
++    return false;
++  else if (ret)
++  {
++    CLog::Log(LOGERROR, "CDVDVideoCodecDRMPRIME::%s - send packet failed, ret:%d", __FUNCTION__, ret);
++    return false;
++  }
++
++  return true;
++}
++
++void CDVDVideoCodecDRMPRIME::Reset()
++{
++  if (!m_pCodecContext)
++    return;
++
++  avcodec_flush_buffers(m_pCodecContext);
++  av_frame_unref(m_pFrame);
++  m_codecControlFlags = 0;
++}
++
++void CDVDVideoCodecDRMPRIME::Drain()
++{
++  AVPacket avpkt;
++  av_init_packet(&avpkt);
++  avpkt.data = nullptr;
++  avpkt.size = 0;
++  avcodec_send_packet(m_pCodecContext, &avpkt);
++}
++
++void CDVDVideoCodecDRMPRIME::SetPictureParams(VideoPicture* pVideoPicture)
++{
++  pVideoPicture->iWidth = m_pFrame->width;
++  pVideoPicture->iHeight = m_pFrame->height;
++
++  double aspect_ratio = (float)pVideoPicture->iWidth / (float)pVideoPicture->iHeight;
++  pVideoPicture->iDisplayWidth = ((int)lrint(pVideoPicture->iHeight * aspect_ratio)) & -3;
++  pVideoPicture->iDisplayHeight = pVideoPicture->iHeight;
++  if (pVideoPicture->iDisplayWidth > pVideoPicture->iWidth)
++  {
++    pVideoPicture->iDisplayWidth = pVideoPicture->iWidth;
++    pVideoPicture->iDisplayHeight = ((int)lrint(pVideoPicture->iWidth / aspect_ratio)) & -3;
++  }
++
++  pVideoPicture->color_range = m_pFrame->color_range;
++  pVideoPicture->color_primaries = m_pFrame->color_primaries;
++  pVideoPicture->color_transfer = m_pFrame->color_trc;
++  pVideoPicture->color_matrix = m_pFrame->colorspace;
++
++  pVideoPicture->iFlags = 0;
++  pVideoPicture->iFlags |= m_pFrame->interlaced_frame ? DVP_FLAG_INTERLACED : 0;
++  pVideoPicture->iFlags |= m_pFrame->top_field_first ? DVP_FLAG_TOP_FIELD_FIRST: 0;
++  pVideoPicture->iFlags |= m_pFrame->data[0] ? 0 : DVP_FLAG_DROPPED;
++
++  int64_t pts = m_pFrame->pts;
++  if (pts == AV_NOPTS_VALUE)
++    pts = av_frame_get_best_effort_timestamp(m_pFrame);
++  pVideoPicture->pts = (pts == AV_NOPTS_VALUE) ? DVD_NOPTS_VALUE : (double)pts * DVD_TIME_BASE / AV_TIME_BASE;
++  pVideoPicture->dts = DVD_NOPTS_VALUE;
++}
++
++CDVDVideoCodec::VCReturn CDVDVideoCodecDRMPRIME::GetPicture(VideoPicture* pVideoPicture)
++{
++  if (m_codecControlFlags & DVD_CODEC_CTRL_DRAIN)
++    Drain();
++
++  int ret = avcodec_receive_frame(m_pCodecContext, m_pFrame);
++  if (ret == AVERROR(EAGAIN))
++    return VC_BUFFER;
++  else if (ret == AVERROR_EOF)
++    return VC_EOF;
++  else if (ret)
++  {
++    CLog::Log(LOGERROR, "CDVDVideoCodecDRMPRIME::%s - receive frame failed, ret:%d", __FUNCTION__, ret);
++    return VC_ERROR;
++  }
++
++  if (pVideoPicture->videoBuffer)
++    pVideoPicture->videoBuffer->Release();
++  pVideoPicture->videoBuffer = nullptr;
++
++  SetPictureParams(pVideoPicture);
++
++  CVideoBufferDRMPRIME* buffer = dynamic_cast<CVideoBufferDRMPRIME*>(m_videoBufferPool->Get());
++  buffer->SetRef(m_pFrame);
++  pVideoPicture->videoBuffer = buffer;
++
++  return VC_PICTURE;
++}
+diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecDRMPRIME.h b/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecDRMPRIME.h
+new file mode 100644
+index 000000000000..12c0f6d505c1
+--- /dev/null
++++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecDRMPRIME.h
+@@ -0,0 +1,79 @@
++/*
++ *      Copyright (C) 2017 Team Kodi
++ *      http://kodi.tv
++ *
++ *  This Program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation; either version 2, or (at your option)
++ *  any later version.
++ *
++ *  This Program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this Program; see the file COPYING.  If not, see
++ *  <http://www.gnu.org/licenses/>.
++ *
++ */
++
++#pragma once
++
++#include <memory>
++#include "cores/VideoPlayer/DVDStreamInfo.h"
++#include "cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodec.h"
++#include "cores/VideoPlayer/Process/VideoBuffer.h"
++
++extern "C" {
++#include "libavutil/frame.h"
++#include "libavutil/hwcontext_drm.h"
++}
++
++class CVideoBufferPoolDRMPRIME;
++
++class CVideoBufferDRMPRIME
++  : public CVideoBuffer
++{
++public:
++  CVideoBufferDRMPRIME(IVideoBufferPool& pool, int id);
++  virtual ~CVideoBufferDRMPRIME();
++  void SetRef(AVFrame* frame);
++  void Unref();
++
++  AVDRMFrameDescriptor* GetDescriptor() const { return reinterpret_cast<AVDRMFrameDescriptor*>(m_pFrame->data[0]); }
++  uint32_t GetWidth() const { return m_pFrame->width; }
++  uint32_t GetHeight() const { return m_pFrame->height; }
++protected:
++  AVFrame* m_pFrame = nullptr;
++};
++
++class CDVDVideoCodecDRMPRIME
++  : public CDVDVideoCodec
++{
++public:
++  explicit CDVDVideoCodecDRMPRIME(CProcessInfo& processInfo);
++  ~CDVDVideoCodecDRMPRIME() override;
++
++  static CDVDVideoCodec* Create(CProcessInfo& processInfo);
++  static void Register();
++
++  bool Open(CDVDStreamInfo& hints, CDVDCodecOptions& options) override;
++  bool AddData(const DemuxPacket& packet) override;
++  void Reset() override;
++  CDVDVideoCodec::VCReturn GetPicture(VideoPicture* pVideoPicture) override;
++  const char* GetName() override { return m_name.c_str(); };
++  unsigned GetAllowedReferences() override { return 4; };
++  void SetCodecControl(int flags) override { m_codecControlFlags = flags; };
++
++protected:
++  virtual AVCodec* FindDecoder(CDVDStreamInfo& hints);
++  virtual void Drain();
++  virtual void SetPictureParams(VideoPicture* pVideoPicture);
++
++  std::string m_name;
++  int m_codecControlFlags = 0;
++  AVCodecContext* m_pCodecContext = nullptr;
++  AVFrame* m_pFrame = nullptr;
++  std::shared_ptr<CVideoBufferPoolDRMPRIME> m_videoBufferPool;
++};
+
+From 87a78397851704996e730cf3accff82a5a342d83 Mon Sep 17 00:00:00 2001
+From: Jonas Karlman <jonas@kwiboo.se>
+Date: Sun, 12 Nov 2017 16:53:11 +0100
+Subject: [PATCH 6/8] VideoPlayer: add DRM PRIME renderer
+
+---
+ .../VideoRenderers/HwDecRender/CMakeLists.txt      |   5 +
+ .../HwDecRender/RendererDRMPRIME.cpp               | 165 +++++++++++++++++++++
+ .../VideoRenderers/HwDecRender/RendererDRMPRIME.h  |  71 +++++++++
+ 3 files changed, 241 insertions(+)
+ create mode 100644 xbmc/cores/VideoPlayer/VideoRenderers/HwDecRender/RendererDRMPRIME.cpp
+ create mode 100644 xbmc/cores/VideoPlayer/VideoRenderers/HwDecRender/RendererDRMPRIME.h
+
+diff --git a/xbmc/cores/VideoPlayer/VideoRenderers/HwDecRender/CMakeLists.txt b/xbmc/cores/VideoPlayer/VideoRenderers/HwDecRender/CMakeLists.txt
+index 3f8115171021..d9f5fa8373f3 100644
+--- a/xbmc/cores/VideoPlayer/VideoRenderers/HwDecRender/CMakeLists.txt
++++ b/xbmc/cores/VideoPlayer/VideoRenderers/HwDecRender/CMakeLists.txt
+@@ -49,6 +49,11 @@ if(CORE_SYSTEM_NAME STREQUAL android)
+                       RendererMediaCodecSurface.h)
+ endif()
+ 
++if(CORE_PLATFORM_NAME_LC STREQUAL gbm)
++  list(APPEND SOURCES RendererDRMPRIME.cpp)
++  list(APPEND HEADERS RendererDRMPRIME.h)
++endif()
++
+ # we might want to build on linux systems
+ # with ENABLE_VDPAU=OFF and ENABLE_VAAPI=OFF
+ if(SOURCES)
+diff --git a/xbmc/cores/VideoPlayer/VideoRenderers/HwDecRender/RendererDRMPRIME.cpp b/xbmc/cores/VideoPlayer/VideoRenderers/HwDecRender/RendererDRMPRIME.cpp
+new file mode 100644
+index 000000000000..1de70b8e6ce5
+--- /dev/null
++++ b/xbmc/cores/VideoPlayer/VideoRenderers/HwDecRender/RendererDRMPRIME.cpp
+@@ -0,0 +1,165 @@
++/*
++ *      Copyright (C) 2017 Team Kodi
++ *      http://kodi.tv
++ *
++ *  This Program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation; either version 2, or (at your option)
++ *  any later version.
++ *
++ *  This Program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this Program; see the file COPYING.  If not, see
++ *  <http://www.gnu.org/licenses/>.
++ *
++ */
++
++#include "RendererDRMPRIME.h"
++
++#include "cores/VideoPlayer/VideoRenderers/RenderCapture.h"
++#include "cores/VideoPlayer/VideoRenderers/RenderFactory.h"
++#include "utils/log.h"
++
++CRendererDRMPRIME::CRendererDRMPRIME()
++{
++}
++
++CRendererDRMPRIME::~CRendererDRMPRIME()
++{
++  Reset();
++}
++
++CBaseRenderer* CRendererDRMPRIME::Create(CVideoBuffer* buffer)
++{
++  if (buffer && dynamic_cast<CVideoBufferDRMPRIME*>(buffer))
++    return new CRendererDRMPRIME();
++
++  return nullptr;
++}
++
++bool CRendererDRMPRIME::Register()
++{
++  VIDEOPLAYER::CRendererFactory::RegisterRenderer("drm_prime", CRendererDRMPRIME::Create);
++  return true;
++}
++
++bool CRendererDRMPRIME::Configure(const VideoPicture& picture, float fps, unsigned flags, unsigned int orientation)
++{
++  m_format = picture.videoBuffer->GetFormat();
++  m_sourceWidth = picture.iWidth;
++  m_sourceHeight = picture.iHeight;
++  m_renderOrientation = orientation;
++
++  // Save the flags.
++  m_iFlags = flags;
++
++  // Calculate the input frame aspect ratio.
++  CalculateFrameAspectRatio(picture.iDisplayWidth, picture.iDisplayHeight);
++  SetViewMode(m_videoSettings.m_ViewMode);
++  ManageRenderArea();
++
++  Reset();
++
++  m_bConfigured = true;
++  return true;
++}
++
++void CRendererDRMPRIME::AddVideoPicture(const VideoPicture& picture, int index, double currentClock)
++{
++  BUFFER& buf = m_buffers[index];
++  buf.videoBuffer = picture.videoBuffer;
++  buf.videoBuffer->Acquire();
++}
++
++void CRendererDRMPRIME::Reset()
++{
++  for (int i = 0; i < m_numRenderBuffers; i++)
++    ReleaseBuffer(i);
++
++  m_iLastRenderBuffer = -1;
++}
++
++void CRendererDRMPRIME::ReleaseBuffer(int index)
++{
++  BUFFER& buf = m_buffers[index];
++  if (buf.videoBuffer)
++  {
++    CVideoBufferDRMPRIME* buffer = dynamic_cast<CVideoBufferDRMPRIME*>(buf.videoBuffer);
++    if (buffer)
++      buffer->Release();
++    buf.videoBuffer = nullptr;
++  }
++}
++
++bool CRendererDRMPRIME::NeedBuffer(int index)
++{
++  return m_iLastRenderBuffer == index;
++}
++
++CRenderInfo CRendererDRMPRIME::GetRenderInfo()
++{
++  CRenderInfo info;
++  info.max_buffer_size = m_numRenderBuffers;
++  info.optimal_buffer_size = m_numRenderBuffers;
++  info.opaque_pointer = (void*)this;
++  return info;
++}
++
++void CRendererDRMPRIME::Update()
++{
++  if (!m_bConfigured)
++    return;
++
++  ManageRenderArea();
++}
++
++void CRendererDRMPRIME::RenderUpdate(int index, int index2, bool clear, unsigned int flags, unsigned int alpha)
++{
++  if (m_iLastRenderBuffer == index)
++    return;
++
++  CVideoBufferDRMPRIME* buffer = dynamic_cast<CVideoBufferDRMPRIME*>(m_buffers[index].videoBuffer);
++  if (buffer)
++    SetVideoPlane(buffer);
++
++  m_iLastRenderBuffer = index;
++}
++
++bool CRendererDRMPRIME::RenderCapture(CRenderCapture* capture)
++{
++  capture->BeginRender();
++  capture->EndRender();
++  return true;
++}
++
++bool CRendererDRMPRIME::ConfigChanged(const VideoPicture& picture)
++{
++  if (picture.videoBuffer->GetFormat() != m_format)
++    return true;
++
++  return false;
++}
++
++bool CRendererDRMPRIME::Supports(ERENDERFEATURE feature)
++{
++  if (feature == RENDERFEATURE_ZOOM ||
++      feature == RENDERFEATURE_STRETCH ||
++      feature == RENDERFEATURE_PIXEL_RATIO)
++    return true;
++
++  return false;
++}
++
++bool CRendererDRMPRIME::Supports(ESCALINGMETHOD method)
++{
++  return false;
++}
++
++void CRendererDRMPRIME::SetVideoPlane(CVideoBufferDRMPRIME* buffer)
++{
++  // TODO: implement
++}
+diff --git a/xbmc/cores/VideoPlayer/VideoRenderers/HwDecRender/RendererDRMPRIME.h b/xbmc/cores/VideoPlayer/VideoRenderers/HwDecRender/RendererDRMPRIME.h
+new file mode 100644
+index 000000000000..5571c0ac2eac
+--- /dev/null
++++ b/xbmc/cores/VideoPlayer/VideoRenderers/HwDecRender/RendererDRMPRIME.h
+@@ -0,0 +1,71 @@
++/*
++ *      Copyright (C) 2017 Team Kodi
++ *      http://kodi.tv
++ *
++ *  This Program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation; either version 2, or (at your option)
++ *  any later version.
++ *
++ *  This Program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this Program; see the file COPYING.  If not, see
++ *  <http://www.gnu.org/licenses/>.
++ *
++ */
++
++#pragma once
++
++#include "system.h"
++
++#include "cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecDRMPRIME.h"
++#include "cores/VideoPlayer/VideoRenderers/BaseRenderer.h"
++
++class CRendererDRMPRIME
++  : public CBaseRenderer
++{
++public:
++  CRendererDRMPRIME();
++  virtual ~CRendererDRMPRIME();
++
++  // Registration
++  static CBaseRenderer* Create(CVideoBuffer* buffer);
++  static bool Register();
++
++  // Player functions
++  bool Configure(const VideoPicture& picture, float fps, unsigned flags, unsigned int orientation) override;
++  bool IsConfigured() override { return m_bConfigured; };
++  void AddVideoPicture(const VideoPicture& picture, int index, double currentClock) override;
++  void UnInit() override {};
++  void Reset() override;
++  void ReleaseBuffer(int idx) override;
++  bool NeedBuffer(int idx) override;
++  bool IsGuiLayer() override { return false; };
++  CRenderInfo GetRenderInfo() override;
++  void Update() override;
++  void RenderUpdate(int index, int index2, bool clear, unsigned int flags, unsigned int alpha) override;
++  bool RenderCapture(CRenderCapture* capture) override;
++  bool ConfigChanged(const VideoPicture& picture) override;
++
++  // Feature support
++  bool SupportsMultiPassRendering() override { return false; };
++  bool Supports(ERENDERFEATURE feature) override;
++  bool Supports(ESCALINGMETHOD method) override;
++
++private:
++  void SetVideoPlane(CVideoBufferDRMPRIME* buffer);
++
++  bool m_bConfigured = false;
++  int m_iLastRenderBuffer = -1;
++  static const int m_numRenderBuffers = 4;
++
++  struct BUFFER
++  {
++    BUFFER() : videoBuffer(nullptr) {};
++    CVideoBuffer* videoBuffer;
++  } m_buffers[m_numRenderBuffers];
++};
+
+From 3855c9dc8e7cc5dbcf194bff94581d44c093557e Mon Sep 17 00:00:00 2001
+From: Jonas Karlman <jonas@kwiboo.se>
+Date: Sun, 12 Nov 2017 16:53:11 +0100
+Subject: [PATCH 7/8] VideoPlayer: add drm legacy support in DRM PRIME renderer
+
+---
+ .../DVDCodecs/Video/DVDVideoCodecDRMPRIME.cpp      | 19 +++++++
+ .../DVDCodecs/Video/DVDVideoCodecDRMPRIME.h        |  3 ++
+ .../HwDecRender/RendererDRMPRIME.cpp               | 62 +++++++++++++++++++++-
+ xbmc/windowing/gbm/DRMUtils.cpp                    |  5 ++
+ xbmc/windowing/gbm/DRMUtils.h                      |  1 +
+ 5 files changed, 89 insertions(+), 1 deletion(-)
+
+diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecDRMPRIME.cpp b/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecDRMPRIME.cpp
+index 008e495ed628..61694ec0b1aa 100644
+--- a/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecDRMPRIME.cpp
++++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecDRMPRIME.cpp
+@@ -23,6 +23,7 @@
+ #include "cores/VideoPlayer/DVDCodecs/DVDFactoryCodec.h"
+ #include "threads/SingleLock.h"
+ #include "utils/log.h"
++#include "windowing/gbm/DRMUtils.h"
+ 
+ extern "C" {
+ #include "libavcodec/avcodec.h"
+@@ -52,6 +53,24 @@ void CVideoBufferDRMPRIME::SetRef(AVFrame* frame)
+ 
+ void CVideoBufferDRMPRIME::Unref()
+ {
++  struct drm* drm = CDRMUtils::GetDrm();
++
++  if (m_fb_id)
++  {
++    drmModeRmFB(drm->fd, m_fb_id);
++    m_fb_id = 0;
++  }
++
++  for (int i = 0; i < AV_DRM_MAX_PLANES; i++)
++  {
++    if (m_handles[i])
++    {
++      struct drm_gem_close gem_close = { .handle = m_handles[i] };
++      drmIoctl(drm->fd, DRM_IOCTL_GEM_CLOSE, &gem_close);
++      m_handles[i] = 0;
++    }
++  }
++
+   av_frame_unref(m_pFrame);
+ }
+ 
+diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecDRMPRIME.h b/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecDRMPRIME.h
+index 12c0f6d505c1..3a94bd94e1c7 100644
+--- a/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecDRMPRIME.h
++++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecDRMPRIME.h
+@@ -41,6 +41,9 @@ class CVideoBufferDRMPRIME
+   void SetRef(AVFrame* frame);
+   void Unref();
+ 
++  uint32_t m_fb_id = 0;
++  uint32_t m_handles[AV_DRM_MAX_PLANES] = {0};
++
+   AVDRMFrameDescriptor* GetDescriptor() const { return reinterpret_cast<AVDRMFrameDescriptor*>(m_pFrame->data[0]); }
+   uint32_t GetWidth() const { return m_pFrame->width; }
+   uint32_t GetHeight() const { return m_pFrame->height; }
+diff --git a/xbmc/cores/VideoPlayer/VideoRenderers/HwDecRender/RendererDRMPRIME.cpp b/xbmc/cores/VideoPlayer/VideoRenderers/HwDecRender/RendererDRMPRIME.cpp
+index 1de70b8e6ce5..5ea349c0372f 100644
+--- a/xbmc/cores/VideoPlayer/VideoRenderers/HwDecRender/RendererDRMPRIME.cpp
++++ b/xbmc/cores/VideoPlayer/VideoRenderers/HwDecRender/RendererDRMPRIME.cpp
+@@ -23,6 +23,7 @@
+ #include "cores/VideoPlayer/VideoRenderers/RenderCapture.h"
+ #include "cores/VideoPlayer/VideoRenderers/RenderFactory.h"
+ #include "utils/log.h"
++#include "windowing/gbm/DRMUtils.h"
+ 
+ CRendererDRMPRIME::CRendererDRMPRIME()
+ {
+@@ -161,5 +162,64 @@ bool CRendererDRMPRIME::Supports(ESCALINGMETHOD method)
+ 
+ void CRendererDRMPRIME::SetVideoPlane(CVideoBufferDRMPRIME* buffer)
+ {
+-  // TODO: implement
++  AVDRMFrameDescriptor* descriptor = buffer->GetDescriptor();
++  if (descriptor && descriptor->nb_layers)
++  {
++    uint32_t handles[4] = {0}, pitches[4] = {0}, offsets[4] = {0};
++    struct drm* drm = CDRMUtils::GetDrm();
++    int ret;
++
++    // convert Prime FD to GEM handle
++    for (int object = 0; object < descriptor->nb_objects; object++)
++    {
++      ret = drmPrimeFDToHandle(drm->fd, descriptor->objects[object].fd, &buffer->m_handles[object]);
++      if (ret < 0)
++      {
++        CLog::Log(LOGERROR, "CRendererDRMPRIME::%s - failed to retrieve the GEM handle from prime fd %d, ret = %d", __FUNCTION__, descriptor->objects[object].fd, ret);
++        return;
++      }
++    }
++
++    AVDRMLayerDescriptor* layer = &descriptor->layers[0];
++
++    for (int plane = 0; plane < layer->nb_planes; plane++)
++    {
++      uint32_t handle = buffer->m_handles[layer->planes[plane].object_index];
++      if (handle && layer->planes[plane].pitch)
++      {
++        handles[plane] = handle;
++        pitches[plane] = layer->planes[plane].pitch;
++        offsets[plane] = layer->planes[plane].offset;
++      }
++    }
++
++    // add the video frame FB
++    ret = drmModeAddFB2(drm->fd, buffer->GetWidth(), buffer->GetHeight(), layer->format, handles, pitches, offsets, &buffer->m_fb_id, 0);
++    if (ret < 0)
++    {
++      CLog::Log(LOGERROR, "CRendererDRMPRIME::%s - failed to add drm layer %d, ret = %d", __FUNCTION__, buffer->m_fb_id, ret);
++      return;
++    }
++
++    int32_t crtc_x = (int32_t)m_destRect.x1;
++    int32_t crtc_y = (int32_t)m_destRect.y1;
++    uint32_t crtc_w = (uint32_t)m_destRect.Width();
++    uint32_t crtc_h = (uint32_t)m_destRect.Height();
++    uint32_t src_x = 0;
++    uint32_t src_y = 0;
++    uint32_t src_w = buffer->GetWidth() << 16;
++    uint32_t src_h = buffer->GetHeight() << 16;
++
++    // TODO: use atomic or legacy api
++
++    // show the video frame FB on the video plane
++    ret = drmModeSetPlane(drm->fd, drm->video_plane_id, drm->crtc_id, buffer->m_fb_id, 0,
++                          crtc_x, crtc_y, crtc_w, crtc_h,
++                          src_x, src_y, src_w, src_h);
++    if (ret < 0)
++    {
++      CLog::Log(LOGERROR, "CRendererDRMPRIME::%s - failed to set drm plane %d, buffer = %d, ret = %d", __FUNCTION__, drm->video_plane_id, buffer->m_fb_id, ret);
++      return;
++    }
++  }
+ }
+diff --git a/xbmc/windowing/gbm/DRMUtils.cpp b/xbmc/windowing/gbm/DRMUtils.cpp
+index 000dcfeb505a..2ce1f3e70ce2 100644
+--- a/xbmc/windowing/gbm/DRMUtils.cpp
++++ b/xbmc/windowing/gbm/DRMUtils.cpp
+@@ -43,6 +43,11 @@ static drmModeConnectorPtr m_drm_connector = nullptr;
+ static drmModeEncoderPtr m_drm_encoder = nullptr;
+ static drmModeCrtcPtr m_orig_crtc = nullptr;
+ 
++struct drm *CDRMUtils::GetDrm()
++{
++  return m_drm;
++}
++
+ void CDRMUtils::WaitVBlank()
+ {
+   drmVBlank vbl;
+diff --git a/xbmc/windowing/gbm/DRMUtils.h b/xbmc/windowing/gbm/DRMUtils.h
+index 841a2757941d..16d8a495e1ca 100644
+--- a/xbmc/windowing/gbm/DRMUtils.h
++++ b/xbmc/windowing/gbm/DRMUtils.h
+@@ -70,6 +70,7 @@ class CDRMUtils
+   static bool GetModes(std::vector<RESOLUTION_INFO> &resolutions);
+   static bool SetMode(RESOLUTION_INFO res);
+   static void WaitVBlank();
++  static struct drm *GetDrm();
+ 
+ protected:
+   static drm_fb * DrmFbGetFromBo(struct gbm_bo *bo);
+
+From 2f2be4a287254091aeab130c809126dfb26a7b2c Mon Sep 17 00:00:00 2001
+From: Jonas Karlman <jonas@kwiboo.se>
+Date: Sun, 12 Nov 2017 16:53:11 +0100
+Subject: [PATCH 8/8] windowing/gbm: register DRM PRIME video codec and
+ renderer
+
+---
+ xbmc/windowing/gbm/WinSystemGbmGLESContext.cpp | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/xbmc/windowing/gbm/WinSystemGbmGLESContext.cpp b/xbmc/windowing/gbm/WinSystemGbmGLESContext.cpp
+index fb7da6a11772..90a2faca7a97 100644
+--- a/xbmc/windowing/gbm/WinSystemGbmGLESContext.cpp
++++ b/xbmc/windowing/gbm/WinSystemGbmGLESContext.cpp
+@@ -24,6 +24,9 @@
+ #include "cores/VideoPlayer/VideoRenderers/HwDecRender/RendererVAAPIGLES.h"
+ #endif
+ 
++#include "cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecDRMPRIME.h"
++#include "cores/VideoPlayer/VideoRenderers/HwDecRender/RendererDRMPRIME.h"
++
+ #include "cores/RetroPlayer/process/RPProcessInfo.h"
+ #include "cores/RetroPlayer/rendering/VideoRenderers/RPRendererGuiTexture.h"
+ #include "cores/VideoPlayer/DVDCodecs/DVDFactoryCodec.h"
+@@ -62,6 +65,9 @@ bool CWinSystemGbmGLESContext::InitWindowSystem()
+   }
+ #endif
+ 
++  CRendererDRMPRIME::Register();
++  CDVDVideoCodecDRMPRIME::Register();
++
+   return true;
+ }
+ 

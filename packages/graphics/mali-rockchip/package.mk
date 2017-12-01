@@ -27,7 +27,7 @@ PKG_SOURCE_DIR="libmali-$PKG_VERSION*"
 PKG_SECTION="graphics"
 PKG_SHORTDESC="mali-rockchip: OpenGL ES user-space binary for the ARM Mali GPU family"
 PKG_LONGDESC="mali-rockchip: OpenGL ES user-space binary for the ARM Mali GPU family"
-PKG_AUTORECONF="no"
+PKG_TOOLCHAIN="manual"
 
 if [ "$TARGET_ARCH" = "arm" ]; then
   PKG_MALI_ARCH="arm-linux-gnueabihf"
@@ -65,10 +65,13 @@ configure_target() {
   fi
 }
 
+<<<<<<< HEAD
 make_target() {
   : # nothing
 }
 
+=======
+>>>>>>> 77e894e22b733a81d45dcd45d59a1977c749d339
 makeinstall_target() {
   cd $PKG_BUILD
 

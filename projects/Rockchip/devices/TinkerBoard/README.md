@@ -15,7 +15,7 @@ This is an experimental project for the ASUS Tinker Board
 * [ ] Video
   * [x] Software decoding
   * [ ] Hardware decoding
-    * [ ] h264 / hevc / vp8
+    * [x] h264 / hevc / vp8
     * [ ] mpeg4 / mpeg2
 * [ ] HDMI Video Format
   * [x] RGB 4:4:4 Limited Range

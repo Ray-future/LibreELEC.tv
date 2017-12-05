@@ -18,8 +18,8 @@
 ################################################################################
 
 PKG_NAME="u-boot"
-PKG_VERSION="2017.11-rc3"
-PKG_SHA256="150ce66648460a343407cbf3a3037f8e45d2441847660d17f65bbbf5cc4111e4"
+PKG_VERSION="2017.11"
+PKG_SHA256="6a018fd3caf58f3dcfa23ee989a82bd35df03af71872b9dca8c6d758a0d26c05"
 PKG_ARCH="arm aarch64"
 PKG_SITE="https://www.denx.de/wiki/U-Boot"
 PKG_URL="http://ftp.denx.de/pub/u-boot/u-boot-$PKG_VERSION.tar.bz2"

@@ -161,6 +161,7 @@ configure_target() {
               $FFMPEG_VDPAU \
               $FFMPEG_RKMPP \
               $FFMPEG_RPI \
+              $FFMPEG_RKMPP \
               --disable-dxva2 \
               --enable-runtime-cpudetect \
               $FFMPEG_TABLES \

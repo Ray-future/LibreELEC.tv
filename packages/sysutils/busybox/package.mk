@@ -156,13 +156,11 @@ makeinstall_target() {
     cp $PKG_DIR/scripts/createlog $INSTALL/usr/bin/
     cp $PKG_DIR/scripts/lsb_release $INSTALL/usr/bin/
     cp $PKG_DIR/scripts/apt-get $INSTALL/usr/bin/
-    cp --remove-destination $PKG_DIR/scripts/passwd $INSTALL/usr/bin/
     cp $PKG_DIR/scripts/sudo $INSTALL/usr/bin/
     cp $PKG_DIR/scripts/pastebinit $INSTALL/usr/bin/
     ln -sf pastebinit $INSTALL/usr/bin/paste
 
   mkdir -p $INSTALL/usr/lib/libreelec
-    cp $PKG_DIR/scripts/passwd-config $INSTALL/usr/lib/libreelec
     cp $PKG_DIR/scripts/functions $INSTALL/usr/lib/libreelec
     cp $PKG_DIR/scripts/fs-resize $INSTALL/usr/lib/libreelec
     sed -e "s/@DISTRONAME@/$DISTRONAME/g" \
@@ -198,7 +196,7 @@ post_install() {
   ROOT_PWD="`$TOOLCHAIN/bin/cryptpw -m sha512 $ROOT_PASSWORD`"
 
   echo "chmod 4755 $INSTALL/usr/bin/busybox" >> $FAKEROOT_SCRIPT
-  echo "chmod 000 $INSTALL/etc/shadow.ro" >> $FAKEROOT_SCRIPT
+  echo "chmod 000 $INSTALL/usr/cache/shadow" >> $FAKEROOT_SCRIPT
 
   add_user root "$ROOT_PWD" 0 0 "Root User" "/storage" "/bin/sh"
   add_group root 0
@@ -213,7 +211,6 @@ post_install() {
   enable_service var.mount
   enable_service var-log-debug.service
   enable_service fs-resize.service
-  enable_service passwd-config.service
 
   # cron support
   if [ "$CRON_SUPPORT" = "yes" ] ; then

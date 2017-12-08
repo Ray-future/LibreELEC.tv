@@ -1,11 +1,11 @@
 [Unit]
-Description=Setup password config files
+Description=Setup User cache dir
 DefaultDependencies=no
 After=systemd-tmpfiles-setup.service
 
 [Service]
 Type=oneshot
-ExecStart=/bin/sh -c "exec /bin/sh /usr/lib/libreelec/passwd-config"
+ExecStart=/usr/bin/usercache-setup
 RemainAfterExit=yes
 
 [Install]

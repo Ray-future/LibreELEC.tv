@@ -17,9 +17,9 @@
 ################################################################################
 
 PKG_NAME="visualization.waveform"
-PKG_VERSION="8204be7"
-PKG_SHA256="457d861a8ef5a054339effe803b4aae801256282b098db63ae45aa90a9c30c9e"
-PKG_REV="7"
+PKG_VERSION="9a8112f"
+PKG_SHA256="067b90a64562bf314699a777fea8f0b120904a78b69057e7b4744fe4dc1b25b3"
+PKG_REV="8"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="http://www.kodi.tv"

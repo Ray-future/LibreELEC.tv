@@ -17,8 +17,8 @@
 ################################################################################
 
 PKG_NAME="kernel-firmware"
-PKG_VERSION="7d2c913"
-PKG_SHA256="fd127d2e36d8a0d2c1e9f70b37d7e31350260fb0755485d9a8c50638596f1791"
+PKG_VERSION="7f93c9d"
+PKG_SHA256="917bb5a48294e83769f5ee17340eabc936e549ce1b0ae5df14cdd00d4c6940f2"
 PKG_ARCH="any"
 PKG_LICENSE="other"
 PKG_SITE="https://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.git/"
@@ -60,5 +60,5 @@ makeinstall_target() {
   done
 
   # The following file is installed by brcmfmac_sdio-firmware-rpi
-  rm -fr $FW_TARGET_DIR/brcm/brcmfmac43430-sdio.bin
+  rm -fr $FW_TARGET_DIR/brcm/brcmfmac43430*-sdio.bin
 }

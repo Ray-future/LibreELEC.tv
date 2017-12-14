@@ -1,12 +1,12 @@
 To create your own set of Netfilters you can save your rules in:
-/storage/.config/iptables/localrules.v4 for ipv4
-and /storage/.config/iptables/localrules.v6 for ipv6
+/storage/.config/iptables/rules.v4 for ipv4
+and /storage/.config/iptables/rules.v6 for ipv6
 
 You can alter tables and save them with:
 
-iptables-save /storage/.config/iptables/localrules.v4
+iptables-save /storage/.config/iptables/rules.v4
 and/or
-ip6tables-save /storage/.config/iptables/localrules.v6
+ip6tables-save /storage/.config/iptables/rules.v6
 
 If you want to disable iptables systemd service you can use 
 the following command:

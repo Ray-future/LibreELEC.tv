@@ -20,8 +20,8 @@
 IPTABLES4="/usr/sbin/iptables"
 IPTABLES6="/usr/sbin/ip6tables"
 IPTABLES_CMDS="$IPTABLES4 $IPTABLES6"
-GLOBAL_RULES="/etc/iptables/globalrules.v"
-LOCAL_RULES="/storage/.config/iptables/localrules.v"
+GLOBAL_RULES="/etc/iptables/rules.v"
+LOCAL_RULES="/storage/.config/iptables/rules.v"
 
 if [ -e "${LOCAL_RULES}4" ]; then
   RULES4="${LOCAL_RULES}4"
@@ -35,34 +35,37 @@ else
   RULES6="${GLOBAL_RULES}6"
 fi
 
-flush() {
-  if [ "$1" = "4" ]; then
-    $IPTABLES4 -F
-    $IPTABLES4 -X
-    $IPTABLES4 -t nat -F
-    $IPTABLES4 -t nat -X
-    $IPTABLES4 -t mangle -F
-    $IPTABLES4 -t mangle -X
-    $IPTABLES4 -P INPUT ACCEPT
-    $IPTABLES4 -P FORWARD ACCEPT
-    $IPTABLES4 -P OUTPUT ACCEPT
-  elif [ "$1" = "6" ]; then
-    $IPTABLES6 -F
-    $IPTABLES6 -X
-    $IPTABLES6 -t nat -F
-    $IPTABLES6 -t nat -X
-    $IPTABLES6 -t mangle -F
-    $IPTABLES6 -t mangle -X
-    $IPTABLES6 -P INPUT ACCEPT
-    $IPTABLES6 -P FORWARD ACCEPT
-    $IPTABLES6 -P OUTPUT ACCEPT
-  fi
+check_docker() {
+    if [ "`/usr/bin/systemctl is-active docker.service`" == "active" ]; then
+	/usr/bin/systemctl restart docker
+    fi
 }
 
-load() {
-  cur_rules=`mktemp`
-  sav_rules=`mktemp`
+check_tether() {
+    if [ -n "`/usr/bin/connmanctl technologies|grep 'Tethering = True'`" ]; then
+	/usr/bin/connmanctl tether wifi off
+	sleep 1
+	/usr/bin/connmanctl tether wifi on
+    fi
+}
 
+flush() {
+  for cmd in $IPTABLES_CMDS; do
+    $cmd -F
+    $cmd -X
+    $cmd -t nat -F
+    $cmd -t nat -X
+    $cmd -t mangle -F
+    $cmd -t mangle -X
+    $cmd -P INPUT ACCEPT
+    $cmd -P FORWARD ACCEPT
+    $cmd -P OUTPUT ACCEPT
+  done
+  check_docker
+  check_tether
+}
+
+enable() {
   for cmd in $IPTABLES_CMDS; do
     case "$cmd" in
       *6*) 
@@ -74,28 +77,16 @@ load() {
 	 ipv="4"
 	 ;;
     esac
-    "$cmd-save" | sed -e '/^[#]/d; s/\[\([^]]*\)\]//g' > "$cur_rules"
-    if [ -e "$rules" ]; then
-      "$cmd-restore" "$rules" 
-      "$cmd-save" | sed -e '/^[#]/d; s/\[\([^]]*\)\]//g' | grep -Ev "(^\*filter$|^\*mangle$|^\*nat$|^COMMIT$)" > "$sav_rules"
-      flush "$ipv"
-      grep -vf "$sav_rules" "$cur_rules" | "$cmd-restore" -n
-      if [ "$1" = "restore" ]; then
-        "$cmd-restore" -n "$rules" 
-      fi
-    fi
+    "$cmd-restore" "$rules" 
   done
-
-  rm -f "$cur_rules" "$sav_rules"
+  check_docker
+  check_tether
 }
 
 if [ "$1" = "enable" ]; then
-  load "restore"
+  enable
 elif [ "$1" = "disable" ]; then
-  load
-elif [ "$1" = "flush" ]; then
-  flush "4"
-  flush "6"
+  flush
 else
   exit 1
 fi

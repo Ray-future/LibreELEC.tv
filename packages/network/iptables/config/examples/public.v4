@@ -5,6 +5,7 @@
 :FORWARD ACCEPT [0:0]
 :OUTPUT ACCEPT [0:0]
 :POSTROUTING ACCEPT [0:0]
+:DOCKER-USER - [0:0]
 COMMIT
 *nat
 :PREROUTING ACCEPT [0:0]
@@ -26,4 +27,7 @@ COMMIT
 -A FORWARD -i tether -s 10.0.0.0/8,172.16.0.0/12,192.168.0.0/16 -m conntrack --ctstate NEW -j ACCEPT
 -A FORWARD -i tether -s 10.0.0.0/8,172.16.0.0/12,192.168.0.0/16 -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
 -A FORWARD -o tether -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
+# Block DOCKER
+-A DOCKER-USER -m conntrack --ctstate RELATED,ESTABLISHED -j RETURN
+-A DOCKER-USER -j REJECT --reject-with icmp-port-unreachable
 COMMIT

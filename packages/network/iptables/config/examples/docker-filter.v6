@@ -1,6 +1,0 @@
-*filter
--A FORWARD -j DOCKER-USER
--A DOCKER-USER -m conntrack --ctstate RELATED,ESTABLISHED -j RETURN                       
--A DOCKER-USER -s fc00::/7 -m conntrack --ctstate NEW -j RETURN                         
--A DOCKER-USER -j DROP
-COMMIT

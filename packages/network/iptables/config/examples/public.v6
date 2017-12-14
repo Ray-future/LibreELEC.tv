@@ -16,6 +16,7 @@ COMMIT
 :INPUT DROP [0:0]
 :FORWARD DROP [0:0]
 :OUTPUT DROP [0:0]
+:DOCKER-USER - [0:0]
 -A OUTPUT -m conntrack --ctstate NEW -j ACCEPT
 -A OUTPUT -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
 -A INPUT -i lo -j ACCEPT
@@ -26,4 +27,6 @@ COMMIT
 -A FORWARD -i tether -s fc00::/7 -m conntrack --ctstate NEW -j ACCEPT
 -A FORWARD -i tether -s fc00::/7 -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
 -A FORWARD -o tether -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
+-A DOCKER-USER -m conntrack --ctstate RELATED,ESTABLISHED -j RETURN
+-A DOCKER-USER -j REJECT --reject-with icmp6-port-unreachable
 COMMIT

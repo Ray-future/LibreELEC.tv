@@ -48,7 +48,7 @@ make_target() {
     imx6)
       make platform=imx6
       ;;
-    WeTek_Play|WeTek_Core|Odroid_C2|WeTek_Hub|WeTek_Play_2)
+    WeTek_Play|WeTek_Core|Odroid_C2|WeTek_Hub|WeTek_Play_2|Rockchip)
       if [ "$TARGET_ARCH" = "aarch64" ]; then
         make platform=aarch64
       else

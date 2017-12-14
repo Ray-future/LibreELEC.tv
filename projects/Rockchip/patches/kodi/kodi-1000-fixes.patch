@@ -1,0 +1,51 @@
+From 01ee4ec5d27b74463e637429515159a340b6d4f2 Mon Sep 17 00:00:00 2001
+From: Jonas Karlman <jonas@kwiboo.se>
+Date: Wed, 13 Dec 2017 07:12:58 +0100
+Subject: [PATCH 1/2] windowing/gbm: use first overlay plane
+
+---
+ xbmc/windowing/gbm/DRMUtils.cpp | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/xbmc/windowing/gbm/DRMUtils.cpp b/xbmc/windowing/gbm/DRMUtils.cpp
+index c5ffb95c95..376388db0f 100644
+--- a/xbmc/windowing/gbm/DRMUtils.cpp
++++ b/xbmc/windowing/gbm/DRMUtils.cpp
+@@ -306,12 +306,12 @@ bool CDRMUtils::GetPlanes()
+       {
+         drmModePropertyPtr p = drmModeGetProperty(m_fd, props->props[j]);
+ 
+-        if ((strcmp(p->name, "type") == 0) && (props->prop_values[j] == DRM_PLANE_TYPE_PRIMARY))
++        if ((strcmp(p->name, "type") == 0) && (props->prop_values[j] == DRM_PLANE_TYPE_PRIMARY) && primary_plane_id == -1)
+         {
+           CLog::Log(LOGDEBUG, "CDRMUtils::%s - found primary plane: %d", __FUNCTION__, id);
+           primary_plane_id = id;
+         }
+-        else if ((strcmp(p->name, "type") == 0) && (props->prop_values[j] == DRM_PLANE_TYPE_OVERLAY))
++        else if ((strcmp(p->name, "type") == 0) && (props->prop_values[j] == DRM_PLANE_TYPE_OVERLAY) && overlay_plane_id == -1)
+         {
+           CLog::Log(LOGDEBUG, "CDRMUtils::%s - found overlay plane: %d", __FUNCTION__, id);
+           overlay_plane_id = id;
+
+From 00c9ab5eb179251c985cf5de790bf581c3c37231 Mon Sep 17 00:00:00 2001
+From: Jonas Karlman <jonas@kwiboo.se>
+Date: Wed, 13 Dec 2017 07:14:58 +0100
+Subject: [PATCH 2/2] windowing/gbm: fix fractal mode detection
+
+---
+ xbmc/windowing/gbm/DRMUtils.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/xbmc/windowing/gbm/DRMUtils.cpp b/xbmc/windowing/gbm/DRMUtils.cpp
+index 376388db0f..5d1a5159bd 100644
+--- a/xbmc/windowing/gbm/DRMUtils.cpp
++++ b/xbmc/windowing/gbm/DRMUtils.cpp
+@@ -613,7 +613,7 @@ bool CDRMUtils::GetModes(std::vector<RESOLUTION_INFO> &resolutions)
+     res.iHeight = m_connector->connector->modes[i].vdisplay;
+     res.iScreenWidth = m_connector->connector->modes[i].hdisplay;
+     res.iScreenHeight = m_connector->connector->modes[i].vdisplay;
+-    if (m_connector->connector->modes[i].clock % 10 != 0)
++    if (m_connector->connector->modes[i].clock % 5 != 0)
+       res.fRefreshRate = (float)m_connector->connector->modes[i].vrefresh * (1000.0f/1001.0f);
+     else
+       res.fRefreshRate = m_connector->connector->modes[i].vrefresh;

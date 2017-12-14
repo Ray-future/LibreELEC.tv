@@ -4,8 +4,15 @@ Date:   Mon Dec 11 23:44:41 2017 -0800
 
     [linux] allow using alsa and pulse together
 
+---
+ xbmc/windowing/X11/WinSystemX11GLContext.cpp | 27 ++-------------------------
+ xbmc/windowing/amlogic/WinSystemAmlogic.cpp  |  2 ++
+ xbmc/windowing/gbm/WinSystemGbm.cpp          | 27 ++-------------------------
+ xbmc/windowing/rpi/WinSystemRpi.cpp          |  4 ++++
+ 4 files changed, 10 insertions(+), 50 deletions(-)
+
 diff --git a/xbmc/windowing/X11/WinSystemX11GLContext.cpp b/xbmc/windowing/X11/WinSystemX11GLContext.cpp
-index 24394d7631..343d4ec3ab 100644
+index 24394d7..0914d28 100644
 --- a/xbmc/windowing/X11/WinSystemX11GLContext.cpp
 +++ b/xbmc/windowing/X11/WinSystemX11GLContext.cpp
 @@ -52,31 +52,8 @@ std::unique_ptr<CWinSystemBase> CWinSystemBase::CreateWinSystem()
@@ -17,11 +24,11 @@ index 24394d7631..343d4ec3ab 100644
 -    envSink = getenv("AE_SINK");
 -  if (StringUtils::EqualsNoCase(envSink, "ALSA"))
 -  {
-     X11::ALSARegister();
+-    X11::ALSARegister();
 -  }
 -  else if (StringUtils::EqualsNoCase(envSink, "PULSE"))
 -  {
-     X11::PulseAudioRegister();
+-    X11::PulseAudioRegister();
 -  }
 -  else if (StringUtils::EqualsNoCase(envSink, "SNDIO"))
 -  {
@@ -37,11 +44,13 @@ index 24394d7631..343d4ec3ab 100644
 -      }
 -    }
 -  }
++  X11::ALSARegister();
++  X11::PulseAudioRegister();
  }
  
  CWinSystemX11GLContext::~CWinSystemX11GLContext()
 diff --git a/xbmc/windowing/amlogic/WinSystemAmlogic.cpp b/xbmc/windowing/amlogic/WinSystemAmlogic.cpp
-index 4b8199760e..e50a31daf9 100644
+index 4b81997..e50a31d 100644
 --- a/xbmc/windowing/amlogic/WinSystemAmlogic.cpp
 +++ b/xbmc/windowing/amlogic/WinSystemAmlogic.cpp
 @@ -32,6 +32,7 @@
@@ -61,10 +70,10 @@ index 4b8199760e..e50a31daf9 100644
  
  CWinSystemAmlogic::~CWinSystemAmlogic()
 diff --git a/xbmc/windowing/gbm/WinSystemGbm.cpp b/xbmc/windowing/gbm/WinSystemGbm.cpp
-index 91851c26fb..2b0940ee71 100644
+index 3ef426f..7a1dfe1 100644
 --- a/xbmc/windowing/gbm/WinSystemGbm.cpp
 +++ b/xbmc/windowing/gbm/WinSystemGbm.cpp
-@@ -36,32 +36,6 @@ CWinSystemGbm::CWinSystemGbm() :
+@@ -37,31 +37,8 @@ CWinSystemGbm::CWinSystemGbm() :
    m_nativeDisplay(nullptr),
    m_nativeWindow(nullptr)
  {
@@ -93,12 +102,13 @@ index 91851c26fb..2b0940ee71 100644
 -      }
 -    }
 -  }
--
++  GBM::ALSARegister();
++  GBM::PulseAudioRegister();
+ 
    m_winEvents.reset(new CWinEventsLinux());
  }
-
 diff --git a/xbmc/windowing/rpi/WinSystemRpi.cpp b/xbmc/windowing/rpi/WinSystemRpi.cpp
-index 3e4c6d2d8a..a00a1c0c18 100644
+index 3e4c6d2..a00a1c0 100644
 --- a/xbmc/windowing/rpi/WinSystemRpi.cpp
 +++ b/xbmc/windowing/rpi/WinSystemRpi.cpp
 @@ -34,7 +34,9 @@
@@ -120,3 +130,6 @@ index 3e4c6d2d8a..a00a1c0c18 100644
  }
  
  CWinSystemRpi::~CWinSystemRpi()
+-- 
+2.14.1
+

@@ -1,7 +1,7 @@
-diff --git a/xbmc/linux/LinuxTimezone.cpp b/xbmc/linux/LinuxTimezone.cpp
+diff --git a/xbmc/platform/linux/LinuxTimezone.cpp b/xbmc/platform/linux/LinuxTimezone.cpp
 index 372c1193c3..0668f09c79 100644
---- a/xbmc/linux/LinuxTimezone.cpp
-+++ b/xbmc/linux/LinuxTimezone.cpp
+--- a/xbmc/platform/linux/LinuxTimezone.cpp
++++ b/xbmc/platform/linux/LinuxTimezone.cpp
 @@ -42,6 +42,7 @@
  #include <stdlib.h>
  

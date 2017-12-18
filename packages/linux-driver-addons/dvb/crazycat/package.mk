@@ -30,10 +30,19 @@ PKG_SECTION="driver.dvb"
 PKG_LONGDESC="DVB driver for TBS cards with CrazyCats additions."
 
 PKG_IS_ADDON="yes"
+PKG_IS_KERNEL_PKG="yes"
 PKG_ADDON_IS_STANDALONE="yes"
 PKG_ADDON_NAME="DVB drivers for TBS (CrazyCat)"
 PKG_ADDON_TYPE="xbmc.service"
 PKG_ADDON_VERSION="${ADDON_VERSION}.${PKG_REV}"
+
+if [ $LINUX = "amlogic-3.14" ]; then
+  PKG_PATCH_DIRS="amlogic"
+fi
+
+if [ $PROJECT = "WeTek_Play_2" ]; then
+  PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET wetekdvb"
+fi
 
 pre_make_target() {
   export KERNEL_VER=$(get_module_dir)
@@ -66,5 +75,9 @@ make_target() {
 }
 
 makeinstall_target() {
+  if [ $PROJECT = "WeTek_Play_2" ]; then
+    mkdir -p "$PKG_BUILD/v4l/wetekdvb/"
+    cp -P $(get_build_dir wetekdvb)/driver/wetekdvb_play2_mb.ko "$PKG_BUILD/v4l/wetekdvb/wetekdvb.ko"
+  fi
   install_driver_addon_files "$PKG_BUILD/v4l/"
 }

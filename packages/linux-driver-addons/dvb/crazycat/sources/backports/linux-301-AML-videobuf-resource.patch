@@ -1,0 +1,25 @@
+diff -Naur a/drivers/media/v4l2-core/Kconfig b/drivers/media/v4l2-core/Kconfig
+--- a/drivers/media/v4l2-core/Kconfig	2017-01-23 18:15:27.000000000 +0100
++++ b/drivers/media/v4l2-core/Kconfig	2017-04-26 20:41:40.645650738 +0200
+@@ -73,6 +73,10 @@
+ 	depends on HAS_DMA
+ 	select VIDEOBUF_GEN
+ 
++config VIDEOBUF_RESOURCE
++	select VIDEOBUF_GEN
++	tristate
++
+ config VIDEOBUF_DVB
+ 	tristate
+ 	select VIDEOBUF_GEN
+diff -Naur a/drivers/media/v4l2-core/Makefile b/drivers/media/v4l2-core/Makefile
+--- a/drivers/media/v4l2-core/Makefile	2017-01-23 18:15:27.000000000 +0100
++++ b/drivers/media/v4l2-core/Makefile	2017-04-26 20:25:05.615327055 +0200
+@@ -33,6 +33,7 @@
+ obj-$(CONFIG_VIDEOBUF_DMA_CONTIG) += videobuf-dma-contig.o
+ obj-$(CONFIG_VIDEOBUF_VMALLOC) += videobuf-vmalloc.o
+ obj-$(CONFIG_VIDEOBUF_DVB) += videobuf-dvb.o
++obj-$(CONFIG_VIDEOBUF_RESOURCE) += videobuf-res.o
+ 
+ obj-$(CONFIG_VIDEOBUF2_CORE) += videobuf2-core.o videobuf2-v4l2.o
+ obj-$(CONFIG_VIDEOBUF2_MEMOPS) += videobuf2-memops.o

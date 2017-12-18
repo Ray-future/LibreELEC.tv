@@ -17,12 +17,13 @@
 ################################################################################
 
 PKG_NAME="wetekdvb"
-PKG_VERSION="20171207"
-PKG_SHA256="9543e07fc8b8abd94542ea9049a242c9f78b49bef07ca675d86728cf141c3fa2"
+PKG_VERSION="20171218-mb"
+PKG_SHA256="d41a84a9b9c313b2fc88f2495a8f5eb6910b184feba3e5364ee9593287aa5651"
 PKG_ARCH="arm aarch64"
 PKG_LICENSE="nonfree"
 PKG_SITE="http://www.wetek.com/"
-PKG_URL="$DISTRO_SRC/$PKG_NAME-$PKG_VERSION.tar.xz"
+#PKG_URL="$DISTRO_SRC/$PKG_NAME-$PKG_VERSION.tar.xz"
+PKG_URL="http://raybuntu.libreelec.tv/sources/$PKG_NAME-$PKG_VERSION.tar.xz"
 PKG_DEPENDS_TARGET="toolchain linux"
 PKG_NEED_UNPACK="$LINUX_DEPENDS"
 PKG_SECTION="driver"

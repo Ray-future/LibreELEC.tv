@@ -1,0 +1,47 @@
+diff --git a/drivers/media/Kconfig b/drivers/media/Kconfig
+index 3512316..26f73fe 100644
+--- a/drivers/media/Kconfig
++++ b/drivers/media/Kconfig
+@@ -235,5 +235,6 @@ source "drivers/media/i2c/Kconfig"
+ source "drivers/media/spi/Kconfig"
+ source "drivers/media/tuners/Kconfig"
+ source "drivers/media/dvb-frontends/Kconfig"
++source "drivers/media/amlogic/Kconfig"
+ 
+ endif # MEDIA_SUPPORT
+diff --git a/drivers/media/Makefile b/drivers/media/Makefile
+index d87ccb8..e30c645 100644
+--- a/drivers/media/Makefile
++++ b/drivers/media/Makefile
+@@ -39,3 +39,4 @@ obj-y += rc/
+ obj-y += common/ platform/ pci/ usb/ mmc/ firewire/ spi/
+ obj-$(CONFIG_VIDEO_DEV) += radio/
+ 
++obj-y += amlogic/
+diff --git a/drivers/media/amlogic/Kconfig b/drivers/media/amlogic/Kconfig
+new file mode 100644
+index 0000000..5203702
+--- /dev/null
++++ b/drivers/media/amlogic/Kconfig
+@@ -0,0 +1,9 @@
++#
++# Amlogic driver configuration
++#
++menu "Amlogic Device Drivers"
++
++source "drivers/media/amlogic/wetek/Kconfig"
++source "drivers/media/amlogic/video_dev/Kconfig"
++
++endmenu
+diff --git a/drivers/media/amlogic/Makefile b/drivers/media/amlogic/Makefile
+new file mode 100644
+index 0000000..049cb81
+--- /dev/null
++++ b/drivers/media/amlogic/Makefile
+@@ -0,0 +1,6 @@
++##########################################
++########## Amlogic Drivers ###############
++##########################################
++
++obj-$(CONFIG_V4L_AMLOGIC_VIDEO) += video_dev/
++obj-$(CONFIG_WETEK)		 += wetek/

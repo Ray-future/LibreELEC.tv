@@ -17,9 +17,9 @@
 ################################################################################
 
 PKG_NAME="pvr.demo"
-PKG_VERSION="aaf7654"
-PKG_SHA256="329a7352f328c39e8d7fd0dbd90072884b69e1e9baa5571164c2367c7aef26a9"
-PKG_REV="9"
+PKG_VERSION="744d8ef"
+PKG_SHA256="a55bd57ad021b1578a806a21a9926c18808f871172a7f87de3aea815af49b9c4"
+PKG_REV="10"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="http://www.kodi.tv"

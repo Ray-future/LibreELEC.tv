@@ -111,6 +111,14 @@
   # e.g. ADDITIONAL_DRIVERS="DRIVER1 DRIVER2"
     ADDITIONAL_DRIVERS="gpu-aml RTL8192CU RTL8192DU RTL8188EU RTL8192EU RTL8812AU media_build"
 
+  # build and install driver addons (yes / no)
+    DRIVER_ADDONS_SUPPORT="yes"
+
+  # driver addons to install:
+  # for a list of additinoal drivers see packages/linux-driver-addons
+  # Space separated list is supported,
+    DRIVER_ADDONS="crazycat"
+
   # additional Firmware to use (dvb-firmware, misc-firmware, wlan-firmware)
   # Space separated list is supported,
   # e.g. FIRMWARE="dvb-firmware misc-firmware wlan-firmware"

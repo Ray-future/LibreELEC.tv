@@ -17,9 +17,9 @@
 ################################################################################
 
 PKG_NAME="pvr.dvblink"
-PKG_VERSION="816f90c"
-PKG_SHA256="da36250a838077775b3657b271e763bbf1abde07d819b3836859ae9783fe11d8"
-PKG_REV="7"
+PKG_VERSION="4ac2f2d"
+PKG_SHA256="1ce065cf54ccbe537ffb6227371ce53d28405fe63e5b6384869d351e0b41fca2"
+PKG_REV="8"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="http://www.kodi.tv"

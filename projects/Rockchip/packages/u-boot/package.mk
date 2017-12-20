@@ -18,11 +18,11 @@
 ################################################################################
 
 PKG_NAME="u-boot"
-PKG_VERSION="2017.11"
-PKG_SHA256="6a018fd3caf58f3dcfa23ee989a82bd35df03af71872b9dca8c6d758a0d26c05"
+PKG_VERSION="6592d3d"
+PKG_SHA256="c1a1d3ea85dc685a038c6816eb588d5999b03d53767292232470041e466d17a7"
 PKG_ARCH="arm aarch64"
 PKG_SITE="https://www.denx.de/wiki/U-Boot"
-PKG_URL="http://ftp.denx.de/pub/u-boot/u-boot-$PKG_VERSION.tar.bz2"
+PKG_URL="https://github.com/rockchip-linux/u-boot/archive/$PKG_VERSION.tar.gz"
 PKG_SOURCE_DIR="u-boot-$PKG_VERSION*"
 PKG_DEPENDS_TARGET="toolchain dtc:host"
 PKG_LICENSE="GPL"
@@ -64,5 +64,16 @@ makeinstall_target() {
       cp -av $PROJECT_DIR/$PROJECT/devices/$DEVICE/bootloader/update.sh $INSTALL/usr/share/bootloader
     elif [ -f $PROJECT_DIR/$PROJECT/bootloader/update.sh ]; then
       cp -av $PROJECT_DIR/$PROJECT/bootloader/update.sh $INSTALL/usr/share/bootloader
+    fi
+
+    # Always install the canupdate script
+    if [ -f $PROJECT_DIR/$PROJECT/devices/$DEVICE/bootloader/canupdate.sh ]; then
+      cp -av $PROJECT_DIR/$PROJECT/devices/$DEVICE/bootloader/canupdate.sh $INSTALL/usr/share/bootloader
+    elif [ -f $PROJECT_DIR/$PROJECT/bootloader/canupdate.sh ]; then
+      cp -av $PROJECT_DIR/$PROJECT/bootloader/canupdate.sh $INSTALL/usr/share/bootloader
+    fi
+    if [ -f $INSTALL/usr/share/bootloader/canupdate.sh ]; then
+      sed -e "s/@PROJECT@/${DEVICE:-$PROJECT}/g" \
+          -i $INSTALL/usr/share/bootloader/canupdate.sh
     fi
 }

@@ -21,8 +21,10 @@
       export KCFLAGS="-Wno-misleading-indentation"
     elif [ "$1" = "RTL8812AU" -a "$LINUX" = "rockchip-4.4" ]; then
       export KCFLAGS="-Wno-date-time -Wno-switch-unreachable"
-    elif [ "$1" = "media_build" -a "$LINUX" = "rockchip-4.4" ]; then
+    elif [ "$1" = "crazycat" -a "$LINUX" = "rockchip-4.4" ]; then
       export KCFLAGS="-Wno-unused-variable -Wno-misleading-indentation -Wno-switch -Wno-declaration-after-statement -Wno-unused-function -Wno-unused-label -Wno-unused-result"
+    elif [ "$1" = "hauppauge" -a "$LINUX" = "rockchip-4.4" ]; then
+      export KCFLAGS="-Wno-int-conversion -Wno-unused-variable -Wno-misleading-indentation -Wno-switch -Wno-declaration-after-statement -Wno-unused-function -Wno-unused-label -Wno-unused-result"
     fi
 
 ################################################################################
@@ -84,3 +86,11 @@
 
   # Start boot partition at 16MiB, same as https://github.com/rockchip-linux/build images
     SYSTEM_PART_START=32768
+
+  # build and install driver addons (yes / no)
+    DRIVER_ADDONS_SUPPORT="yes"
+
+  # driver addons to install:
+  # for a list of additinoal drivers see packages/linux-driver-addons
+  # Space separated list is supported,
+    DRIVER_ADDONS="crazycat hauppauge"

@@ -23,13 +23,12 @@ new file mode 100644
 index 0000000..5203702
 --- /dev/null
 +++ b/drivers/media/amlogic/Kconfig
-@@ -0,0 +1,9 @@
+@@ -0,0 +1,8 @@
 +#
 +# Amlogic driver configuration
 +#
 +menu "Amlogic Device Drivers"
 +
-+source "drivers/media/amlogic/wetek/Kconfig"
 +source "drivers/media/amlogic/video_dev/Kconfig"
 +
 +endmenu
@@ -38,10 +37,9 @@ new file mode 100644
 index 0000000..049cb81
 --- /dev/null
 +++ b/drivers/media/amlogic/Makefile
-@@ -0,0 +1,6 @@
+@@ -0,0 +1,5 @@
 +##########################################
 +########## Amlogic Drivers ###############
 +##########################################
 +
 +obj-$(CONFIG_V4L_AMLOGIC_VIDEO) += video_dev/
-+obj-$(CONFIG_WETEK)		 += wetek/

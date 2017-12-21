@@ -1,7 +1,7 @@
 diff -Naur crazycat-2017-11-13.orig/linux/Makefile crazycat-2017-11-13/linux/Makefile
 --- crazycat-2017-11-13.orig/linux/Makefile	2017-12-03 20:47:44.000000000 +0100
 +++ crazycat-2017-11-13/linux/Makefile	2017-12-20 09:48:15.516826488 +0100
-@@ -112,6 +112,15 @@
+@@ -112,6 +112,13 @@
  
  untar: linux-media.tar.bz2
  	tar xfj linux-media.tar.bz2
@@ -12,8 +12,6 @@ diff -Naur crazycat-2017-11-13.orig/linux/Makefile crazycat-2017-11-13/linux/Mak
 +	# Copy videobuf-res module
 +	cp -a "$(SRCDIR)/drivers/media/v4l2-core/videobuf-res.c" "drivers/media/v4l2-core/"
 +	cp -a "$(SRCDIR)/include/media/videobuf-res.h" "include/media/"
-+	# Copy wetek driver
-+	cp -a "$(SRCDIR)/drivers/amlogic/wetek" "drivers/media/amlogic/wetek"
  	-rm -f .patches_applied .linked_dir .git_log.md5
  
  clean:

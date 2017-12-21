@@ -68,7 +68,8 @@ make_target() {
 makeinstall_target() {
   if [ $PROJECT = "WeTek_Play" ]; then
     cp -P $(get_build_dir wetekdvb)/driver/wetekdvb_mb.ko "$PKG_BUILD/v4l/wetekdvb.ko"
-  elif [ $PROJECT = "WeTek_Play_2" ]; then
+  fi
+  if [ $PROJECT = "WeTek_Play_2" ]; then
     cp -P $(get_build_dir wetekdvb)/driver/wetekdvb_play2_mb.ko "$PKG_BUILD/v4l/wetekdvb.ko"
   fi
   install_driver_addon_files "$PKG_BUILD/v4l/"

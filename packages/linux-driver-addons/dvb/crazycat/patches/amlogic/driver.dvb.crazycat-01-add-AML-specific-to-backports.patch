@@ -1,12 +1,13 @@
 diff -Naur crazycat-2017-11-13.orig/backports/backports.txt crazycat-2017-11-13/backports/backports.txt
 --- crazycat-2017-11-13.orig/backports/backports.txt	2017-12-18 15:22:34.665142045 +0100
 +++ crazycat-2017-11-13/backports/backports.txt	2017-12-18 15:22:59.232389044 +0100
-@@ -27,6 +27,8 @@
+@@ -27,6 +27,9 @@
  add drx39xxj.patch
  add linux-202-lnbp22_patch_for_more_power_if_rotor.patch
  add linux-220-Xbox-One-DVB-T2-stick-support.patch
 +add linux-301-AML-videobuf-resource.patch
 +add linux-302-AML-amlogic-video-dev-and-wetekdvb.patch
++add linux-303-AML-meson-ir.patch
  
  [4.12.255]
  add v4.12_revert_solo6x10_copykerneluser.patch

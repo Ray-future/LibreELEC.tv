@@ -43,10 +43,10 @@ make_host() {
   make BUILD_OPT=1 USE_64=1 \
      PREFIX=$TOOLCHAIN \
      NSPR_INCLUDE_DIR=$TOOLCHAIN/include/nspr \
-     USE_SYSTEM_ZLIB=1 ZLIB_LIBS=-lz \
+     USE_SYSTEM_ZLIB=1 ZLIB_LIBS="-lz -L$TOOLCHAIN/lib" \
      SKIP_SHLIBSIGN=1 \
      NSS_TESTS="dummy" \
-     CC=$CC LDFLAGS="$LDFLAGS -L$TOOLCHAIN/lib" \
+     CC=$CC OS_REL_CFLAGS="-I$TOOLCHAIN/include" \
      V=1
 }
 

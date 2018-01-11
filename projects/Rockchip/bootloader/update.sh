@@ -1,4 +1,3 @@
-#!/bin/sh
 ################################################################################
 #      This file is part of LibreELEC - https://libreelec.tv
 #      Copyright (C) 2017-present Team LibreELEC
@@ -38,23 +37,27 @@ fi
   for all_dtb in $BOOT_ROOT/*.dtb; do
     dtb=$(basename $all_dtb)
     if [ -f $SYSTEM_ROOT/usr/share/bootloader/$dtb ]; then
-      echo "*** updating $dtb on: $BOOT_DISK ..."
+      echo -n "Updating $dtb... "
       cp -p $SYSTEM_ROOT/usr/share/bootloader/$dtb $BOOT_ROOT
+      echo "done"
     fi
   done
 
 # update bootloader
   if [ -f $SYSTEM_ROOT/usr/share/bootloader/idbloader.img ]; then
-    echo "*** updating idbloader.img on: $BOOT_DISK ..."
+    echo -n "Updating idbloader.img... "
     dd if=$SYSTEM_ROOT/usr/share/bootloader/idbloader.img of=$BOOT_DISK bs=32k seek=1 conv=fsync &>/dev/null
+    echo "done"
   fi
   if [ -f $SYSTEM_ROOT/usr/share/bootloader/uboot.img ]; then
-    echo "*** updating uboot.img on: $BOOT_DISK ..."
+    echo -n "Updating uboot.img... "
     dd if=$SYSTEM_ROOT/usr/share/bootloader/uboot.img of=$BOOT_DISK bs=64k seek=128 conv=fsync &>/dev/null
+    echo "done"
   fi
   if [ -f $SYSTEM_ROOT/usr/share/bootloader/trust.img ]; then
-    echo "*** updating trust.img on: $BOOT_DISK ..."
+    echo -n "Updating trust.img... "
     dd if=$SYSTEM_ROOT/usr/share/bootloader/trust.img of=$BOOT_DISK bs=64k seek=192 conv=fsync &>/dev/null
+    echo "done"
   fi
 
 # mount $BOOT_ROOT r/o

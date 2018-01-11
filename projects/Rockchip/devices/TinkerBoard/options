@@ -13,6 +13,9 @@
         ;;
     esac
 
+  # Custom build root
+    CUSTOM_BUILD="RK3288"
+
   # Configuration for u-boot
     UBOOT_SYSTEM="rk3288"
 

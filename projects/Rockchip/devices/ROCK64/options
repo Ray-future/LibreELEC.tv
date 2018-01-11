@@ -21,6 +21,9 @@
         ;;
     esac
 
+  # Custom build root
+    CUSTOM_BUILD="RK3328"
+
   # Configuration for u-boot
     UBOOT_SYSTEM="rk3328"
 

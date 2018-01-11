@@ -27,11 +27,20 @@ PKG_SECTION="tools"
 PKG_SHORTDESC="u-boot: Universal Bootloader project"
 PKG_LONGDESC="Das U-Boot is a cross-platform bootloader for embedded systems, used as the default boot loader by several board vendors. It is intended to be easy to port and to debug, and runs on many supported architectures, including PPC, ARM, MIPS, x86, m68k, NIOS, and Microblaze."
 PKG_IS_KERNEL_PKG="yes"
+PKG_STAMP="${DEVICE:-$PROJECT} $UBOOT_SYSTEM"
 
 PKG_NEED_UNPACK="$PROJECT_DIR/$PROJECT/bootloader"
 [ -n "$DEVICE" ] && PKG_NEED_UNPACK+=" $PROJECT_DIR/$PROJECT/devices/$DEVICE/bootloader"
 
 case "$PROJECT" in
+  Rockchip)
+    PKG_VERSION="5ecf0ee"
+    PKG_SHA256="fba1d26583d446a5bbb5713fe37848e05b546d125384c2c2d2883414d61b7cad"
+    PKG_URL="https://github.com/rockchip-linux/u-boot/archive/$PKG_VERSION.tar.gz"
+    PKG_PATCH_DIRS="rockchip"
+    PKG_DEPENDS_TARGET+=" rkbin"
+    PKG_NEED_UNPACK+=" $(get_pkg_directory rkbin)"
+    ;;
   *)
     PKG_VERSION="2017.09"
     PKG_SHA256="b2d15f2cf5f72e706025cde73d67247c6da8cd35f7e10891eefe7d9095089744"

@@ -6,7 +6,7 @@
   # generated code.
     case $TARGET_ARCH in
       aarch64)
-        TARGET_CPU="cortex-a53"
+        TARGET_CPU="cortex-a72.cortex-a53"
         TARGET_CPU_FLAGS="+crc+crypto"
         TARGET_FEATURES="64bit neon"
         ;;
@@ -14,7 +14,7 @@
         TARGET_KERNEL_ARCH="arm64"
         TARGET_PATCH_ARCH="aarch64"
         TARGET_FLOAT="hard"
-        TARGET_CPU="cortex-a53"
+        TARGET_CPU="cortex-a72.cortex-a53"
         TARGET_CPU_FLAGS="+crc"
         TARGET_FPU="crypto-neon-fp-armv8"
         TARGET_FEATURES="32bit neon"
@@ -22,27 +22,22 @@
     esac
 
   # Custom build root
-    CUSTOM_BUILD="RK3328"
+    CUSTOM_BUILD="RK3399"
 
   # Configuration for u-boot
-    UBOOT_SYSTEM="rk3328"
+    UBOOT_SYSTEM="rk3399"
 
   # Kernel target
     KERNEL_TARGET="Image"
 
   # Additional kernel make parameters (for example to specify the u-boot loadaddress)
-    KERNEL_MAKE_EXTRACMD="rockchip/rk3328-rockbox.dtb"
+    KERNEL_MAKE_EXTRACMD="rockchip/rk3399-sapphire.dtb"
 
   # Mali GPU family
-    MALI_FAMILY="450"
+    MALI_FAMILY="t860"
 
   # kernel image name
     KERNEL_NAME="Image"
 
   # kernel serial console
-    EXTRA_CMDLINE="console=uart8250,mmio32,0xff130000 console=tty0"
-
-  # Fix linux rockchip-4.4 compile
-    if [ "$1" = "linux" -a "$LINUX" = "rockchip-4.4" ]; then
-      export KCFLAGS="$KCFLAGS -Wno-bool-compare -Wno-logical-not-parentheses"
-    fi
+    EXTRA_CMDLINE="console=uart8250,mmio32,0xff1a0000 console=tty0"

@@ -1,0 +1,42 @@
+diff --git a/drivers/gpu/drm/drm_edid.c b/drivers/gpu/drm/drm_edid.c
+index 3e3ebdf34e9f..6b2cd4de23b2 100644
+--- a/drivers/gpu/drm/drm_edid.c
++++ b/drivers/gpu/drm/drm_edid.c
+@@ -78,6 +78,8 @@
+ #define EDID_QUIRK_FORCE_6BPC			(1 << 10)
+ /* Force 10bpc */
+ #define EDID_QUIRK_FORCE_10BPC			(1 << 11)
++/* Prefer 1080p */
++#define EDID_QUIRK_PREFER_1920_1080		(1 << 12)
+ 
+ struct detailed_mode_closure {
+ 	struct drm_connector *connector;
+@@ -1659,6 +1661,8 @@ static bool edid_vendor(struct edid *edid, char *vendor)
+ 	return !strncmp(edid_vendor, vendor, 3);
+ }
+ 
++static u8 *drm_find_cea_extension(struct edid *edid);
++
+ /**
+  * edid_get_quirks - return quirk flags for a given EDID
+  * @edid: EDID to process
+@@ -1678,6 +1682,9 @@ static u32 edid_get_quirks(struct edid *edid)
+ 			return quirk->quirks;
+ 	}
+ 
++	if (drm_find_cea_extension(edid))
++		return EDID_QUIRK_PREFER_1920_1080 | EDID_QUIRK_PREFER_LARGE_60;
++
+ 	return 0;
+ }
+ 
+@@ -1716,6 +1723,9 @@ static void edid_fixup_preferred(struct drm_connector *connector,
+ 		if (cur_mode == preferred_mode)
+ 			continue;
+ 
++		if (quirks & EDID_QUIRK_PREFER_1920_1080 && MODE_SIZE(cur_mode) != (1920*1080))
++			continue;
++
+ 		/* Largest mode is preferred */
+ 		if (MODE_SIZE(cur_mode) > MODE_SIZE(preferred_mode))
+ 			preferred_mode = cur_mode;

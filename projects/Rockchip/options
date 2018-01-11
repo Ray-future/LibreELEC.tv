@@ -12,21 +12,6 @@
   # default:  default mainline kernel
     LINUX="${LINUX:-rockchip-4.4}"
 
-  # Fix linux rockchip-4.4 compile
-    if [ "$1" = "linux" -a "$LINUX" = "rockchip-4.4" ]; then
-      export KCFLAGS="-Wno-misleading-indentation -Wno-tautological-compare -Wno-unused-function -Wno-duplicate-decl-specifier -Wno-switch-unreachable"
-    elif [ "$1" = "RTL8192CU" -a "$LINUX" = "rockchip-4.4" ]; then
-      export KCFLAGS="-Wno-misleading-indentation -Wno-aggressive-loop-optimizations -Wno-int-to-pointer-cast -Wno-int-conversion"
-    elif [ "$1" = "RTL8192EU" -a "$LINUX" = "rockchip-4.4" ]; then
-      export KCFLAGS="-Wno-misleading-indentation"
-    elif [ "$1" = "RTL8812AU" -a "$LINUX" = "rockchip-4.4" ]; then
-      export KCFLAGS="-Wno-date-time -Wno-switch-unreachable"
-    elif [ "$1" = "crazycat" -a "$LINUX" = "rockchip-4.4" ]; then
-      export KCFLAGS="-Wno-unused-variable -Wno-misleading-indentation -Wno-switch -Wno-declaration-after-statement -Wno-unused-function -Wno-unused-label -Wno-unused-result"
-    elif [ "$1" = "hauppauge" -a "$LINUX" = "rockchip-4.4" ]; then
-      export KCFLAGS="-Wno-int-conversion -Wno-unused-variable -Wno-misleading-indentation -Wno-switch -Wno-declaration-after-statement -Wno-unused-function -Wno-unused-label -Wno-unused-result"
-    fi
-
 ################################################################################
 # setup build defaults
 ################################################################################

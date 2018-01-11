@@ -20,32 +20,22 @@
 IPTABLES4="/usr/sbin/iptables"
 IPTABLES6="/usr/sbin/ip6tables"
 IPTABLES_CMDS="$IPTABLES4 $IPTABLES6"
-GLOBAL_RULES="/etc/iptables/rules.v"
-LOCAL_RULES="/storage/.config/iptables/rules.v"
-
-if [ -e "${LOCAL_RULES}4" ]; then
-  RULES4="${LOCAL_RULES}4"
-else
-  RULES4="${GLOBAL_RULES}4"
-fi
-
-if [ -e "${LOCAL_RULES}6" ]; then
-  RULES6="${LOCAL_RULES}6"
-else
-  RULES6="${GLOBAL_RULES}6"
-fi
+PUBLIC_RULES="/etc/iptables/public.v"
+HOME_RULES="/etc/iptables/home.v"
+CUSTOM_RULES="/storage/.config/iptables/rules.v"
+DOCKER="service.system.docker.service"
+SYSTEMCTL="/usr/bin/systemctl"
+CONNMANCTL="/usr/bin/connmanctl"
 
 check_docker() {
-    if [ "`/usr/bin/systemctl is-active docker.service`" == "active" ]; then
-	/usr/bin/systemctl restart docker
-    fi
+    $SYSTEMCTL is-active --quiet $DOCKER && $SYSTEMCTL restart $DOCKER
 }
 
 check_tether() {
-    if [ -n "`/usr/bin/connmanctl technologies|grep 'Tethering = True'`" ]; then
-	/usr/bin/connmanctl tether wifi off
+    if [ -n "`$CONNMANCTL technologies|grep 'Tethering = True'`" ]; then
+	$CONNMANCTL tether wifi off
 	sleep 1
-	/usr/bin/connmanctl tether wifi on
+	$CONNMANCTL tether wifi on
     fi
 }
 
@@ -77,13 +67,35 @@ enable() {
 	 ipv="4"
 	 ;;
     esac
-    "$cmd-restore" "$rules" 
+    if [ -e "$rules" ]; then
+      "$cmd-restore" "$rules" 
+    fi
   done
   check_docker
   check_tether
 }
 
 if [ "$1" = "enable" ]; then
+  case "${RULES}" in
+    "none") 
+       flush
+       ;;
+    "public") 
+       RULES4="${PUBLIC_RULES}4"
+       RULES6="${PUBLIC_RULES}6"
+       ;;
+    "home") 
+       RULES4="${HOME_RULES}4"
+       RULES6="${HOME_RULES}6"
+       ;;
+    "custom") 
+       RULES4="${CUSTOM_RULES}4"
+       RULES6="${CUSTOM_RULES}6"
+       ;;
+    *) 
+       exit 1
+       ;;
+  esac
   enable
 elif [ "$1" = "disable" ]; then
   flush

@@ -17,8 +17,8 @@
 ################################################################################
 
 PKG_NAME="systemd"
-PKG_VERSION="235"
-PKG_SHA256="25811f96f5a027bf2a4c9383495cf5b623e385d84da31e473cf375932b3e9c52"
+PKG_VERSION="236"
+PKG_SHA256="0cadccfa7109232ec2a469d41ca595d5595b83b648b534ea669c15dbca904c43"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="http://www.freedesktop.org/wiki/Software/systemd"
@@ -69,7 +69,7 @@ PKG_MESON_OPTS_TARGET="--libdir=/usr/lib \
                        -Dcoredump=false \
                        -Dresolve=false \
                        -Dlogind=true \
-                       -Dhostnamed=false \
+                       -Dhostnamed=true \
                        -Dlocaled=false \
                        -Dmachined=false \
                        -Dnetworkd=false \
@@ -177,9 +177,16 @@ post_makeinstall_target() {
   rm -rf $INSTALL/usr/lib/systemd/system-generators
   rm -rf $INSTALL/usr/lib/systemd/catalog
 
+  # remove partition
+  rm -rf $INSTALL/usr/lib/systemd/systemd-growfs
+  rm -rf $INSTALL/usr/lib/systemd/systemd-makefs
+
   # distro preset policy
   rm -f $INSTALL/usr/lib/systemd/system-preset/*
   echo "disable *" > $INSTALL/usr/lib/systemd/system-preset/99-default.preset
+
+  rm -f $INSTALL/usr/lib/systemd/user-preset/*
+  echo "disable *" > $INSTALL/usr/lib/systemd/user-preset/90-systemd.preset
 
   # remove networkd
   rm -rf $INSTALL/usr/lib/systemd/network
@@ -224,6 +231,8 @@ post_makeinstall_target() {
 
   rm -rf $INSTALL/etc/modules-load.d
   ln -sf /storage/.config/modules-load.d $INSTALL/etc/modules-load.d
+  rm -rf $INSTALL/etc/systemd/sleep.conf.d
+  ln -sf /storage/.config/sleep.conf.d $INSTALL/etc/systemd/sleep.conf.d
   rm -rf $INSTALL/etc/sysctl.d
   ln -sf /storage/.config/sysctl.d $INSTALL/etc/sysctl.d
   rm -rf $INSTALL/etc/tmpfiles.d

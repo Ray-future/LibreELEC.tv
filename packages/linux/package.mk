@@ -39,8 +39,8 @@ case "$LINUX" in
     PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET aml-dtbtools:host"
     ;;
   amlogic-3.14)
-    PKG_VERSION="da53aa7"
-    PKG_SHA256="f79650b9c31f668e48d7a8bd6c419deed11ba8ea728a613b902445ad8feefa89"
+    PKG_VERSION="9ccf3f0"
+    PKG_SHA256="0b5f0ecffe6ceb0e31dfc6c27ba328d0682b05723fe88a2f5c4cf6ceb7b7565f"
     PKG_URL="https://github.com/LibreELEC/linux-amlogic/archive/$PKG_VERSION.tar.gz"
     PKG_SOURCE_DIR="$PKG_NAME-amlogic-$PKG_VERSION*"
     PKG_PATCH_DIRS="amlogic-3.14"
@@ -54,8 +54,8 @@ case "$LINUX" in
     PKG_PATCH_DIRS="rockchip-4.4"
     ;;
   *)
-    PKG_VERSION="4.14.4"
-    PKG_SHA256="2a91bff790da9a27e392469f7cc65ae7380e4204fc118be28ec799eb87e6a79e"
+    PKG_VERSION="4.14.10"
+    PKG_SHA256="86baf1374ca003bdd9a43cae7f59cec02b455a6c38c3705aa46b2b68d91ed110"
     PKG_URL="https://www.kernel.org/pub/linux/kernel/v4.x/$PKG_NAME-$PKG_VERSION.tar.xz"
     PKG_PATCH_DIRS="default"
     ;;

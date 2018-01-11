@@ -115,7 +115,7 @@ if [ -d "$SOURCES/$1" -o -d "$PKG_DIR/sources" ]; then
   else
     PATCH_ARCH="${TARGET_PATCH_ARCH:-$TARGET_ARCH}"
   fi
-  
+
   PATCH_DIRS_PKG=""
   PATCH_DIRS_PRJ=""
   if [ -n "$PKG_PATCH_DIRS" ]; then

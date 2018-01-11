@@ -17,9 +17,9 @@
 ################################################################################
 
 PKG_NAME="pvr.filmon"
-PKG_VERSION="17e8193"
-PKG_SHA256="59ebeac019120e2e52029e5d30becd61a25d785cfac5671cad7bf93791c4680e"
-PKG_REV="11"
+PKG_VERSION="e754b4b"
+PKG_SHA256="c90375e63cc191b63e1108cc2a7ce27d5341f815b1772141b672dab21ccca2c0"
+PKG_REV="12"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="http://www.kodi.tv"

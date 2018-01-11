@@ -1,7 +1,7 @@
-From a1d970225e761d356a4836c68bf51a0fbbd1ea28 Mon Sep 17 00:00:00 2001
-From: Radostan Riedel <raybuntu@googlemail.com>
-Date: Fri, 14 Jul 2017 14:31:33 +0200
-Subject: [PATCH 1/1] [PATCH] make binary addons executable
+From 3e1f7d098726e4af7eac9c83c70cf8196e4e9e3e Mon Sep 17 00:00:00 2001
+From: MilhouseVH <milhouseVH.github@nmacleod.com>
+Date: Wed, 5 Jul 2017 15:46:51 +0100
+Subject: [PATCH] make binary addons executable
 
 add executable mode to all files in addon's bin folder
 
@@ -11,7 +11,7 @@ credits to vpeter4 for the patch
  1 file changed, 26 insertions(+)
 
 diff --git a/xbmc/addons/Addon.cpp b/xbmc/addons/Addon.cpp
-index 2f6bad46c3..45f42ad2e3 100644
+index 07fd5bf..639ee5c 100644
 --- a/xbmc/addons/Addon.cpp
 +++ b/xbmc/addons/Addon.cpp
 @@ -26,6 +26,10 @@
@@ -24,8 +24,8 @@ index 2f6bad46c3..45f42ad2e3 100644
 +
  #include "AddonManager.h"
  #include "addons/Service.h"
- #include "addons/settings/AddonSettings.h"
-@@ -412,6 +416,28 @@ void OnPreInstall(const AddonPtr& addon)
+ #include "filesystem/Directory.h"
+@@ -417,6 +421,28 @@ void OnPreInstall(const AddonPtr& addon)
  
  void OnPostInstall(const AddonPtr& addon, bool update, bool modal)
  {
@@ -55,5 +55,5 @@ index 2f6bad46c3..45f42ad2e3 100644
  }
  
 -- 
-2.11.0
+2.7.4
 

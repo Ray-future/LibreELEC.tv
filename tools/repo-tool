@@ -61,9 +61,7 @@ update_addons_xml() {
     mv $line.tmp $line
     cd $localdir
 
-    gzip addons.xml
-    md5sum addons.xml.gz > addons.xml.gz.md5
-    md5sum -c addons.xml.gz.md5
+    md5sum addons.xml > addons.xml.md5
     cd $pwd
   done
   rm -rf .addons

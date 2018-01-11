@@ -17,9 +17,9 @@
 ################################################################################
 
 PKG_NAME="pvr.stalker"
-PKG_VERSION="fad6ed4"
-PKG_SHA256="3aec458230a7ef38c8302350d81a9172ccff4ac46efa692e54083762e23ab477"
-PKG_REV="11"
+PKG_VERSION="c91421d"
+PKG_SHA256="5062ca5199f08d698aaae3625d8ccd1decdae49281e860b484719f84e5bea902"
+PKG_REV="12"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="http://www.kodi.tv"

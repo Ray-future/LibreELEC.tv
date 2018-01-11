@@ -17,9 +17,9 @@
 ################################################################################
 
 PKG_NAME="pvr.argustv"
-PKG_VERSION="1aa4ddc"
-PKG_SHA256="fa049c49840bfb7995571b344b83a8bbfe429ee54310aab5a88ef16bd3e29154"
-PKG_REV="10"
+PKG_VERSION="a4d3ec7"
+PKG_SHA256="e13c8da83480578e6f055af8c71f71e8615fc095b2f9e1d2200f05a575a6151e"
+PKG_REV="11"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="http://www.kodi.tv"

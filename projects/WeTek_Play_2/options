@@ -118,12 +118,12 @@
     ADDITIONAL_DRIVERS="gpu-aml brcmap6xxx-aml RTL8192CU RTL8192DU RTL8188EU RTL8192EU RTL8812AU wetekdvb"
 
   # build and install driver addons (yes / no)
-    DRIVER_ADDONS_SUPPORT="yes"
+    DRIVER_ADDONS_SUPPORT="no"
 
   # driver addons to install:
   # for a list of additinoal drivers see packages/linux-driver-addons
   # Space separated list is supported,
-    DRIVER_ADDONS="crazycat"
+    DRIVER_ADDONS=""
 
   # additional Firmware to use (dvb-firmware, misc-firmware, wlan-firmware)
   # Space separated list is supported,
@@ -132,9 +132,6 @@
 
   # build and install ATV IR remote support (yes / no)
     ATVCLIENT_SUPPORT="no"
-
-  # Amlogic IR remote support (yes / no)
-    AMREMOTE_SUPPORT="yes"
 
   # build with installer (yes / no)
     INSTALLER_SUPPORT="no"

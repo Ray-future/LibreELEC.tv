@@ -17,9 +17,9 @@
 ################################################################################
 
 PKG_NAME="pvr.njoy"
-PKG_VERSION="f7a9913"
-PKG_SHA256="53e78fe68a006a588e2467092128504265603c30538615a9c25d577ab50a26e9"
-PKG_REV="9"
+PKG_VERSION="67b837d"
+PKG_SHA256="a561378bc93f984400f8f324b44e97bbe19201af8edb4c22fd89e3d6098cd206"
+PKG_REV="10"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="http://www.kodi.tv"

@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <addon id="repository.rbrepo"
 		name="RB Add-ons"
-		version="9.0.5"
+		version="@ADDON_VERSION@"
 		provider-name="Raybuntu">
 	<extension point="xbmc.addon.repository"
 		name="RB Add-ons">

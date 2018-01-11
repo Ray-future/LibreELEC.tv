@@ -17,9 +17,9 @@
 ################################################################################
 
 PKG_NAME="visualization.spectrum"
-PKG_VERSION="d75d995"
-PKG_SHA256="1d838196a38bca5b1ca6b29f340165e4249513c548f9f183b2b07fbd10dae268"
-PKG_REV="8"
+PKG_VERSION="c2284bc"
+PKG_SHA256="081e88ed208b2b2b9beb97e49c3c1147ae5d7eb18e953a3e1aedcf40e73f9794"
+PKG_REV="9"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="http://www.kodi.tv"

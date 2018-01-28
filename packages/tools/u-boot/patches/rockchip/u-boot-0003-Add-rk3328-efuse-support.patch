@@ -1,7 +1,7 @@
 From dd6e1ab93a92e133c41a8665f6d8aca9450bdca8 Mon Sep 17 00:00:00 2001
 From: Kamil Trzcinski <ayufan@ayufan.eu>
 Date: Sun, 20 Aug 2017 01:52:34 +0200
-Subject: [PATCH 3/5] Add rk3328-efuse support
+Subject: [PATCH] Add rk3328-efuse support
 
 ---
  arch/arm/dts/rk3328.dtsi      | 25 ++++++++++++++++++++

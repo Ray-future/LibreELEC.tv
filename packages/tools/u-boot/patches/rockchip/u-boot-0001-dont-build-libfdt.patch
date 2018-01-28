@@ -1,7 +1,7 @@
 From 85f5dd7511d2eaea04a6ba53dc60d1879060568b Mon Sep 17 00:00:00 2001
 From: Jonas Karlman <jonas@kwiboo.se>
 Date: Sat, 2 Dec 2017 11:47:07 +0100
-Subject: [PATCH 1/5] dont build libfdt
+Subject: [PATCH] dont build libfdt
 
 ---
  Makefile             | 2 +-

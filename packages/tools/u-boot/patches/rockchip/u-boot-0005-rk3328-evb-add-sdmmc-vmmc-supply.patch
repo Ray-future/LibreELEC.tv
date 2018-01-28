@@ -1,7 +1,7 @@
 From b6c47bd9f6a8965ab538f168086d4fd99fcf3066 Mon Sep 17 00:00:00 2001
 From: Jonas Karlman <jonas@kwiboo.se>
 Date: Wed, 10 Jan 2018 19:56:16 +0100
-Subject: [PATCH 5/5] rk3328-evb: add sdmmc vmmc-supply
+Subject: [PATCH] rk3328-evb: add sdmmc vmmc-supply
 
 ---
  arch/arm/dts/rk3328-evb.dts | 1 +

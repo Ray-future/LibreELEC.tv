@@ -38,8 +38,3 @@
 
   # kernel serial console
     EXTRA_CMDLINE="console=uart8250,mmio32,0xff130000 console=tty0"
-
-  # Fix linux rockchip-4.4 compile
-    if [ "$1" = "linux" -a "$LINUX" = "rockchip-4.4" ]; then
-      export KCFLAGS="$KCFLAGS -Wno-bool-compare -Wno-logical-not-parentheses"
-    fi

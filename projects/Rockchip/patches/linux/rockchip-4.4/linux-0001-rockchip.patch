@@ -98,41 +98,6 @@ index 3eac07d76766..14916ea86905 100644
  		mali_devfreq_term_freq_table(mdev);
  		return PTR_ERR(mdev->devfreq);
 
-From 466c796b38409918adf20ea561bac0f45208e977 Mon Sep 17 00:00:00 2001
-From: LongChair <LongChair@hotmail.com>
-Date: Fri, 21 Apr 2017 13:39:12 +0200
-Subject: [PATCH] drm/rockchip: remove unsupported 4K freqs
-
----
- drivers/gpu/drm/rockchip/dw_hdmi-rockchip.c | 12 +++++++++++-
- 1 file changed, 11 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/gpu/drm/rockchip/dw_hdmi-rockchip.c b/drivers/gpu/drm/rockchip/dw_hdmi-rockchip.c
-index 257d0d0dcc3d..f3571e417c6c 100644
---- a/drivers/gpu/drm/rockchip/dw_hdmi-rockchip.c
-+++ b/drivers/gpu/drm/rockchip/dw_hdmi-rockchip.c
-@@ -506,9 +506,19 @@ dw_hdmi_rockchip_mode_valid(struct drm_connector *connector,
- 		return MODE_BAD;
- 
- 	hdmi = to_rockchip_hdmi(encoder);
--	if (hdmi->dev_type == RK3368_HDMI && mode->clock > 340000 &&
-+	if ((hdmi->dev_type == RK3368_HDMI || hdmi->dev_type == RK3328_HDMI) &&
-+	    mode->clock > 340000 &&
- 	    !drm_mode_is_420(&connector->display_info, mode))
- 		return MODE_BAD;
-+
-+	/* Skip bad clocks for RK3288 */
-+	if (hdmi->dev_type == RK3288_HDMI && (mode->clock < 27500 || mode->clock > 340000))
-+		return MODE_CLOCK_RANGE;
-+
-+	/* Skip 4K 50/60Hz clocks for RK3328 */
-+	if (hdmi->dev_type == RK3328_HDMI && mode->clock > 340000)
-+		return MODE_CLOCK_RANGE;
-+
- 	/*
- 	 * ensure all drm display mode can work, if someone want support more
- 	 * resolutions, please limit the possible_crtc, only connect to
-
 From 065f0aee800b608b4c6e58b26e1adbbe9cef835f Mon Sep 17 00:00:00 2001
 From: xuhuicong <xhc@rock-chips.com>
 Date: Fri, 23 Jun 2017 18:56:17 +0800

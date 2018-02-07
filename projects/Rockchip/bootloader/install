@@ -25,8 +25,14 @@ case "$UBOOT_SYSTEM" in
     ;;
   rk3328)
     PKG_DATAFILE="$PKG_RKBIN/rk33/rk3328_ddr_786MHz_v1.08.bin"
+    if [ -f $PROJECT_DIR/$PROJECT/bootloader/rk3328_ddr_933MHz_v1.06.bin ]; then
+      PKG_DATAFILE="$PROJECT_DIR/$PROJECT/bootloader/rk3328_ddr_933MHz_v1.06.bin"
+    fi
     PKG_LOADER="$PKG_RKBIN/rk33/rk3328_miniloader_v2.44.bin"
     PKG_BL31="$PKG_RKBIN/rk33/rk3328_bl31_v1.34.bin"
+    if [ -f $PROJECT_DIR/$PROJECT/bootloader/rk3328_bl31_v1.39.bin ]; then
+      PKG_BL31="$PROJECT_DIR/$PROJECT/bootloader/rk3328_bl31_v1.39.bin"
+    fi
     ;;
   rk3399)
     PKG_DATAFILE="$PKG_RKBIN/rk33/rk3399_ddr_800MHz_v1.08.bin"

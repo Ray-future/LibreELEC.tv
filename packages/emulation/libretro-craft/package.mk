@@ -54,13 +54,11 @@ make_target() {
     Generic)
       make -f Makefile.libretro
       ;;
-    *)
-      if [ "$TARGET_CPU" = "cortex-a9" ] || [ "$TARGET_CPU" = "cortex-a53" ] || [ "$TARGET_CPU" = "cortex-a17" ]; then
-        if [ "$TARGET_ARCH" = "aarch64" ]; then
-          make -f Makefile.libretro platform=aarch64
-        else
-          make -f Makefile.libretro platform=armv7-neon-gles-cortex-a9
-        fi
+    cortex-a9|*cortex-a53|cortex-a17)
+      if [ "$TARGET_ARCH" = "aarch64" ]; then
+        make -f Makefile.libretro platform=aarch64
+      else
+        make -f Makefile.libretro platform=armv7-neon-gles-cortex-a9
       fi
       ;;
   esac

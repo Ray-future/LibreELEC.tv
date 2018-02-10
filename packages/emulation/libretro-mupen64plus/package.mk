@@ -52,13 +52,11 @@ make_target() {
     Generic)
       make WITH_DYNAREC=x86_64
       ;;
-    *)
-      if [ "$TARGET_CPU" = "cortex-a9" ] || [ "$TARGET_CPU" = "cortex-a53" ] || [ "$TARGET_CPU" = "cortex-a17" ]; then
-        if [ "$TARGET_ARCH" = "aarch64" ]; then
-          make platform=aarch64
-        else
-          make platform=linux-gles FORCE_GLES=1 WITH_DYNAREC=arm
-        fi
+    cortex-a9|*cortex-a53|cortex-a17)
+      if [ "$TARGET_ARCH" = "aarch64" ]; then
+        make platform=aarch64
+      else
+        make platform=linux-gles FORCE_GLES=1 WITH_DYNAREC=arm
       fi
       ;;
   esac

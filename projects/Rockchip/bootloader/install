@@ -29,20 +29,19 @@ case "$PKG_SOC" in
     PKG_LOADER="u-boot-dtb.bin"
     ;;
   rk3328)
-    PKG_DATAFILE="$PKG_RKBIN/rk33/rk3328_ddr_786MHz_v1.08.bin"
-    if [ -f $PROJECT_DIR/$PROJECT/bootloader/rk3328_ddr_933MHz_v1.06.bin ]; then
+    PKG_DATAFILE="$PKG_RKBIN/rk33/rk3328_ddr_786MHz_v1.12.bin"
+    if [ -f $PROJECT_DIR/$PROJECT/bootloader/rk3328_ddr_933MHz_v1.12.bin ]; then
+      PKG_DATAFILE="$PROJECT_DIR/$PROJECT/bootloader/rk3328_ddr_933MHz_v1.12.bin"
+    elif [ -f $PROJECT_DIR/$PROJECT/bootloader/rk3328_ddr_933MHz_v1.06.bin ]; then
       PKG_DATAFILE="$PROJECT_DIR/$PROJECT/bootloader/rk3328_ddr_933MHz_v1.06.bin"
     fi
     PKG_LOADER="$PKG_RKBIN/rk33/rk3328_miniloader_v2.44.bin"
-    PKG_BL31="$PKG_RKBIN/rk33/rk3328_bl31_v1.34.bin"
-    if [ -f $PROJECT_DIR/$PROJECT/bootloader/rk3328_bl31_v1.39.bin ]; then
-      PKG_BL31="$PROJECT_DIR/$PROJECT/bootloader/rk3328_bl31_v1.39.bin"
-    fi
+    PKG_BL31="$PKG_RKBIN/rk33/rk3328_bl31_v1.39.bin"
     ;;
   rk3399)
-    PKG_DATAFILE="$PKG_RKBIN/rk33/rk3399_ddr_800MHz_v1.08.bin"
-    PKG_LOADER="$PKG_RKBIN/rk33/rk3399_miniloader_v1.06.bin"
-    PKG_BL31="$PKG_RKBIN/rk33/rk3399_bl31_v1.00.elf"
+    PKG_DATAFILE="$PKG_RKBIN/rk33/rk3399_ddr_800MHz_v1.09.bin"
+    PKG_LOADER="$PKG_RKBIN/rk33/rk3399_miniloader_v1.09.bin"
+    PKG_BL31="$PKG_RKBIN/rk33/rk3399_bl31_v1.12.elf"
     ;;
   *)
     PKG_DATAFILE="spl/u-boot-spl-dtb.bin"

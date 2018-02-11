@@ -1,0 +1,138 @@
+diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecDRMPRIME.cpp b/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecDRMPRIME.cpp
+index 41ff3397e8..3edc35e4ac 100644
+--- a/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecDRMPRIME.cpp
++++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecDRMPRIME.cpp
+@@ -250,8 +250,8 @@ bool CDVDVideoCodecDRMPRIME::AddData(const DemuxPacket& packet)
+   avpkt.size = packet.iSize;
+   avpkt.dts = (packet.dts == DVD_NOPTS_VALUE) ? AV_NOPTS_VALUE : static_cast<int64_t>(packet.dts / DVD_TIME_BASE * AV_TIME_BASE);
+   avpkt.pts = (packet.pts == DVD_NOPTS_VALUE) ? AV_NOPTS_VALUE : static_cast<int64_t>(packet.pts / DVD_TIME_BASE * AV_TIME_BASE);
+-  // TODO: avpkt.side_data = static_cast<AVPacketSideData*>(packet.pSideData);
+-  // TODO: avpkt.side_data_elems = packet.iSideDataElems;
++  avpkt.side_data = static_cast<AVPacketSideData*>(packet.pSideData);
++  avpkt.side_data_elems = packet.iSideDataElems;
+ 
+   int ret = avcodec_send_packet(m_pCodecContext, &avpkt);
+   if (ret == AVERROR(EAGAIN))
+diff --git a/xbmc/cores/VideoPlayer/VideoRenderers/HwDecRender/RendererDRMPRIME.cpp b/xbmc/cores/VideoPlayer/VideoRenderers/HwDecRender/RendererDRMPRIME.cpp
+index cb46cbb9d9..4e75d1e7ef 100644
+--- a/xbmc/cores/VideoPlayer/VideoRenderers/HwDecRender/RendererDRMPRIME.cpp
++++ b/xbmc/cores/VideoPlayer/VideoRenderers/HwDecRender/RendererDRMPRIME.cpp
+@@ -72,6 +72,14 @@ bool CRendererDRMPRIME::Configure(const VideoPicture& picture, float fps, unsign
+ 
+   Reset();
+ 
++  // color_primaries == 9 -> AVCOL_PRI_BT2020
++  // color_primaries == 11 -> AVCOL_PRI_SMPTE431 (DCI-P3 Theater)
++  // color_primaries == 12 -> AVCOL_PRI_SMPTE432 (DCI-P3 D65)
++  // color_transfer == 16 -> AVCOL_TRC_SMPTE2084 (HDR10)
++  // color_transfer == 18 -> AVCOL_TRC_ARIB_STD_B67 (HLG)
++  CLog::Log(LOGINFO, "CRendererDRMPRIME::%s - color_range=%u color_primaries=%u color_transfer=%u color_space=%u", __FUNCTION__,
++            picture.color_range, picture.color_primaries, picture.color_transfer, picture.color_space);
++
+   m_bConfigured = true;
+   return true;
+ }
+@@ -209,10 +217,14 @@ void CRendererDRMPRIME::SetVideoPlane(CVideoBufferDRMPRIME* buffer)
+       return;
+     }
+ 
+-    int32_t crtc_x = (int32_t)m_destRect.x1;
+-    int32_t crtc_y = (int32_t)m_destRect.y1;
+-    uint32_t crtc_w = (uint32_t)m_destRect.Width();
+-    uint32_t crtc_h = (uint32_t)m_destRect.Height();
++    //int32_t crtc_x = (int32_t)m_destRect.x1;
++    //int32_t crtc_y = (int32_t)m_destRect.y1;
++    //uint32_t crtc_w = (uint32_t)m_destRect.Width();
++    //uint32_t crtc_h = (uint32_t)m_destRect.Height();
++    int32_t crtc_x = 0;
++    int32_t crtc_y = 0;
++    uint32_t crtc_w = (uint32_t)m_DRM->m_mode->hdisplay;
++    uint32_t crtc_h = (uint32_t)m_DRM->m_mode->vdisplay;
+     uint32_t src_x = 0;
+     uint32_t src_y = 0;
+     uint32_t src_w = buffer->GetWidth() << 16;
+diff --git a/xbmc/windowing/gbm/DRMAtomic.cpp b/xbmc/windowing/gbm/DRMAtomic.cpp
+index 4361faccae..2a467cd1c0 100644
+--- a/xbmc/windowing/gbm/DRMAtomic.cpp
++++ b/xbmc/windowing/gbm/DRMAtomic.cpp
+@@ -159,11 +159,11 @@ void CDRMAtomic::DrmAtomicCommit(int fb_id, int flags, bool rendered, bool video
+   if (rendered)
+   {
+     AddPlaneProperty(m_req, plane, "FB_ID", fb_id);
+-    AddPlaneProperty(m_req, plane, "CRTC_ID", m_crtc->crtc->crtc_id);
++    AddPlaneProperty(m_req, plane, "CRTC_ID", fb_id ? m_crtc->crtc->crtc_id : 0);
+     AddPlaneProperty(m_req, plane, "SRC_X", 0);
+     AddPlaneProperty(m_req, plane, "SRC_Y", 0);
+-    AddPlaneProperty(m_req, plane, "SRC_W", m_mode->hdisplay << 16);
+-    AddPlaneProperty(m_req, plane, "SRC_H", m_mode->vdisplay << 16);
++    AddPlaneProperty(m_req, plane, "SRC_W", m_width << 16);
++    AddPlaneProperty(m_req, plane, "SRC_H", m_height << 16);
+     AddPlaneProperty(m_req, plane, "CRTC_X", 0);
+     AddPlaneProperty(m_req, plane, "CRTC_Y", 0);
+     AddPlaneProperty(m_req, plane, "CRTC_W", m_mode->hdisplay);
+@@ -254,6 +254,8 @@ void CDRMAtomic::DestroyDrm()
+ 
+ bool CDRMAtomic::SetVideoMode(RESOLUTION_INFO res, struct gbm_bo *bo)
+ {
++  m_width = res.iWidth;
++  m_height = res.iHeight;
+   m_need_modeset = true;
+ 
+   return true;
+diff --git a/xbmc/windowing/gbm/DRMUtils.cpp b/xbmc/windowing/gbm/DRMUtils.cpp
+index 7d0c09a68e..d76d2e3d8f 100644
+--- a/xbmc/windowing/gbm/DRMUtils.cpp
++++ b/xbmc/windowing/gbm/DRMUtils.cpp
+@@ -620,8 +620,8 @@ bool CDRMUtils::GetModes(std::vector<RESOLUTION_INFO> &resolutions)
+   {
+     RESOLUTION_INFO res;
+     res.iScreen = 0;
+-    res.iWidth = m_connector->connector->modes[i].hdisplay;
+-    res.iHeight = m_connector->connector->modes[i].vdisplay;
++    res.iWidth = m_connector->connector->modes[i].hdisplay == 3840 ? 1280 : m_connector->connector->modes[i].hdisplay;
++    res.iHeight = m_connector->connector->modes[i].vdisplay == 2160 ? 720 : m_connector->connector->modes[i].vdisplay;
+     res.iScreenWidth = m_connector->connector->modes[i].hdisplay;
+     res.iScreenHeight = m_connector->connector->modes[i].vdisplay;
+     if (m_connector->connector->modes[i].clock % 5 != 0)
+diff --git a/xbmc/windowing/gbm/DRMUtils.h b/xbmc/windowing/gbm/DRMUtils.h
+index 83dcb743d0..a66748202c 100644
+--- a/xbmc/windowing/gbm/DRMUtils.h
++++ b/xbmc/windowing/gbm/DRMUtils.h
+@@ -85,6 +85,9 @@ public:
+   drmModeModeInfo *m_mode = nullptr;
+   drmModeAtomicReq *m_req = nullptr;
+ 
++  uint32_t m_width;
++  uint32_t m_height;
++
+ protected:
+   bool OpenDrm();
+   drm_fb * DrmFbGetFromBo(struct gbm_bo *bo);
+diff --git a/xbmc/windowing/gbm/WinSystemGbm.cpp b/xbmc/windowing/gbm/WinSystemGbm.cpp
+index 02689411d5..0f1fa2037c 100644
+--- a/xbmc/windowing/gbm/WinSystemGbm.cpp
++++ b/xbmc/windowing/gbm/WinSystemGbm.cpp
+@@ -119,7 +119,7 @@ bool CWinSystemGbm::CreateNewWindow(const std::string& name,
+     return false;
+   }
+ 
+-  if(!m_GBM->CreateSurface(m_DRM->m_mode->hdisplay, m_DRM->m_mode->vdisplay))
++  if(!m_GBM->CreateSurface(res.iWidth, res.iHeight))
+   {
+     CLog::Log(LOGERROR, "CWinSystemGbm::%s - failed to initialize GBM", __FUNCTION__);
+     return false;
+diff --git a/xbmc/windowing/gbm/WinSystemGbmGLESContext.cpp b/xbmc/windowing/gbm/WinSystemGbmGLESContext.cpp
+index 6a1b300cc1..22e6f86826 100644
+--- a/xbmc/windowing/gbm/WinSystemGbmGLESContext.cpp
++++ b/xbmc/windowing/gbm/WinSystemGbmGLESContext.cpp
+@@ -124,8 +124,8 @@ bool CWinSystemGbmGLESContext::CreateNewWindow(const std::string& name,
+ 
+ bool CWinSystemGbmGLESContext::SetFullScreen(bool fullScreen, RESOLUTION_INFO& res, bool blankOtherDisplays)
+ {
+-  if (res.iWidth != m_DRM->m_mode->hdisplay ||
+-      res.iHeight != m_DRM->m_mode->vdisplay)
++  if (res.iWidth != m_DRM->m_width ||
++      res.iHeight != m_DRM->m_height)
+   {
+     CLog::Log(LOGDEBUG, "CWinSystemGbmGLESContext::%s - resolution changed, creating a new window", __FUNCTION__);
+     CreateNewWindow("", fullScreen, res);
